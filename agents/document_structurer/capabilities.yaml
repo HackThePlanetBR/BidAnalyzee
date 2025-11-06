@@ -1,0 +1,327 @@
+# Document Structurer - Capabilities Specification
+
+agent:
+  name: "Document Structurer"
+  version: "1.0.0"
+  framework: "SHIELD v1.0"
+  mode: "Strict"
+  created: "2025-11-06"
+
+purpose:
+  short: "Extract and structure requirements from Brazilian public procurement PDFs"
+  long: |
+    Specialized agent that extracts technical requirements from Brazilian public
+    procurement documents (editais) in PDF format, producing a structured CSV
+    ready for technical analysis.
+
+input:
+  format: "PDF"
+  max_size_mb: 50
+  max_pages: 500
+  requirements:
+    - "Text-extractable PDF (no OCR needed)"
+    - "Brazilian Portuguese content"
+    - "Technical specifications section"
+  examples:
+    - "PMSP-Videomonitoramento-2025-001.pdf (345 pages)"
+    - "EditalTJ-SP-2025-045.pdf (120 pages)"
+
+output:
+  primary:
+    format: "CSV"
+    encoding: "UTF-8"
+    delimiter: ","
+    fields:
+      - name: "ID"
+        type: "integer"
+        required: true
+        description: "Sequential identifier starting from 1"
+        example: 1
+
+      - name: "Descrição"
+        type: "string"
+        required: true
+        max_length: 2000
+        description: "Full text of the requirement"
+        example: "Sistema de câmeras IP com resolução 4K"
+
+      - name: "Categoria"
+        type: "enum"
+        required: true
+        values: ["Hardware", "Software", "Serviço", "Integração"]
+        description: "Type of requirement"
+        example: "Hardware"
+
+      - name: "Prioridade"
+        type: "enum"
+        required: true
+        values: ["Alta", "Média", "Baixa"]
+        description: "Priority level"
+        example: "Alta"
+
+      - name: "Página"
+        type: "integer"
+        required: true
+        min: 1
+        description: "Source page number in PDF"
+        example: 23
+
+      - name: "Confiança"
+        type: "float"
+        required: true
+        min: 0.0
+        max: 1.0
+        description: "Extraction confidence score"
+        example: 0.95
+
+  secondary:
+    - format: "YAML"
+      type: "InspectionResult"
+      description: "Quality inspection results"
+
+    - format: "YAML"
+      type: "ValidationResult"
+      description: "Quantitative validation metrics"
+
+    - format: "TXT"
+      type: "ExecutionLogs"
+      description: "Complete execution logs"
+
+    - format: "MD"
+      type: "ExecutiveSummary"
+      description: "Delivery README with metrics"
+
+capabilities:
+  can_do:
+    - action: "extract_text_from_pdf"
+      description: "Extract text content from PDF pages"
+      method: "PyPDF2 library"
+      speed: "~0.5 seconds per page"
+
+    - action: "identify_requirements"
+      description: "Identify technical requirements using linguistic patterns"
+      patterns:
+        - "deve [verb]"
+        - "deverá [verb]"
+        - "é obrigatório"
+        - "requisito técnico"
+      accuracy: ">95%"
+
+    - action: "categorize_automatically"
+      description: "Classify requirements into categories"
+      categories:
+        hardware: ["câmera", "servidor", "equipamento", "dispositivo"]
+        software: ["sistema", "aplicação", "licença", "software"]
+        service: ["treinamento", "manutenção", "suporte", "instalação"]
+        integration: ["integração", "API", "protocolo", "interface"]
+      accuracy: ">90%"
+
+    - action: "assign_priority"
+      description: "Assign priority based on keywords"
+      rules:
+        alta: ["obrigatório", "essencial", "crítico", "fundamental"]
+        media: ["importante", "necessário", "recomendado"]
+        baixa: ["desejável", "opcional", "diferencial"]
+      accuracy: ">85%"
+
+    - action: "calculate_confidence"
+      description: "Calculate extraction confidence score"
+      factors:
+        - "Presence of modal verbs"
+        - "Position in technical section"
+        - "Clarity of wording"
+        - "Pattern match strength"
+      thresholds:
+        high: ">= 0.90"
+        medium: "0.85 - 0.89"
+        low: "< 0.85 (flagged for review)"
+
+    - action: "self_inspect"
+      description: "Run quality checklists"
+      checklists:
+        - name: "Anti-Alucinação"
+          items: 8
+          type: "fixed"
+        - name: "Estruturação de Edital"
+          items: 8
+          type: "dynamic"
+      mode: "Strict (100% required)"
+
+    - action: "validate_quantitatively"
+      description: "Validate completeness metrics"
+      metrics:
+        - "Completeness (items_processed / items_expected)"
+        - "Integrity (fields_filled / fields_required)"
+        - "Consistency (IDs sequential without gaps)"
+        - "Traceability (all items have source page)"
+      threshold: "100%"
+
+    - action: "generate_evidence"
+      description: "Create complete audit trail"
+      outputs:
+        - "InspectionResult YAML"
+        - "ValidationResult YAML"
+        - "Execution logs (structured)"
+        - "Delivery package (organized)"
+
+  cannot_do:
+    - action: "process_scanned_pdfs"
+      reason: "No OCR capability"
+      workaround: "Convert PDF with OCR first (e.g., Adobe Acrobat)"
+
+    - action: "interpret_images"
+      reason: "No image processing"
+      workaround: "Manually transcribe image content"
+
+    - action: "infer_implicit_requirements"
+      reason: "Anti-Hallucination principle"
+      workaround: "User must clarify ambiguities via HALT"
+
+    - action: "understand_business_context"
+      reason: "No domain knowledge without instructions"
+      workaround: "Provide context in task description"
+
+    - action: "process_non_pdf_formats"
+      reason: "Only PDF supported"
+      workaround: "Convert to PDF first"
+
+limitations:
+  technical:
+    max_pdf_pages: 500
+    max_pdf_size_mb: 50
+    max_text_size_mb: 2
+    timeout_per_step_seconds: 600
+    max_loop_iterations: 3
+
+  quality:
+    confidence_threshold: 0.85
+    min_requirements_expected: 1
+    max_requirements_expected: 500
+
+  performance:
+    avg_time_per_page: 0.5  # seconds
+    avg_time_identify: 180  # seconds (3 min)
+    avg_time_structure: 60   # seconds (1 min)
+    total_avg_time: 600      # seconds (10 min)
+
+shield_phases:
+  implemented:
+    - phase: "STRUCTURE"
+      prompt: "framework/phases/structure_prompt.md"
+      required: true
+
+    - phase: "HALT"
+      prompt: "framework/phases/halt_prompt.md"
+      required: true
+      count: 2  # After STRUCTURE, before DELIVER
+
+    - phase: "EXECUTE"
+      prompt: "framework/phases/execute_prompt.md"
+      required: true
+      steps: 5
+
+    - phase: "INSPECT"
+      prompt: "framework/phases/inspect_prompt.md"
+      required: true
+      checklists: 2
+
+    - phase: "LOOP"
+      prompt: "framework/phases/loop_prompt.md"
+      required: false  # Only if INSPECT fails
+      max_iterations: 3
+
+    - phase: "VALIDATE"
+      prompt: "framework/phases/validate_prompt.md"
+      required: true
+      metrics: 4
+
+    - phase: "DELIVER"
+      prompt: "framework/phases/deliver_prompt.md"
+      required: true
+      package: true
+
+quality_metrics:
+  inspection:
+    total_items: 16
+    pass_threshold: 100  # percent (Modo Strict)
+
+  validation:
+    completeness_threshold: 100  # percent
+    integrity_threshold: 100     # percent
+    consistency_threshold: 100   # percent
+    traceability_threshold: 100  # percent
+
+  accuracy:
+    requirement_identification: 95  # percent
+    categorization: 90              # percent
+    prioritization: 85              # percent
+    avg_confidence: 90              # percent
+
+dependencies:
+  python:
+    min_version: "3.9"
+    libraries:
+      - name: "PyPDF2"
+        version: "3.0.1"
+        purpose: "PDF text extraction"
+
+      - name: "pandas"
+        version: "2.1.3"
+        purpose: "CSV manipulation"
+
+      - name: "pyyaml"
+        version: "6.0.1"
+        purpose: "YAML templates"
+
+      - name: "structlog"
+        version: "23.2.0"
+        purpose: "Structured logging"
+
+configuration:
+  env_vars:
+    - name: "MAX_LOOP_ITERATIONS"
+      default: 3
+      description: "Maximum LOOP attempts"
+
+    - name: "CONFIDENCE_THRESHOLD"
+      default: 0.85
+      description: "Minimum confidence for requirements"
+
+    - name: "PDF_TIMEOUT_SECONDS"
+      default: 600
+      description: "Timeout for PDF processing"
+
+    - name: "MAX_PDF_PAGES"
+      default: 500
+      description: "Maximum pages to process"
+
+testing:
+  unit_tests:
+    - "test_extract.py"
+    - "test_identify.py"
+    - "test_structure.py"
+    coverage_target: 80  # percent
+
+  integration_tests:
+    - "test_document_structurer.py"
+    fixture: "edital_sample.pdf"
+    expected_requirements: 47
+
+  manual_tests:
+    command: "/structure-edital data/uploads/edital.pdf"
+    expected_time: 600  # seconds (10 min)
+
+versioning:
+  current: "1.0.0"
+  changelog:
+    - version: "1.0.0"
+      date: "2025-11-06"
+      changes:
+        - "Initial implementation"
+        - "SHIELD v1.0 integration"
+        - "Modo Strict enabled"
+
+status:
+  development: "In Progress (Sprint 3)"
+  production_ready: false
+  last_updated: "2025-11-06"
