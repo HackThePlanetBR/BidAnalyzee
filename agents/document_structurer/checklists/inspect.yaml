@@ -1,0 +1,123 @@
+# SHIELD Framework - Dynamic Checklist: Estruturação de Documentos
+# This checklist is specific to the @EstruturadorDeDocumentos agent
+# Version: 1.0
+
+checklist:
+  name: "Inspeção de Estruturação de Documentos"
+  type: "dynamic"
+  agent: "document_structurer"
+  version: "1.0"
+
+  description: |
+    Este checklist valida a qualidade da estruturação de documentos de editais
+    em formato CSV, garantindo que todos os requisitos foram extraídos corretamente
+    e que o output está pronto para análise.
+
+  items:
+    - id: "ED-01"
+      question: "Cada linha do CSV representa um requisito único e indivisível?"
+      rationale: "Requisitos múltiplos numa linha dificultam a análise individual."
+      how_to_check: "Leia cada linha do CSV. Se uma linha contém 'e' ou 'ou' listando múltiplas exigências, deve ser decomposta."
+      pass_criteria: "Cada linha = 1 requisito único"
+      fail_criteria: "Qualquer linha com múltiplos requisitos"
+      severity: "high"
+      examples:
+        pass:
+          - "Sistema deve suportar resolução 1920x1080"
+          - "Câmeras devem ter proteção IP66"
+        fail:
+          - "Sistema deve suportar resolução 1920x1080 e ter proteção IP66"
+
+    - id: "ED-02"
+      question: "Todas as colunas obrigatórias estão preenchidas?"
+      rationale: "Colunas vazias impedem o processamento correto."
+      how_to_check: "Verifique se as colunas obrigatórias (ID, Descrição, Tipo) estão preenchidas em todas as linhas."
+      pass_criteria: "100% das colunas obrigatórias preenchidas"
+      fail_criteria: "Qualquer coluna obrigatória vazia"
+      severity: "critical"
+      required_columns:
+        - "ID"
+        - "Descrição"
+        - "Tipo"
+        - "Categoria"
+
+    - id: "ED-03"
+      question: "Não há requisitos duplicados?"
+      rationale: "Duplicatas causam análises redundantes e confusão."
+      how_to_check: "Compare o texto da coluna 'Descrição' de todas as linhas. Descrições idênticas ou muito similares (>90% similaridade) indicam duplicatas."
+      pass_criteria: "Zero duplicatas"
+      fail_criteria: "Qualquer duplicata identificada"
+      severity: "high"
+
+    - id: "ED-04"
+      question: "A numeração (ID) está sequencial e sem gaps?"
+      rationale: "Gaps na numeração podem indicar perda de dados."
+      how_to_check: "Verifique se a sequência de IDs é: 1, 2, 3, ..., N, sem pulos."
+      pass_criteria: "Sequência completa de 1 a N"
+      fail_criteria: "Qualquer gap na sequência"
+      severity: "medium"
+
+    - id: "ED-05"
+      question: "Requisitos complexos foram adequadamente decompostos?"
+      rationale: "Requisitos compostos devem ser quebrados em partes analisáveis."
+      how_to_check: "Identifique requisitos que contêm múltiplas exigências técnicas. Cada exigência deve ser uma linha separada."
+      pass_criteria: "Todos os requisitos compostos foram decompostos"
+      fail_criteria: "Requisitos compostos não decompostos"
+      severity: "high"
+      examples:
+        before_decomposition:
+          - "Sistema de CFTV com capacidade de armazenamento de 30 dias, resolução mínima Full HD, e integração com sistema de alarmes"
+        after_decomposition:
+          - "Sistema de CFTV com capacidade de armazenamento de 30 dias"
+          - "Sistema de CFTV com resolução mínima Full HD"
+          - "Sistema de CFTV com integração com sistema de alarmes"
+
+    - id: "ED-06"
+      question: "A tipologia dos requisitos está corretamente classificada?"
+      rationale: "Classificação correta facilita a análise e priorização."
+      how_to_check: "Verifique se cada requisito tem um 'Tipo' adequado (Técnico, Funcional, Operacional, etc.)"
+      pass_criteria: "100% dos requisitos classificados corretamente"
+      fail_criteria: "Requisitos mal classificados ou sem tipo"
+      severity: "medium"
+      valid_types:
+        - "Técnico"
+        - "Funcional"
+        - "Operacional"
+        - "Administrativo"
+        - "Comercial"
+        - "Jurídico"
+
+    - id: "ED-07"
+      question: "Requisitos vagos ou subjetivos foram identificados e marcados?"
+      rationale: "Requisitos vagos precisam de atenção especial na análise."
+      how_to_check: "Procure por termos como 'adequado', 'suficiente', 'razoável' sem quantificação."
+      pass_criteria: "Requisitos vagos marcados com flag 'REQUER_CLARIFICACAO'"
+      fail_criteria: "Requisitos vagos não marcados"
+      severity: "low"
+
+    - id: "ED-08"
+      question: "Referências cruzadas (ex: 'conforme item 5.2') foram preservadas?"
+      rationale: "Referências cruzadas mantêm o contexto e dependências."
+      how_to_check: "Verifique se menções a outros itens foram mantidas na descrição."
+      pass_criteria: "Todas as referências preservadas"
+      fail_criteria: "Referências perdidas"
+      severity: "medium"
+
+  # Scoring
+  scoring:
+    method: "all_or_nothing"
+    pass_threshold: "100%"
+    fail_action: "LOOP"
+    max_loop_iterations: 3
+
+  # Usage
+  usage:
+    when_to_use: "Após gerar o CSV estruturado, antes de VALIDATE"
+    precedes: "framework/checklists/anti_alucinacao.yaml"
+    output_format: "framework/templates/inspection_result.yaml"
+
+# Metadata
+metadata:
+  agent: "document_structurer"
+  created_at: "2025-11-06"
+  version: "1.0"

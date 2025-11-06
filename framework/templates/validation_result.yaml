@@ -1,0 +1,119 @@
+# SHIELD Framework - VALIDATE (L.5) Phase Result Template
+# This template is used to record quantitative validation results
+# Version: 1.0
+
+validation:
+  # Basic information
+  timestamp: "[ISO 8601 timestamp]"
+  agent: "[Nome do agente que executou a validação]"
+  task: "[Nome da tarefa validada]"
+  task_id: "[ID da tarefa ou análise]"
+  phase: "[Fase que está sendo validada - ex: Estruturação, Análise]"
+
+  # Quantitative metrics (sempre objetivas e mensuráveis)
+  metrics:
+    - name: "Total de itens esperados"
+      description: "[Descrição - ex: Total de requisitos no PDF]"
+      expected: 47
+      actual: 47
+      unit: "itens"
+      status: "PASS"  # PASS ou FAIL
+      tolerance: 0  # Margem de tolerância (0 = exato)
+
+    - name: "Total de linhas no output"
+      description: "[Descrição - ex: Linhas no CSV gerado]"
+      expected: 47
+      actual: 47
+      unit: "linhas"
+      status: "PASS"
+
+    - name: "Campos vazios não justificados"
+      description: "Campos obrigatórios que ficaram vazios sem justificativa"
+      expected: 0
+      actual: 0
+      unit: "campos"
+      status: "PASS"
+
+    - name: "Duplicatas identificadas"
+      description: "Itens duplicados no output"
+      expected: 0
+      actual: 0
+      unit: "itens"
+      status: "PASS"
+
+    - name: "[Métrica adicional específica da tarefa]"
+      description: "[Descrição]"
+      expected: "[Valor esperado]"
+      actual: "[Valor real]"
+      unit: "[Unidade]"
+      status: "[PASS ou FAIL]"
+      notes: "[Observações adicionais - opcional]"
+
+  # Completeness assessment (100% é obrigatório em Modo Strict)
+  completeness:
+    total_tasks: 5  # Total de subtarefas ou itens a processar
+    completed_tasks: 5  # Quantos foram completados
+    percentage: "100%"
+    status: "PASS"  # PASS = 100%, FAIL = < 100%
+
+  # Data integrity checks
+  integrity:
+    - check: "Consistência de formato"
+      description: "[Ex: Todos os campos seguem o padrão definido]"
+      status: "PASS"
+      evidence: "[Evidência]"
+
+    - check: "Integridade referencial"
+      description: "[Ex: Todos os links de evidência são válidos]"
+      status: "PASS"
+      evidence: "[Evidência]"
+
+    - check: "Sequência lógica"
+      description: "[Ex: IDs são sequenciais sem gaps]"
+      status: "PASS"
+      evidence: "[Evidência]"
+
+  # Summary
+  summary:
+    metrics_total: 5
+    metrics_passed: 5
+    metrics_failed: 0
+    completeness: "100%"
+    overall_status: "PASS"  # PASS apenas se TODOS os metrics passarem E completeness = 100%
+
+  # Failed metrics (se houver)
+  failed_metrics:
+    # - name: "[Nome da métrica que falhou]"
+    #   expected: "[Valor esperado]"
+    #   actual: "[Valor real]"
+    #   gap: "[Diferença]"
+    #   impact: "[Alto/Médio/Baixo]"
+    #   corrective_action: "[O que fazer]"
+
+  # Evidence manifest
+  evidence:
+    - type: "file"
+      description: "[Ex: CSV estruturado]"
+      location: "[Caminho]"
+      size: "[Tamanho]"
+      checksum: "[Hash - opcional]"
+
+    - type: "log"
+      description: "[Ex: Log de execução]"
+      location: "[Caminho]"
+      lines: "[Número de linhas]"
+
+  # Next action
+  next_action: "HALT"  # HALT (se passou) ou LOOP (se falhou)
+  loop_iteration: null  # Número da iteração do loop (se aplicável)
+
+  # Validation details
+  validation_method: "[Método usado - ex: contagem, comparação, hash]"
+  validation_duration: "[Tempo gasto - ex: 5s]"
+
+# Metadata
+metadata:
+  shield_version: "1.0"
+  mode: "STRICT"
+  template_version: "1.0"
+  validated_by: "[Agent name]"
