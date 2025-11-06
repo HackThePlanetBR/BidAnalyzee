@@ -1,0 +1,194 @@
+# Edital Fixture with Intentional Errors
+# For testing LOOP correction and error handling scenarios
+
+edital:
+  name: "PMRJ-Test-Errors-2025-999"
+  title: "Edital de Teste com Erros Intencionais"
+  pages: 20
+  size_mb: 1.5
+  type: "Mixed procurement with errors"
+
+content:
+  sections:
+    - name: "Informações Gerais"
+      pages: [1, 2, 3]
+
+    - name: "Especificações Técnicas"
+      pages: [4, 5, 6, 7, 8, 9, 10]
+      requirements:
+        # Error 1: Complex requirement (needs decomposition)
+        - id: 1
+          item: "3.1.1"
+          text: "Sistema com resolução 4K e taxa de 60 fps"
+          page: 4
+          category: "Hardware"
+          priority: "Alta"
+          error_type: "complex_requirement"
+
+        # Normal requirements
+        - id: 2
+          item: "3.1.2"
+          text: "Proteção IP67 para ambientes externos"
+          page: 4
+          category: "Hardware"
+          priority: "Alta"
+
+        # Error 2: Invalid category
+        - id: 3
+          item: "3.2.1"
+          text: "Certificação ABNT NBR ISO 9001"
+          page: 5
+          category: "Administrativo"  # Invalid!
+          priority: "Média"
+          error_type: "invalid_category"
+
+        # Error 3: Another complex requirement
+        - id: 4
+          item: "3.2.2"
+          text: "VMS compatível com ONVIF Profile S, T e G"
+          page: 5
+          category: "Software"
+          priority: "Alta"
+          error_type: "complex_requirement"
+
+        # Normal requirement
+        - id: 5
+          item: "3.3.1"
+          text: "Alimentação via PoE IEEE 802.3af"
+          page: 6
+          category: "Hardware"
+          priority: "Média"
+
+        # Error 4: Another invalid category
+        - id: 6
+          item: "3.3.2"
+          text: "Garantia de 36 meses"
+          page: 6
+          category: "Comercial"  # Invalid!
+          priority: "Alta"
+          error_type: "invalid_category"
+
+        # Error 5: Low confidence (vague requirement)
+        - id: 7
+          item: "3.4.1"
+          text: "Sistema deve ter desempenho adequado"
+          page: 7
+          category: "Software"
+          priority: "Média"
+          error_type: "vague_requirement"
+          confidence: 0.72  # Low!
+
+        # Normal requirement
+        - id: 8
+          item: "3.4.2"
+          text: "Software de gerenciamento de vídeo incluído"
+          page: 7
+          category: "Software"
+          priority: "Alta"
+
+        # Error 6: Another low confidence
+        - id: 9
+          item: "4.1.1"
+          text: "Capacidade suficiente de armazenamento"
+          page: 8
+          category: "Hardware"
+          priority: "Média"
+          error_type: "vague_requirement"
+          confidence: 0.78  # Low!
+
+        # Normal requirement
+        - id: 10
+          item: "4.1.2"
+          text: "Treinamento técnico de 16 horas"
+          page: 8
+          category: "Serviço"
+          priority: "Média"
+
+        # Error 7: Gap in ID sequence (ID 12 missing - will be ID 11)
+        - id: 12  # Should be 11!
+          item: "4.2.1"
+          text: "Instalação e configuração"
+          page: 9
+          category: "Serviço"
+          priority: "Alta"
+          error_type: "id_gap"
+
+        # Normal requirement
+        - id: 13  # Should be 12!
+          item: "4.2.2"
+          text: "Suporte técnico 24x7"
+          page: 9
+          category: "Serviço"
+          priority: "Alta"
+
+expected_errors:
+  complex_requirements: 2  # IDs 1, 4
+  invalid_categories: 2    # IDs 3, 6
+  low_confidence: 2        # IDs 7, 9
+  id_gaps: 1              # ID sequence jump
+
+expected_after_loop:
+  total_requirements: 15  # 13 original + 2 from decomposition (ID 1 → 2, ID 4 → 3)
+  loop_iterations: 3
+  corrections_applied:
+    - type: "decompose_complex"
+      count: 2
+    - type: "fix_invalid_category"
+      count: 2
+    - type: "renumber_ids"
+      count: 1
+
+loop_iteration_details:
+  iteration_1:
+    issue: "2 complex requirements detected"
+    action: "Decompose into atomic requirements"
+    result: "13 → 15 requirements"
+
+  iteration_2:
+    issue: "2 invalid categories detected"
+    action: "Reclassify to valid categories"
+    changes:
+      - "Administrativo → Serviço"
+      - "Comercial → Serviço"
+
+  iteration_3:
+    issue: "IDs not sequential (gap detected)"
+    action: "Renumber IDs 1-15"
+    result: "Sequential IDs restored"
+
+validation:
+  after_loop:
+    completeness: 100.0
+    integrity: 100.0
+    consistency: 100.0
+    traceability: 100.0
+    inspection_status: "PASS"
+    inspection_score: "16/16"
+
+low_confidence_handling:
+  threshold: 0.85
+  items_below_threshold: 2  # IDs 7, 9
+  expected_halt_checkpoint: "HALT checkpoint 2 (low confidence)"
+  expected_user_options:
+    - "[A] Continue (mark for review)"
+    - "[B] Review now (manual)"
+    - "[C] Cancel operation"
+
+notes: |
+  This fixture is designed to test the Document Structurer's ability to:
+  1. Detect and correct errors via LOOP phase
+  2. Handle multiple types of errors simultaneously
+  3. Apply corrections iteratively
+  4. Flag low confidence items appropriately
+  5. Maintain data integrity through corrections
+
+  Expected workflow:
+  - EXECUTE: Generates CSV with 13 rows (with errors)
+  - INSPECT: Fails with multiple issues
+  - LOOP Iter 1: Decomposes 2 complex requirements (13 → 15 rows)
+  - LOOP Iter 2: Fixes 2 invalid categories
+  - LOOP Iter 3: Renumbers IDs sequentially
+  - INSPECT: Passes 16/16
+  - VALIDATE: All metrics = 100%
+  - HALT: Flags 2 low confidence items for review
+  - DELIVER: Complete package with corrections documented
