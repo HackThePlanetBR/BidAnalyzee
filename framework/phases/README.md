@@ -80,18 +80,29 @@ Para cada etapa do plano, execute seguindo:
 
 ---
 
-### 🔍 I - INSPECT (Inspeção)
+### ✅ I - INSPECT (Inspeção)
 
-**Status:** 🚧 A IMPLEMENTAR (História 1.3 - Sprint 1)
+**Status:** ✅ IMPLEMENTADO (História 1.3 - Sprint 1)
 
 **Objetivo:** Auto-inspeção rigorosa usando checklists
 
-**Arquivos (futuros):**
-- 📖 `inspect.md` - Guia teórico
-- 🤖 `inspect_prompt.md` - Prompt reutilizável
-- 📊 `inspect_examples.md` - Exemplos de execução de checklists
+**Arquivos:**
+- 📖 **[inspect.md](inspect.md)** - Guia teórico completo
+- 🤖 **[inspect_prompt.md](inspect_prompt.md)** - Prompt reutilizável para agentes
+- 📊 **[inspect_examples.md](inspect_examples.md)** - Exemplos de execução de checklists
 
 **Quando usar:** Obrigatório após TODA fase EXECUTE
+
+**Saída:** InspectionResult YAML + decisão (VALIDATE ou LOOP)
+
+**Exemplo de uso:**
+```markdown
+## Após Executar uma Etapa
+
+Execute auto-inspeção usando checklists:
+
+{{incluir: framework/phases/inspect_prompt.md}}
+```
 
 ---
 
@@ -236,7 +247,7 @@ Para cada etapa do plano, execute seguindo:
 |----------|------|--------|--------|
 | 1.1 | STRUCTURE | Sprint 1 | ✅ Completa |
 | 1.2 | EXECUTE | Sprint 1 | ✅ Completa |
-| 1.3 | INSPECT | Sprint 1 | 🚧 Pendente |
+| 1.3 | INSPECT | Sprint 1 | ✅ Completa |
 | 1.4 | LOOP | Sprint 1 | 🚧 Pendente |
 | 1.5 | HALT | Sprint 2 | 🚧 Pendente |
 | 1.6 | VALIDATE | Sprint 2 | 🚧 Pendente |
