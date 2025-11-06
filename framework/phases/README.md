@@ -148,16 +148,27 @@ Execute o ciclo de correção LOOP:
 
 ### ✅ L.5 - VALIDATE (Validação Quantitativa)
 
-**Status:** 🚧 A IMPLEMENTAR (História 1.6 - Sprint 2)
+**Status:** ✅ IMPLEMENTADO (História 1.6 - Sprint 2)
 
 **Objetivo:** Validação quantitativa de 100% de completude
 
-**Arquivos (futuros):**
-- 📖 `validate.md` - Guia teórico
-- 🤖 `validate_prompt.md` - Prompt reutilizável
-- 📊 `validate_examples.md` - Exemplos de métricas quantitativas
+**Arquivos:**
+- 📖 **[validate.md](validate.md)** - Guia teórico completo
+- 🤖 **[validate_prompt.md](validate_prompt.md)** - Prompt reutilizável para agentes
+- 📊 **[validate_examples.md](validate_examples.md)** - Exemplos de métricas quantitativas
 
 **Quando usar:** Obrigatório após INSPECT passar, antes de HALT ou DELIVER
+
+**Saída:** ValidationResult YAML com 5 métricas (completeness, integrity, consistency, traceability, coverage)
+
+**Exemplo de uso:**
+```markdown
+## Após INSPECT Passar
+
+Execute validação quantitativa:
+
+{{incluir: framework/phases/validate_prompt.md}}
+```
 
 ---
 
@@ -274,11 +285,11 @@ Sprint 1: STRUCTURE ✅ → EXECUTE ✅ → INSPECT ✅ → LOOP ✅
 | 1.3 | INSPECT | Sprint 1 | ✅ Completa |
 | 1.4 | LOOP | Sprint 1 | ✅ Completa |
 | 1.5 | HALT | Sprint 2 | ✅ Completa |
-| 1.6 | VALIDATE | Sprint 2 | 🚧 Pendente |
+| 1.6 | VALIDATE | Sprint 2 | ✅ Completa |
 | 1.7 | DELIVER | Sprint 2 | 🚧 Pendente |
 
 **Sprint 1 Progress:** 4/4 (100%) ✅
-**Sprint 2 Progress:** 1/3 (33%) 🚧
+**Sprint 2 Progress:** 2/3 (67%) 🚧
 
 ---
 
