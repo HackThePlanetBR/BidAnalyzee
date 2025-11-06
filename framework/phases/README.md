@@ -39,6 +39,32 @@ Quando você receber uma nova tarefa, siga a fase STRUCTURE:
 
 ---
 
+### ✅ E - EXECUTE (Execução)
+
+**Status:** ✅ IMPLEMENTADO (História 1.2 - Sprint 1)
+
+**Objetivo:** Executar tarefas de forma controlada com logging e error handling
+
+**Arquivos:**
+- 📖 **[execute.md](execute.md)** - Guia teórico completo
+- 🤖 **[execute_prompt.md](execute_prompt.md)** - Prompt reutilizável para agentes
+- 📊 **[execute_examples.md](execute_examples.md)** - Exemplos práticos
+
+**Quando usar:** Para executar CADA etapa do plano (após aprovação)
+
+**Saída:** ExecutionResult estruturado + logs completos
+
+**Exemplo de uso:**
+```markdown
+## Protocolo de Execução
+
+Para cada etapa do plano, execute seguindo:
+
+{{incluir: framework/phases/execute_prompt.md}}
+```
+
+---
+
 ### 🔄 H - HALT (Parada)
 
 **Status:** 🚧 A IMPLEMENTAR (História 1.5 - Sprint 2)
@@ -69,18 +95,6 @@ Quando você receber uma nova tarefa, siga a fase STRUCTURE:
 
 ---
 
-### ⚙️ E - EXECUTE (Execução)
-
-**Status:** 🚧 A IMPLEMENTAR (História 1.2 - Sprint 1)
-
-**Objetivo:** Executar a tarefa de forma controlada
-
-**Arquivos (futuros):**
-- 📖 `execute.md` - Guia teórico
-- 🤖 `execute_prompt.md` - Prompt reutilizável
-- 📊 `execute_examples.md` - Exemplos de execução
-
-**Quando usar:** Para executar cada etapa do plano (após aprovação)
 
 ---
 
@@ -221,7 +235,7 @@ Quando você receber uma nova tarefa, siga a fase STRUCTURE:
 | História | Fase | Sprint | Status |
 |----------|------|--------|--------|
 | 1.1 | STRUCTURE | Sprint 1 | ✅ Completa |
-| 1.2 | EXECUTE | Sprint 1 | 🚧 Pendente |
+| 1.2 | EXECUTE | Sprint 1 | ✅ Completa |
 | 1.3 | INSPECT | Sprint 1 | 🚧 Pendente |
 | 1.4 | LOOP | Sprint 1 | 🚧 Pendente |
 | 1.5 | HALT | Sprint 2 | 🚧 Pendente |
