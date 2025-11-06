@@ -1,0 +1,130 @@
+# Sample Edital Fixture Metadata
+# This represents a small test edital for integration testing
+
+edital:
+  name: "PMSP-Cameras-Test-2025-999"
+  title: "Aquisição de Sistema de Câmeras de Segurança"
+  pages: 15
+  size_mb: 1.2
+  type: "Hardware procurement"
+
+content:
+  sections:
+    - name: "Informações Gerais"
+      pages: [1, 2, 3]
+
+    - name: "Objeto e Escopo"
+      pages: [4, 5]
+
+    - name: "Especificações Técnicas"
+      pages: [6, 7, 8, 9, 10]
+      requirements:
+        - id: 1
+          item: "3.1.1"
+          text: "Câmeras IP com resolução Full HD (1920x1080)"
+          page: 6
+          category: "Hardware"
+          priority: "Alta"
+
+        - id: 2
+          item: "3.1.2"
+          text: "Taxa de captura mínima de 30 fps"
+          page: 6
+          category: "Hardware"
+          priority: "Alta"
+
+        - id: 3
+          item: "3.2.1"
+          text: "Proteção IP66 para uso externo"
+          page: 7
+          category: "Hardware"
+          priority: "Alta"
+
+        - id: 4
+          item: "3.2.2"
+          text: "Visão noturna com alcance de 30 metros"
+          page: 7
+          category: "Hardware"
+          priority: "Alta"
+
+        - id: 5
+          item: "3.3.1"
+          text: "Alimentação via PoE (IEEE 802.3af)"
+          page: 8
+          category: "Hardware"
+          priority: "Média"
+
+        - id: 6
+          item: "3.3.2"
+          text: "Lente varifocal ajustável de 2.8mm a 12mm"
+          page: 8
+          category: "Hardware"
+          priority: "Média"
+
+        - id: 7
+          item: "3.4.1"
+          text: "Software de gerenciamento de vídeo incluído"
+          page: 9
+          category: "Software"
+          priority: "Alta"
+
+        - id: 8
+          item: "3.4.2"
+          text: "Suporte a protocolo ONVIF Profile S"
+          page: 9
+          category: "Integração"
+          priority: "Alta"
+
+        - id: 9
+          item: "4.1.1"
+          text: "Instalação e configuração das câmeras"
+          page: 10
+          category: "Serviço"
+          priority: "Alta"
+
+        - id: 10
+          item: "4.1.2"
+          text: "Treinamento técnico de 8 horas"
+          page: 10
+          category: "Serviço"
+          priority: "Média"
+
+    - name: "Condições de Entrega"
+      pages: [11, 12]
+
+    - name: "Anexos"
+      pages: [13, 14, 15]
+
+expected_output:
+  total_requirements: 10
+  categories:
+    Hardware: 6
+    Software: 1
+    Integração: 1
+    Serviço: 2
+  priorities:
+    Alta: 7
+    Média: 3
+    Baixa: 0
+  avg_confidence: 0.92
+
+validation:
+  completeness: 100.0
+  integrity: 100.0
+  consistency: 100.0
+  traceability: 100.0
+
+inspection:
+  fixed_checklist: 8
+  dynamic_checklist: 8
+  total: 16
+  expected_result: "PASS"
+
+loop_iterations_expected: 0
+
+notes: |
+  This fixture represents a simple, well-structured edital that should
+  pass all validation on the first attempt (no LOOP iterations needed).
+
+  It contains 10 clear, unambiguous technical requirements across 4 categories.
+  All requirements are atomic (no decomposition needed) and properly classified.

@@ -1,0 +1,65 @@
+dynamic_checklist:
+  checks:
+    ED-01: &id001 !!python/object/apply:numpy._core.multiarray.scalar
+    - !!python/object/apply:numpy.dtype
+      args:
+      - b1
+      - false
+      - true
+      state: !!python/tuple
+      - 3
+      - '|'
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - !!binary |
+      AQ==
+    ED-02: *id001
+    ED-03: true
+    ED-04: *id001
+    ED-05: true
+    ED-06: *id001
+    ED-07: true
+    ED-08: true
+  passed: !!python/object/apply:numpy._core.multiarray.scalar
+  - &id002 !!python/object/apply:numpy.dtype
+    args:
+    - i8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    CAAAAAAAAAA=
+  total: 8
+fixed_checklist:
+  checks:
+    AT-01: *id001
+    AT-02: true
+    AT-03: true
+    AT-04: true
+    AT-05: true
+    AT-06: *id001
+    AT-07: *id001
+    AT-08: true
+  passed: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id002
+  - !!binary |
+    CAAAAAAAAAA=
+  total: 8
+overall_status: PASS
+total_items: 16
+total_passed: !!python/object/apply:numpy._core.multiarray.scalar
+- *id002
+- !!binary |
+  EAAAAAAAAAA=
