@@ -67,16 +67,27 @@ Para cada etapa do plano, execute seguindo:
 
 ### 🔄 H - HALT (Parada)
 
-**Status:** 🚧 A IMPLEMENTAR (História 1.5 - Sprint 2)
+**Status:** ✅ IMPLEMENTADO (História 1.5 - Sprint 2)
 
 **Objetivo:** Pausar o workflow para solicitar aprovação do usuário
 
-**Arquivos (futuros):**
-- 📖 `halt.md` - Guia teórico
-- 🤖 `halt_prompt.md` - Prompt reutilizável
-- 📊 `halt_examples.md` - Exemplos de menus de aprovação
+**Arquivos:**
+- 📖 **[halt.md](halt.md)** - Guia teórico completo
+- 🤖 **[halt_prompt.md](halt_prompt.md)** - Prompt reutilizável para agentes
+- 📊 **[halt_examples.md](halt_examples.md)** - Exemplos de menus de aprovação
 
 **Quando usar:** Após cada etapa macro, quando houver ambiguidade, ou conforme o plano
+
+**Saída:** HaltRequest YAML + resposta do usuário documentada
+
+**Exemplo de uso:**
+```markdown
+## Após Criar Plano ou Encontrar Ambiguidade
+
+Pause para aprovação/esclarecimento:
+
+{{incluir: framework/phases/halt_prompt.md}}
+```
 
 ---
 
@@ -262,11 +273,12 @@ Sprint 1: STRUCTURE ✅ → EXECUTE ✅ → INSPECT ✅ → LOOP ✅
 | 1.2 | EXECUTE | Sprint 1 | ✅ Completa |
 | 1.3 | INSPECT | Sprint 1 | ✅ Completa |
 | 1.4 | LOOP | Sprint 1 | ✅ Completa |
-| 1.5 | HALT | Sprint 2 | 🚧 Pendente |
+| 1.5 | HALT | Sprint 2 | ✅ Completa |
 | 1.6 | VALIDATE | Sprint 2 | 🚧 Pendente |
 | 1.7 | DELIVER | Sprint 2 | 🚧 Pendente |
 
 **Sprint 1 Progress:** 4/4 (100%) ✅
+**Sprint 2 Progress:** 1/3 (33%) 🚧
 
 ---
 
