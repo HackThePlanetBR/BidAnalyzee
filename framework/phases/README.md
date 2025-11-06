@@ -111,16 +111,27 @@ Execute auto-inspeção usando checklists:
 
 ### 🔁 L - LOOP (Repetição)
 
-**Status:** 🚧 A IMPLEMENTAR (História 1.4 - Sprint 1)
+**Status:** ✅ IMPLEMENTADO (História 1.4 - Sprint 1)
 
 **Objetivo:** Corrigir problemas identificados na fase INSPECT
 
-**Arquivos (futuros):**
-- 📖 `loop.md` - Guia teórico
-- 🤖 `loop_prompt.md` - Prompt reutilizável
-- 📊 `loop_examples.md` - Exemplos de ciclos de correção
+**Arquivos:**
+- 📖 **[loop.md](loop.md)** - Guia teórico completo
+- 🤖 **[loop_prompt.md](loop_prompt.md)** - Prompt reutilizável para agentes
+- 📊 **[loop_examples.md](loop_examples.md)** - Exemplos de ciclos de correção
 
 **Quando usar:** Automático quando INSPECT falha, ou manual via feedback do usuário
+
+**Saída:** LoopResult estruturado + dados corrigidos (ou HALT se atingir limite)
+
+**Exemplo de uso:**
+```markdown
+## Após INSPECT Falhar
+
+Execute o ciclo de correção LOOP:
+
+{{incluir: framework/phases/loop_prompt.md}}
+```
 
 ---
 
@@ -158,7 +169,7 @@ Execute auto-inspeção usando checklists:
 
 ```
 ┌─────────────────┐
-│   STRUCTURE     │ ← Você está aqui (História 1.1 ✅)
+│   STRUCTURE     │ (História 1.1 ✅)
 │  (Planejar)     │
 └────────┬────────┘
          │
@@ -173,14 +184,14 @@ Execute auto-inspeção usando checklists:
          │
          ↓ [Aprovado]
 ┌────────┴────────┐
-│     EXECUTE     │ (História 1.2 🚧)
+│     EXECUTE     │ (História 1.2 ✅)
 │  (Executar      │
 │   etapa 1)      │
 └────────┬────────┘
          │
          ↓
 ┌────────┴────────┐
-│     INSPECT     │ (História 1.3 🚧)
+│     INSPECT     │ (História 1.3 ✅)
 │  (Checklist)    │
 └────────┬────────┘
          │
@@ -192,7 +203,7 @@ Execute auto-inspeção usando checklists:
          │    │
          ↓    ↓
     ┌────┴────┐
-    │  LOOP   │ (História 1.4 🚧)
+    │  LOOP   │ (História 1.4 ✅)
     │ (Corrig │
     │  ir)    │
     └────┬────┘
@@ -218,6 +229,8 @@ Execute auto-inspeção usando checklists:
          │ (Entrega    │
          │  final)     │
          └─────────────┘
+
+Sprint 1: STRUCTURE ✅ → EXECUTE ✅ → INSPECT ✅ → LOOP ✅
 ```
 
 ---
@@ -248,10 +261,12 @@ Execute auto-inspeção usando checklists:
 | 1.1 | STRUCTURE | Sprint 1 | ✅ Completa |
 | 1.2 | EXECUTE | Sprint 1 | ✅ Completa |
 | 1.3 | INSPECT | Sprint 1 | ✅ Completa |
-| 1.4 | LOOP | Sprint 1 | 🚧 Pendente |
+| 1.4 | LOOP | Sprint 1 | ✅ Completa |
 | 1.5 | HALT | Sprint 2 | 🚧 Pendente |
 | 1.6 | VALIDATE | Sprint 2 | 🚧 Pendente |
 | 1.7 | DELIVER | Sprint 2 | 🚧 Pendente |
+
+**Sprint 1 Progress:** 4/4 (100%) ✅
 
 ---
 
@@ -275,5 +290,5 @@ Se você está implementando um novo agente e tem dúvidas sobre como usar uma f
 
 ---
 
-**Última atualização:** 06/11/2025 (História 1.1 completa)
-**Próxima atualização:** Após História 1.2 (EXECUTE)
+**Última atualização:** 06/11/2025 (Sprint 1 completo - Histórias 1.1 a 1.4)
+**Próxima atualização:** Após História 1.5 (HALT - Sprint 2)
