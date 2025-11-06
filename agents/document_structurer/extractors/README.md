@@ -1,7 +1,7 @@
 # Metadata Extractor - Document Structurer
 
 **Module:** `metadata_extractor.py`
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Purpose:** Extract key metadata from Brazilian public procurement documents (editais)
 
 ---
@@ -21,6 +21,9 @@ The Metadata Extractor complements the Document Structurer agent by extracting a
 | **modalidade** | Procurement modality | "Pregão Eletrônico" |
 | **numero_edital** | Edital number | "001/2025" |
 | **data_publicacao** | Publication date | "15/01/2025" |
+| **endereco_entrega** | Delivery address | "Rua das Flores, 123 - Centro - SP" |
+| **contato_responsavel** | Contact person/email/phone | "joao.silva@prefeitura.sp.gov.br" |
+| **anexos** | Required attachments (list) | ["I - Especificações Técnicas", "II - Modelo de Proposta"] |
 
 ---
 
@@ -160,9 +163,33 @@ else:
 
 ### Overall Confidence
 
+**New in v1.1.0:** Weighted confidence calculation
+
 ```python
-overall = average([conf for conf in field_confidences if conf > 0])
+# Field importance weights
+field_weights = {
+    "objeto": 2.0,           # Critical
+    "numero_edital": 2.0,    # Critical
+    "orgao": 1.5,            # Important
+    "modalidade": 1.5,       # Important
+    "valor_estimado": 1.0,   # Optional
+    "prazo_entrega": 1.0,    # Optional
+    "data_publicacao": 1.0,  # Optional
+    "endereco_entrega": 1.0, # Optional
+    "contato_responsavel": 1.0, # Optional
+    "anexos": 1.0            # Optional
+}
+
+# Weighted average
+weighted_avg = sum(score * weight) / sum(weights)
+
+# Completeness bonus (up to 0.1)
+bonus = (fields_extracted / 10) * 0.1
+
+overall = min(weighted_avg + bonus, 1.0)
 ```
+
+This ensures that more complete metadata (more fields extracted) gets higher overall confidence, even if some individual field scores are lower.
 
 ---
 
@@ -279,7 +306,9 @@ Metadata extraction is integrated into the main Document Structurer integration 
 - [ ] Support for multiple languages (Spanish, English)
 - [ ] ML-based extraction (vs pure regex)
 - [ ] Table extraction for structured metadata
-- [ ] OCR support for scanned documents
+- [x] ~~Additional metadata fields (endereco, contato, anexos)~~ ✅ **v1.1.0**
+- [x] ~~Weighted confidence calculation~~ ✅ **v1.1.0**
+- [ ] OCR support for scanned documents (planned for Sprint 4.5)
 - [ ] Auto-correction for common typos
 
 ---
@@ -292,6 +321,27 @@ Metadata extraction is integrated into the main Document Structurer integration 
 
 ---
 
+## 📝 Changelog
+
+### v1.1.0 (2025-11-06) - História 2.8
+- ✅ Fixed 2 failing tests (100% pass rate achieved)
+- ✅ Implemented weighted confidence calculation
+- ✅ Added 3 new metadata fields:
+  - `endereco_entrega` - Delivery address extraction
+  - `contato_responsavel` - Contact person/email/phone extraction
+  - `anexos` - List of required attachments
+- ✅ Improved value cleaning (trailing whitespace fix)
+- ✅ Updated field count from 7 to 10
+- ✅ Completeness bonus now based on 10 fields
+
+### v1.0.0 (2025-11-06) - História 2.4
+- Initial release with 7 core metadata fields
+- Pattern-based extraction for Brazilian Portuguese
+- Confidence scoring and validation
+- Integration with Document Structurer
+
+---
+
 **Created:** 2025-11-06
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** ✅ Production Ready

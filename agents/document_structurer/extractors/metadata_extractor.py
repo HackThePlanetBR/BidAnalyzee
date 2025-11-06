@@ -10,10 +10,13 @@ Extracts key metadata from edital PDFs:
 - Modalidade (procurement modality)
 - Número do Edital (edital number)
 - Data de Publicação (publication date)
+- Endereço de Entrega (delivery address)
+- Contato Responsável (contact person)
+- Anexos (required attachments)
 
 Author: BidAnalyzee Team
 Date: 2025-11-06
-Version: 1.0.0
+Version: 1.1.0
 """
 
 import re
@@ -33,6 +36,9 @@ class EditalMetadata:
     modalidade: Optional[str] = None
     numero_edital: Optional[str] = None
     data_publicacao: Optional[str] = None
+    endereco_entrega: Optional[str] = None
+    contato_responsavel: Optional[str] = None
+    anexos: Optional[List[str]] = field(default_factory=list)
     confidence_scores: Dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -45,6 +51,9 @@ class EditalMetadata:
             "modalidade": self.modalidade,
             "numero_edital": self.numero_edital,
             "data_publicacao": self.data_publicacao,
+            "endereco_entrega": self.endereco_entrega,
+            "contato_responsavel": self.contato_responsavel,
+            "anexos": self.anexos,
             "confidence_scores": self.confidence_scores
         }
 
@@ -102,6 +111,22 @@ class MetadataExtractor:
             r'(?:DATA DE PUBLICAÇÃO|Data de Publicação)[:\s]*(\d{2}/\d{2}/\d{4})',
             r'(?:PUBLICADO EM|Publicado em)[:\s]*(\d{2}/\d{2}/\d{4})',
         ],
+
+        "endereco_entrega": [
+            r'(?:ENDEREÇO DE ENTREGA|Endereço de Entrega)[:\s]+(.{10,150}?)(?:\n)',
+            r'(?:LOCAL DE ENTREGA|Local de Entrega)[:\s]+(.{10,150}?)(?:\n)',
+        ],
+
+        "contato_responsavel": [
+            r'(?:E-?MAIL|E-?mail)[:\s]+([\w\.\-]+@[\w\.\-]+)',
+            r'(?:TELEFONE|Telefone)[:\s]+([\(\)\d\s\-]{8,20})',
+            r'(?:CONTATO|Contato)[:\s]+([A-ZÀ-Úa-zà-ú\s]{5,50})(?:\n)',
+        ],
+
+        "anexos": [
+            r'(?:ANEXO|Anexo)\s+([IVX\d]+)\s*[-–]\s*(.{5,100}?)(?:\n)',
+            r'(?:DOCUMENTOS? EXIGIDOS?|Documentos? Exigidos?)[:\s]*\n\s*[-•]\s*(.{5,100}?)(?:\n)',
+        ],
     }
 
     def __init__(self):
@@ -135,6 +160,9 @@ class MetadataExtractor:
         metadata.modalidade = self._extract_field(search_text, "modalidade")
         metadata.numero_edital = self._extract_field(search_text, "numero_edital")
         metadata.data_publicacao = self._extract_field(search_text, "data_publicacao")
+        metadata.endereco_entrega = self._extract_field(search_text, "endereco_entrega")
+        metadata.contato_responsavel = self._extract_field(search_text, "contato_responsavel")
+        metadata.anexos = self._extract_list_field(search_text, "anexos")
 
         # Calculate confidence scores
         metadata.confidence_scores = self._calculate_confidence(metadata)
@@ -167,6 +195,37 @@ class MetadataExtractor:
 
         return None
 
+    def _extract_list_field(self, text: str, field_name: str) -> List[str]:
+        """
+        Extract a list of values from a metadata field (e.g., anexos).
+
+        Args:
+            text: Text to search
+            field_name: Name of field (key in PATTERNS dict)
+
+        Returns:
+            List of extracted values (empty list if none found)
+        """
+        patterns = self.PATTERNS.get(field_name, [])
+        results = []
+
+        for pattern in patterns:
+            matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
+            for match in matches:
+                # For anexos, we might have either 1 or 2 capture groups
+                if match.lastindex == 2:
+                    # Pattern has 2 groups (e.g., "ANEXO I - Description")
+                    value = f"{match.group(1)} - {match.group(2)}".strip()
+                else:
+                    # Pattern has 1 group
+                    value = match.group(1).strip()
+
+                value = self._clean_value(value, field_name)
+                if value and len(value) > 3 and value not in results:
+                    results.append(value)
+
+        return results if results else []
+
     def _clean_value(self, value: str, field_name: str) -> str:
         """
         Clean extracted value (remove excess whitespace, format, etc.)
@@ -198,7 +257,8 @@ class MetadataExtractor:
             # Title case for agency names
             value = value.title()
 
-        return value
+        # Final strip to remove any remaining whitespace
+        return value.strip()
 
     def _calculate_confidence(self, metadata: EditalMetadata) -> Dict[str, float]:
         """
@@ -278,13 +338,44 @@ class MetadataExtractor:
         else:
             scores["data_publicacao"] = 0.0
 
+        if metadata.endereco_entrega:
+            # Reasonable length = decent confidence
+            if len(metadata.endereco_entrega) > 20:
+                scores["endereco_entrega"] = 0.85
+            else:
+                scores["endereco_entrega"] = 0.70
+        else:
+            scores["endereco_entrega"] = 0.0
+
+        if metadata.contato_responsavel:
+            # Email or phone pattern = high confidence
+            if '@' in metadata.contato_responsavel or re.search(r'\d{2,}', metadata.contato_responsavel):
+                scores["contato_responsavel"] = 0.90
+            else:
+                scores["contato_responsavel"] = 0.75
+        else:
+            scores["contato_responsavel"] = 0.0
+
+        if metadata.anexos and len(metadata.anexos) > 0:
+            # Found anexos = high confidence
+            # More anexos = slightly higher confidence
+            base_confidence = 0.85
+            bonus = min(len(metadata.anexos) * 0.02, 0.10)  # Up to 0.10 bonus
+            scores["anexos"] = min(base_confidence + bonus, 0.98)
+        else:
+            scores["anexos"] = 0.0
+
         return scores
 
     def get_overall_confidence(self, metadata: EditalMetadata) -> float:
         """
         Calculate overall confidence score for metadata extraction.
 
-        Based on average of individual field confidences (excluding None values).
+        Uses weighted average where:
+        - Critical fields (objeto, numero_edital) have weight 2.0
+        - Important fields (orgao, modalidade) have weight 1.5
+        - Optional fields (valor, prazo, data, endereco, contato, anexos) have weight 1.0
+        - Completeness bonus: more fields extracted = higher confidence
 
         Args:
             metadata: EditalMetadata object
@@ -292,15 +383,42 @@ class MetadataExtractor:
         Returns:
             Overall confidence score (0.0-1.0)
         """
-        scores = [
-            score for score in metadata.confidence_scores.values()
-            if score > 0.0
-        ]
+        # Field importance weights
+        field_weights = {
+            "objeto": 2.0,
+            "numero_edital": 2.0,
+            "orgao": 1.5,
+            "modalidade": 1.5,
+            "valor_estimado": 1.0,
+            "prazo_entrega": 1.0,
+            "data_publicacao": 1.0,
+            "endereco_entrega": 1.0,
+            "contato_responsavel": 1.0,
+            "anexos": 1.0
+        }
 
-        if not scores:
+        weighted_sum = 0.0
+        total_weight = 0.0
+        fields_extracted = 0
+
+        for field, score in metadata.confidence_scores.items():
+            if score > 0.0:
+                weight = field_weights.get(field, 1.0)
+                weighted_sum += score * weight
+                total_weight += weight
+                fields_extracted += 1
+
+        if total_weight == 0:
             return 0.0
 
-        return sum(scores) / len(scores)
+        # Base weighted average
+        base_confidence = weighted_sum / total_weight
+
+        # Completeness bonus (up to 0.1 points for extracting all 10 fields)
+        completeness_bonus = (fields_extracted / 10.0) * 0.1
+
+        # Final confidence (capped at 1.0)
+        return min(base_confidence + completeness_bonus, 1.0)
 
     def validate_metadata(self, metadata: EditalMetadata) -> Dict[str, bool]:
         """
