@@ -27,7 +27,7 @@ A fase **INSPECT** é onde o agente valida a qualidade do trabalho executado usa
 
 ## 📋 Quando Usar
 
-- ✅ **Obrigatório** após TODA fase EXECUTE
+- ✅ **Obrigatório** após TODA fase [EXECUTE](execute.md)
 - ✅ Antes de qualquer VALIDATE
 - ✅ Antes de qualquer HALT (apresentação ao usuário)
 
@@ -42,7 +42,7 @@ EXECUTE → INSPECT (você está aqui) → VALIDATE → HALT
 
 ### Entrada (Input)
 
-- **Output da fase EXECUTE** (arquivo, dados, resultado)
+- **Output da fase [EXECUTE](execute.md)** (arquivo, dados, resultado)
 - **Checklists aplicáveis:**
   - Fixo: `framework/checklists/anti_alucinacao.yaml` (obrigatório para TODOS)
   - Dinâmico: `agents/[agent_name]/checklists/inspect.yaml` (específico do agente)

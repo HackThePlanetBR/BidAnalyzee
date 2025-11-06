@@ -29,7 +29,7 @@ A fase **STRUCTURE** é a primeira fase do Framework SHIELD e a base de todo pla
 ## 📋 Quando Usar
 
 - ✅ **Obrigatório** no início de TODA tarefa (Modo Strict)
-- ✅ Antes de qualquer fase EXECUTE
+- ✅ Antes de qualquer fase [EXECUTE](execute.md)
 - ✅ Quando o usuário solicita uma nova análise
 - ✅ Quando um LOOP requer replanejamento significativo
 
@@ -439,7 +439,7 @@ DELIVER (entrega final)
 ## 📚 Referências
 
 - **Template YAML:** `framework/templates/plan_template.yaml`
-- **Princípios SHIELD:** `OPERATING_PRINCIPLES.md`
+- **Princípios SHIELD:** [OPERATING_PRINCIPLES.md](../../OPERATING_PRINCIPLES.md)
 - **ADR-001:** Agentes como prompts estruturados
 - **PRD História 1.1:** Implementação da Capacidade de Planeamento
 

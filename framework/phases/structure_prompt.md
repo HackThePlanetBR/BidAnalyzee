@@ -8,7 +8,7 @@
 
 ## 📌 Como Usar Este Componente
 
-Este prompt deve ser incluído no prompt de um agente quando ele precisa executar a fase STRUCTURE do SHIELD.
+Este prompt deve ser incluído no prompt de um agente quando ele precisa executar a fase [STRUCTURE](structure.md) do SHIELD.
 
 **Exemplo de inclusão:**
 ```markdown
@@ -16,7 +16,7 @@ Você é o @EstruturadorDeDocumentos...
 
 ## Quando Iniciar uma Nova Tarefa
 
-Antes de qualquer execução, você DEVE seguir a fase STRUCTURE:
+Antes de qualquer execução, você DEVE seguir a fase [STRUCTURE](structure.md):
 
 {{incluir: framework/phases/structure_prompt.md}}
 ```
@@ -381,14 +381,14 @@ Este arquivo será usado para:
 
 9. SALVAR plano aprovado em YAML
 
-10. INICIAR fase EXECUTE com plano
+10. INICIAR fase [EXECUTE](execute.md) com plano
 ```
 
 ---
 
 ## ⚠️ Avisos Importantes
 
-1. **NUNCA pule a fase STRUCTURE** (obrigatório em Modo Strict)
+1. **NUNCA pule a fase [STRUCTURE](structure.md)** (obrigatório em Modo Strict)
 2. **SEMPRE aguarde aprovação** antes de EXECUTE
 3. **NÃO faça suposições** - se algo não está claro, HALT e pergunte
 4. **Salve o plano ANTES de executar** (para auditoria)

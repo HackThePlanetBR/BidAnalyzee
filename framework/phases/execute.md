@@ -30,7 +30,7 @@ A fase **EXECUTE** é onde o trabalho real acontece. Após o planeamento (STRUCT
 
 - ✅ Após aprovação do plano (STRUCTURE → HALT → aprovado)
 - ✅ Para executar CADA etapa do plano sequencialmente
-- ✅ Antes de qualquer fase INSPECT (Execute → Inspect)
+- ✅ Antes de qualquer fase [INSPECT](inspect.md) (Execute → Inspect)
 
 ---
 

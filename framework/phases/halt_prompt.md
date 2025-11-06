@@ -157,7 +157,7 @@ Requisito "Sistema deve suportar câmeras IP" não especifica protocolo.
 🛑 HALT: Escalação - Problema Não Resolvido
 
 📍 **Contexto:**
-Após fase LOOP (3 tentativas), não consegui corrigir problema automaticamente.
+Após fase [LOOP](loop.md) (3 tentativas), não consegui corrigir problema automaticamente.
 
 📊 **O Que Precisa de Decisão:**
 Como resolver inconsistência técnica que não posso corrigir sozinho.
