@@ -1,0 +1,442 @@
+# SHIELD Framework - Extended Validation Rules
+# Domain-specific validation for Brazilian public procurement (editais)
+# Version: 1.1.0
+# História: 2.10 - Additional Validation Rules
+
+validation_rules:
+  name: "Validação de Conformidade Legal e Completude - Editais"
+  type: "domain_specific"
+  agent: "document_structurer"
+  version: "1.1.0"
+  total_rules: 30  # 16 existing + 14 new
+
+  description: |
+    Regras adicionais de validação para garantir conformidade legal com
+    legislação brasileira de licitações (Lei 8.666/93 e Lei 14.133/2021),
+    completude de informações essenciais, e consistência interna do edital.
+
+  # ==========================================================================
+  # LEGAL COMPLIANCE RULES (6 rules)
+  # Verificam conformidade com legislação de licitações públicas no Brasil
+  # ==========================================================================
+  legal_compliance:
+    - id: "LC-01"
+      name: "Lei 8.666/93 - Cláusulas Obrigatórias"
+      description: "Verifica presença de cláusulas obrigatórias da Lei 8.666/93"
+      severity: "CRITICAL"
+      category: "Legal Compliance"
+
+      validation_logic:
+        required_clauses:
+          - pattern: "objeto.*licitação|objeto.*edital"
+            description: "Objeto da licitação"
+            article: "Art. 40, I"
+
+          - pattern: "prazo.*entrega|prazo.*execução"
+            description: "Prazo de entrega/execução"
+            article: "Art. 40, III"
+
+          - pattern: "sanções|penalidades|multa"
+            description: "Sanções administrativas"
+            article: "Art. 40, XVI"
+
+          - pattern: "dotação.*orçamentária|previsão.*orçamentária"
+            description: "Dotação orçamentária"
+            article: "Art. 14"
+
+          - pattern: "critério.*julgamento|tipo.*licitação"
+            description: "Critério de julgamento"
+            article: "Art. 40, VII"
+
+      pass_criteria: "Todas as 5 cláusulas obrigatórias presentes"
+      fail_criteria: "Qualquer cláusula obrigatória ausente"
+      remediation: "Adicionar cláusulas faltantes conforme Lei 8.666/93"
+
+    - id: "LC-02"
+      name: "Lei 14.133/2021 - Compatibilidade"
+      description: "Verifica se edital é compatível com nova Lei de Licitações"
+      severity: "WARNING"
+      category: "Legal Compliance"
+
+      validation_logic:
+        check_references:
+          - pattern: "lei.*14\\.?133|nova.*lei.*licitações"
+            indicates: "Edital referencia Lei 14.133/2021"
+
+          - pattern: "lei.*8\\.?666"
+            indicates: "Edital referencia Lei 8.666/93 (antiga)"
+
+        compatibility_flags:
+          - "Modalidade compatível com Lei 14.133/2021"
+          - "Critérios de julgamento atualizados"
+          - "Prazos em conformidade com nova lei"
+
+      pass_criteria: "Edital compatível com Lei 14.133/2021 ou justifica uso de Lei 8.666/93"
+      fail_criteria: "Referências desatualizadas sem justificativa"
+      remediation: "Verificar se edital deve ser atualizado para Lei 14.133/2021"
+
+    - id: "LC-03"
+      name: "Prazos Legais Mínimos"
+      description: "Verifica se prazos atendem aos mínimos legais por modalidade"
+      severity: "CRITICAL"
+      category: "Legal Compliance"
+
+      validation_logic:
+        modalidade_prazos:
+          pregao_eletronico:
+            prazo_minimo_proposta: 8  # dias úteis
+            prazo_minimo_impugnacao: 3  # dias úteis
+            fundamento: "Lei 10.520/2002, Art. 4º"
+
+          concorrencia:
+            prazo_minimo_proposta: 30  # dias corridos (obras/serviços)
+            prazo_minimo_impugnacao: 5  # dias úteis
+            fundamento: "Lei 8.666/93, Art. 21"
+
+          tomada_precos:
+            prazo_minimo_proposta: 15  # dias corridos
+            prazo_minimo_impugnacao: 5  # dias úteis
+            fundamento: "Lei 8.666/93, Art. 21"
+
+        extract_patterns:
+          - pattern: "prazo.*(?:proposta|envio).*?(\\d+).*dias?"
+            extracts: "prazo_proposta"
+
+          - pattern: "impugnação.*?(\\d+).*dias?"
+            extracts: "prazo_impugnacao"
+
+      pass_criteria: "Todos os prazos atendem aos mínimos legais"
+      fail_criteria: "Qualquer prazo inferior ao mínimo legal"
+      remediation: "Ajustar prazos para atender requisitos legais mínimos"
+
+    - id: "LC-04"
+      name: "Garantia - Requisitos"
+      description: "Verifica se requisitos de garantia (caução) estão presentes"
+      severity: "WARNING"
+      category: "Legal Compliance"
+
+      validation_logic:
+        garantia_patterns:
+          - pattern: "garantia.*execução|caução"
+            description: "Menção a garantia de execução"
+
+          - pattern: "\\d+%.*valor.*contrato|valor.*contrato.*\\d+%"
+            description: "Percentual da garantia"
+            expected: "Até 10% do valor (Lei 8.666/93)"
+
+          - pattern: "modalidade.*garantia|forma.*garantia"
+            description: "Modalidades aceitas de garantia"
+            expected: "Caução, seguro-garantia, fiança bancária"
+
+      pass_criteria: "Requisitos de garantia claramente definidos quando aplicável"
+      fail_criteria: "Garantia exigida sem critérios claros ou percentual ilegal"
+      remediation: "Definir modalidades e percentuais conforme Art. 56 da Lei 8.666/93"
+
+    - id: "LC-05"
+      name: "Habilitação Jurídica"
+      description: "Verifica se exigências de habilitação jurídica estão presentes"
+      severity: "CRITICAL"
+      category: "Legal Compliance"
+
+      validation_logic:
+        documentos_obrigatorios:
+          - pattern: "registro.*comercial|junta.*comercial"
+            description: "Registro comercial"
+            fundamento: "Art. 28, I"
+
+          - pattern: "ato.*constitutivo|contrato.*social|estatuto"
+            description: "Ato constitutivo"
+            fundamento: "Art. 28, II"
+
+          - pattern: "inscrição.*cnpj|cadastro.*nacional"
+            description: "Inscrição no CNPJ"
+            fundamento: "Art. 28, IV"
+
+          - pattern: "regularidade.*fgts|certificado.*fgts"
+            description: "Regularidade com FGTS"
+            fundamento: "Art. 29, IV"
+
+      pass_criteria: "Todos os documentos de habilitação jurídica listados"
+      fail_criteria: "Qualquer documento obrigatório ausente"
+      remediation: "Incluir todos os documentos exigidos por Lei (Art. 28-29)"
+
+    - id: "LC-06"
+      name: "Qualificação Técnica"
+      description: "Verifica se exigências de qualificação técnica estão presentes"
+      severity: "WARNING"
+      category: "Legal Compliance"
+
+      validation_logic:
+        qualificacao_patterns:
+          - pattern: "atestado.*capacidade.*técnica|comprovação.*técnica"
+            description: "Atestado de capacidade técnica"
+            fundamento: "Art. 30, §1º"
+
+          - pattern: "responsável.*técnico|profissional.*habilitado"
+            description: "Responsável técnico habilitado"
+            fundamento: "Art. 30, §1º"
+
+          - pattern: "certidão.*acervo.*técnico|registro.*crea|registro.*cau"
+            description: "Certidão de acervo técnico (CAT)"
+            fundamento: "Art. 30, II"
+
+      pass_criteria: "Requisitos de qualificação técnica presentes quando aplicável"
+      fail_criteria: "Exigências desproporcionais ao objeto (Art. 30, §5º)"
+      remediation: "Adequar exigências técnicas ao objeto da licitação"
+
+  # ==========================================================================
+  # COMPLETENESS RULES (4 rules)
+  # Verificam se informações essenciais estão presentes e completas
+  # ==========================================================================
+  completeness:
+    - id: "CP-01"
+      name: "Anexos Obrigatórios Referenciados"
+      description: "Verifica se todos os anexos obrigatórios estão referenciados"
+      severity: "WARNING"
+      category: "Completeness"
+
+      validation_logic:
+        anexos_obrigatorios:
+          - "Termo de Referência / Projeto Básico"
+          - "Minuta do Contrato"
+          - "Modelo de Proposta Comercial"
+          - "Modelo de Declarações"
+
+        extract_pattern: "anexo.*[IiVvXx]+|anexo.*\\d+"
+
+        cross_reference_check:
+          - "Cada anexo mencionado no edital deve existir"
+          - "Cada anexo deve ser claramente identificado"
+
+      pass_criteria: "Todos os anexos obrigatórios referenciados e identificáveis"
+      fail_criteria: "Anexo obrigatório não mencionado ou referência ambígua"
+      remediation: "Listar todos os anexos obrigatórios com identificação clara"
+
+    - id: "CP-02"
+      name: "Informações de Contato Completas"
+      description: "Verifica presença de informações de contato do órgão"
+      severity: "WARNING"
+      category: "Completeness"
+
+      validation_logic:
+        required_contact_info:
+          - pattern: "\\(\\d{2}\\).*\\d{4,5}-?\\d{4}|telefone.*\\d+"
+            description: "Telefone"
+
+          - pattern: "[\\w\\.]+@[\\w\\.]+\\.[a-zA-Z]{2,}"
+            description: "E-mail"
+
+          - pattern: "endereço|rua|avenida.*\\d+|cep.*\\d{5}-?\\d{3}"
+            description: "Endereço físico"
+
+          - pattern: "horário.*atendimento|expediente"
+            description: "Horário de atendimento"
+
+      pass_criteria: "Pelo menos telefone e e-mail presentes"
+      fail_criteria: "Informações de contato insuficientes"
+      remediation: "Incluir telefone, e-mail e endereço do órgão licitante"
+
+    - id: "CP-03"
+      name: "Cronograma/Calendário Completo"
+      description: "Verifica se cronograma com datas importantes está presente"
+      severity: "CRITICAL"
+      category: "Completeness"
+
+      validation_logic:
+        required_dates:
+          - pattern: "publicação.*edital|data.*publicação"
+            description: "Data de publicação"
+
+          - pattern: "prazo.*esclarecimento|esclarecimento.*até"
+            description: "Prazo para esclarecimentos"
+
+          - pattern: "data.*sessão|abertura.*proposta|data.*pregão"
+            description: "Data da sessão/abertura"
+
+          - pattern: "início.*vigência|assinatura.*contrato"
+            description: "Início da vigência/assinatura"
+
+      pass_criteria: "Todas as datas críticas presentes e em ordem cronológica"
+      fail_criteria: "Qualquer data crítica ausente"
+      remediation: "Incluir cronograma completo com todas as datas relevantes"
+
+    - id: "CP-04"
+      name: "Condições de Pagamento Definidas"
+      description: "Verifica se condições e prazos de pagamento estão claros"
+      severity: "CRITICAL"
+      category: "Completeness"
+
+      validation_logic:
+        payment_info:
+          - pattern: "prazo.*pagamento|pagamento.*\\d+.*dias"
+            description: "Prazo de pagamento"
+
+          - pattern: "forma.*pagamento|condições.*pagamento"
+            description: "Forma de pagamento"
+
+          - pattern: "medição|faturamento|nota.*fiscal"
+            description: "Processo de medição/faturamento"
+
+          - pattern: "reajuste|correção.*monetária|índice"
+            description: "Critérios de reajuste"
+
+      pass_criteria: "Prazo e forma de pagamento claramente definidos"
+      fail_criteria: "Informações de pagamento ambíguas ou ausentes"
+      remediation: "Definir prazo, forma e processo de pagamento detalhadamente"
+
+  # ==========================================================================
+  # CONSISTENCY RULES (4 rules)
+  # Verificam consistência interna entre diferentes partes do edital
+  # ==========================================================================
+  consistency:
+    - id: "CS-01"
+      name: "Ordem Cronológica de Datas"
+      description: "Verifica se todas as datas estão em ordem cronológica lógica"
+      severity: "WARNING"
+      category: "Consistency"
+
+      validation_logic:
+        date_sequence_check:
+          expected_order:
+            - "data_publicacao"
+            - "prazo_esclarecimentos"
+            - "prazo_impugnacao"
+            - "data_sessao_abertura"
+            - "prazo_entrega"
+            - "inicio_vigencia"
+
+        validation_rules:
+          - "Data de publicação < Data de abertura"
+          - "Prazo de impugnação < Data de abertura"
+          - "Data de abertura < Prazo de entrega"
+          - "Prazo de entrega <= Início de vigência"
+
+      pass_criteria: "Todas as datas em ordem cronológica lógica"
+      fail_criteria: "Qualquer data fora de sequência lógica"
+      remediation: "Corrigir sequência de datas para ordem cronológica correta"
+
+    - id: "CS-02"
+      name: "Soma de Valores (Itens vs. Total)"
+      description: "Verifica se soma dos itens corresponde ao valor total estimado"
+      severity: "CRITICAL"
+      category: "Consistency"
+
+      validation_logic:
+        value_check:
+          extract_total: "valor.*total.*estimado|valor.*global"
+          extract_items: "item.*\\d+.*R?\\$.*[\\d\\.,]+"
+
+          tolerance: 0.01  # 1% de tolerância para arredondamentos
+
+          validation:
+            - "Somar valores de todos os itens"
+            - "Comparar com valor total declarado"
+            - "Diferença deve ser <= tolerância"
+
+      pass_criteria: "Soma dos itens = valor total (± 1%)"
+      fail_criteria: "Diferença > 1% entre soma e total"
+      remediation: "Corrigir valores dos itens ou valor total para consistência"
+
+    - id: "CS-03"
+      name: "Unidades de Medida Consistentes"
+      description: "Verifica se unidades de medida são usadas consistentemente"
+      severity: "WARNING"
+      category: "Consistency"
+
+      validation_logic:
+        unit_standardization:
+          common_units:
+            - ["unidade", "un", "und", "peça"]
+            - ["metro", "m", "metros"]
+            - ["quilograma", "kg", "kilo"]
+            - ["litro", "l", "lt"]
+            - ["hora", "h", "hrs"]
+
+          consistency_check:
+            - "Mesmo item deve usar mesma unidade em todo edital"
+            - "Conversões devem estar explícitas"
+            - "Unidades devem seguir padrão brasileiro (INMETRO)"
+
+      pass_criteria: "Unidades consistentes e padronizadas"
+      fail_criteria: "Mesma grandeza com unidades diferentes sem conversão"
+      remediation: "Padronizar unidades conforme INMETRO ou incluir conversões"
+
+    - id: "CS-04"
+      name: "Referências Cruzadas Válidas"
+      description: "Verifica se todas as referências a seções/itens existem"
+      severity: "WARNING"
+      category: "Consistency"
+
+      validation_logic:
+        reference_validation:
+          extract_references:
+            - pattern: "(?:conforme|vide|ver).*(?:item|seção|anexo|capítulo).*([\\d\\.]+)"
+              extracts: "referenced_section"
+
+            - pattern: "anexo.*([IiVvXx]+|\\d+)"
+              extracts: "referenced_annex"
+
+          extract_existing_sections:
+            - pattern: "^\\d+\\.?\\d*\\.?\\d*\\s"
+              extracts: "existing_section"
+
+          validation:
+            - "Cada referência deve apontar para seção/anexo existente"
+            - "Links internos devem ser válidos"
+
+      pass_criteria: "100% das referências apontam para seções/anexos existentes"
+      fail_criteria: "Qualquer referência quebrada ou inválida"
+      remediation: "Corrigir referências quebradas ou adicionar seções faltantes"
+
+# ==========================================================================
+# SEVERITY LEVELS
+# ==========================================================================
+severity_levels:
+  CRITICAL:
+    description: "Violação bloqueia entrega - requer correção imediata"
+    action: "LOOP (retornar para correção)"
+    color: "red"
+    symbol: "🔴"
+
+  WARNING:
+    description: "Problema sério que deve ser revisado antes de prosseguir"
+    action: "Sinalizar para revisão humana"
+    color: "yellow"
+    symbol: "🟡"
+
+  INFO:
+    description: "Sugestão de melhoria - não bloqueia entrega"
+    action: "Registrar no relatório"
+    color: "blue"
+    symbol: "🔵"
+
+# ==========================================================================
+# SCORING AND USAGE
+# ==========================================================================
+scoring:
+  method: "weighted"
+  weights:
+    CRITICAL: 10
+    WARNING: 5
+    INFO: 1
+
+  pass_threshold:
+    CRITICAL: "100%"  # Todos os CRITICAL devem passar
+    WARNING: "80%"    # 80% dos WARNING devem passar
+    INFO: "0%"        # INFO não bloqueia
+
+  fail_action: "LOOP"
+  max_loop_iterations: 3
+
+usage:
+  when_to_use: "Após validação básica (ED-01 a ED-08 e AA-01 a AA-08)"
+  integration: "Integrado ao validation_engine.py"
+  output_format: "validation_report.yaml"
+
+# Metadata
+metadata:
+  created_by: "História 2.10 - Sprint 4.5"
+  created_at: "2025-11-06"
+  version: "1.1.0"
+  total_new_rules: 14
+  total_rules: 30  # 8 AA + 8 ED + 6 LC + 4 CP + 4 CS
