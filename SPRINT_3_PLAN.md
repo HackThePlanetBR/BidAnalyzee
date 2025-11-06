@@ -154,22 +154,23 @@ OUTPUT: Delivery Package completo
 
 ### Output Principal
 
-**CSV Estruturado com 6 campos obrigatórios:**
+**CSV Estruturado com 7 campos obrigatórios:**
 
 ```csv
-ID,Descrição,Categoria,Prioridade,Página,Confiança
-1,"Sistema de câmeras com resolução 4K",Hardware,Alta,23,0.95
-2,"Software de análise de vídeo com IA",Software,Alta,25,0.92
+ID,Item,Descrição,Categoria,Prioridade,Página,Confiança
+1,"3.2.1","Sistema de câmeras com resolução 4K",Hardware,Alta,23,0.95
+2,"3.2.2","Software de análise de vídeo com IA",Software,Alta,25,0.92
 ...
 ```
 
 **Campos:**
-1. **ID** (int): Sequencial 1 a N
-2. **Descrição** (string): Texto completo do requisito
-3. **Categoria** (enum): Hardware | Software | Serviço | Integração
-4. **Prioridade** (enum): Alta | Média | Baixa
-5. **Página** (int): Página de origem no PDF
-6. **Confiança** (float): 0.0 a 1.0 (confiança da extração)
+1. **ID** (int): Sequencial interno 1 a N (para validação de completude)
+2. **Item** (string): Número do item no edital original (e.g., "3.2.1", "5.4", "A.2")
+3. **Descrição** (string): Texto completo do requisito
+4. **Categoria** (enum): Hardware | Software | Serviço | Integração
+5. **Prioridade** (enum): Alta | Média | Baixa
+6. **Página** (int): Página de origem no PDF
+7. **Confiança** (float): 0.0 a 1.0 (confiança da extração)
 
 ### Capacidades
 

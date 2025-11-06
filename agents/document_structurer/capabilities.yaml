@@ -35,8 +35,15 @@ output:
       - name: "ID"
         type: "integer"
         required: true
-        description: "Sequential identifier starting from 1"
+        description: "Sequential identifier starting from 1 (internal, for validation)"
         example: 1
+
+      - name: "Item"
+        type: "string"
+        required: true
+        max_length: 50
+        description: "Original item number from the edital (e.g., '3.2.1', '5.4', 'A.2')"
+        example: "3.2.1"
 
       - name: "Descrição"
         type: "string"

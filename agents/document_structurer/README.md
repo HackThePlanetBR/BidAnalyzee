@@ -24,11 +24,12 @@ O **Document Structurer** é um agente especializado em extrair e estruturar req
 
 ### Output Produzido
 
-**CSV Estruturado** com 6 campos obrigatórios:
+**CSV Estruturado** com 7 campos obrigatórios:
 
 | Campo | Tipo | Descrição | Exemplo |
 |-------|------|-----------|---------|
-| **ID** | int | Identificador sequencial | 1, 2, 3, ..., 47 |
+| **ID** | int | Identificador sequencial interno (1, 2, 3...) | 1, 2, 3, ..., 47 |
+| **Item** | string | Número do item no edital original | "3.2.1", "5.4", "A.2" |
 | **Descrição** | string | Texto completo do requisito | "Sistema de câmeras com resolução 4K" |
 | **Categoria** | enum | Tipo do requisito | Hardware, Software, Serviço, Integração |
 | **Prioridade** | enum | Nível de prioridade | Alta, Média, Baixa |
@@ -38,12 +39,16 @@ O **Document Structurer** é um agente especializado em extrair e estruturar req
 **Exemplo de Output:**
 
 ```csv
-ID,Descrição,Categoria,Prioridade,Página,Confiança
-1,"Sistema de câmeras IP com resolução 4K (3840x2160)",Hardware,Alta,23,0.95
-2,"Software de análise de vídeo com algoritmos de IA",Software,Alta,25,0.92
-3,"Integração com sistema de controle de acesso existente",Integração,Média,45,0.88
-4,"Treinamento de operadores para uso do sistema",Serviço,Média,289,0.91
+ID,Item,Descrição,Categoria,Prioridade,Página,Confiança
+1,"3.2.1","Sistema de câmeras IP com resolução 4K (3840x2160)",Hardware,Alta,23,0.95
+2,"3.2.2","Software de análise de vídeo com algoritmos de IA",Software,Alta,25,0.92
+3,"5.4","Integração com sistema de controle de acesso existente",Integração,Média,45,0.88
+4,"A.2","Treinamento de operadores para uso do sistema",Serviço,Média,289,0.91
 ```
+
+**Campos Explicados:**
+- **ID:** Número sequencial usado pelos agentes para validar completude (verifica se IDs 1-N existem sem gaps)
+- **Item:** Preserva a numeração original do edital para referência (pode ser "3.2.1", "5.4", etc.)
 
 ---
 
