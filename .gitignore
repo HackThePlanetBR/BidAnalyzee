@@ -11,6 +11,12 @@ data/analyses/*
 data/state/*.json
 !data/state/.gitkeep
 
+# RAG specific
+data/vector_store/faiss/*.index
+data/vector_store/faiss/*.pkl
+*.index
+*.pkl
+
 # Logs
 *.log
 logs/
@@ -19,6 +25,7 @@ data/analyses/*/logs.txt
 # Temporary files
 *.tmp
 *.temp
+*.bak
 .DS_Store
 Thumbs.db
 
