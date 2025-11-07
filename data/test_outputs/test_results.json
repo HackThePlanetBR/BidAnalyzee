@@ -1,0 +1,41 @@
+{
+  "test_name": "Document Structurer Integration Test",
+  "test_date": "2025-11-06 17:59:58",
+  "phases": {
+    "structure": {
+      "status": "PASS",
+      "plan_created": true,
+      "steps_count": 5,
+      "checkpoints_count": 3
+    },
+    "execute": {
+      "status": "PASS",
+      "csv_generated": true,
+      "rows_count": 10,
+      "columns_count": 7
+    },
+    "inspect": {
+      "status": "PASS",
+      "total_items": 16,
+      "passed_items": 16,
+      "fixed_passed": 8,
+      "dynamic_passed": 8
+    },
+    "validate": {
+      "status": "PASS",
+      "all_metrics_100": true,
+      "completeness": 100.0,
+      "integrity": 100.0,
+      "consistency": 100.0,
+      "traceability": 100.0
+    },
+    "deliver": {
+      "status": "PASS",
+      "package_created": true,
+      "package_path": "/home/user/BidAnalyzee/data/test_outputs/delivery_20251106_175958",
+      "directories_count": 5,
+      "files_count": 5
+    }
+  },
+  "overall_status": "PASS"
+}

@@ -1,0 +1,11 @@
+﻿ID,Item,Descrição,Categoria,Prioridade,Página,Confiança
+1,3.1.1,Câmeras IP com resolução Full HD (1920x1080),Hardware,Alta,6,0.89
+2,3.1.2,Taxa de captura mínima de 30 fps,Hardware,Alta,6,0.9
+3,3.2.1,Proteção IP66 para uso externo,Hardware,Alta,7,0.91
+4,3.2.2,Visão noturna com alcance de 30 metros,Hardware,Alta,7,0.92
+5,3.3.1,Alimentação via PoE (IEEE 802.3af),Hardware,Média,8,0.93
+6,3.3.2,Lente varifocal ajustável de 2.8mm a 12mm,Hardware,Média,8,0.94
+7,3.4.1,Software de gerenciamento de vídeo incluído,Software,Alta,9,0.95
+8,3.4.2,Suporte a protocolo ONVIF Profile S,Integração,Alta,9,0.96
+9,4.1.1,Instalação e configuração das câmeras,Serviço,Alta,10,0.97
+10,4.1.2,Treinamento técnico de 8 horas,Serviço,Média,10,0.98

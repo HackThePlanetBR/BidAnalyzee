@@ -1,0 +1,87 @@
+# SHIELD Framework - STRUCTURE Phase Template
+# This template is used to create execution plans for any task
+# Version: 1.0
+
+plan:
+  # Basic information
+  task: "[Nome descritivo da tarefa]"
+  agent: "[Nome do agente responsável - ex: orchestrator, document_structurer]"
+  created_at: "[ISO 8601 timestamp]"
+  estimated_duration: "[Tempo total estimado - ex: 5min 30s]"
+
+  # Task context
+  context:
+    objective: "[Objetivo claro e específico da tarefa]"
+    inputs:
+      - type: "[Tipo do input - ex: file, url, text]"
+        description: "[Descrição do input]"
+        required: true
+    outputs:
+      - type: "[Tipo do output - ex: csv, json, report]"
+        description: "[Descrição do output esperado]"
+        location: "[Caminho do arquivo ou destino]"
+
+  # Execution steps
+  steps:
+    - id: 1
+      name: "[Nome da etapa]"
+      description: "[Descrição detalhada do que será feito]"
+      estimated_time: "[Tempo estimado - ex: 30s]"
+      dependencies: []  # IDs de etapas que devem ser concluídas antes
+      checkpoints:
+        - type: "INSPECT"
+          description: "[O que será inspecionado]"
+        - type: "VALIDATE"
+          description: "[O que será validado quantitativamente]"
+      success_criteria:
+        - "[Critério mensurável de sucesso #1]"
+        - "[Critério mensurável de sucesso #2]"
+
+    - id: 2
+      name: "[Segunda etapa]"
+      description: "[Descrição]"
+      estimated_time: "[Tempo]"
+      dependencies: [1]  # Depende da etapa 1
+      checkpoints:
+        - type: "HALT"
+          reason: "[Por que pausar aqui para aprovação do usuário]"
+      success_criteria:
+        - "[Critério #1]"
+
+  # HALT points (checkpoints de aprovação do usuário)
+  halt_points:
+    - after_step: 2
+      reason: "[Justificativa para pausar e solicitar aprovação]"
+      presentation:
+        format: "[Como apresentar - ex: table, summary, preview]"
+        include:
+          - "[Item a mostrar #1]"
+          - "[Item a mostrar #2]"
+
+  # Overall success criteria
+  success_criteria:
+    - "[Critério global #1 - ex: 100% dos requisitos processados]"
+    - "[Critério global #2 - ex: CSV válido conforme template]"
+    - "[Critério global #3 - ex: Zero duplicatas]"
+
+  # Risk assessment
+  risks:
+    - risk: "[Descrição do risco]"
+      probability: "[low/medium/high]"
+      impact: "[low/medium/high]"
+      mitigation: "[Estratégia de mitigação]"
+
+  # Resource estimates
+  resources:
+    estimated_tokens: "[Número estimado - ex: 15000]"
+    estimated_api_calls:
+      pinecone: "[Número - ex: 50]"
+      n8n: "[Número - ex: 50]"
+    estimated_disk_space: "[Tamanho - ex: 2MB]"
+
+# Metadata
+metadata:
+  shield_version: "1.0"
+  mode: "STRICT"
+  created_by: "[Agent name]"
+  template_version: "1.0"

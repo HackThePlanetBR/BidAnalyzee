@@ -1,0 +1,93 @@
+# SHIELD Framework - INSPECT Phase Result Template
+# This template is used to record inspection results
+# Version: 1.0
+
+inspection:
+  # Basic information
+  timestamp: "[ISO 8601 timestamp]"
+  agent: "[Nome do agente que executou a inspeção]"
+  phase: "[Nome da etapa/fase que foi inspecionada]"
+  task_id: "[ID da tarefa ou análise]"
+
+  # Checklist used
+  checklist_used:
+    fixed: "framework/checklists/anti_alucinacao.yaml"
+    dynamic: "[Caminho do checklist específico da tarefa - ex: agents/document_structurer/checklists/inspect.yaml]"
+
+  # Fixed checklist results (Anti-alucinação e qualidade geral)
+  fixed_checklist_results:
+    - item: "Todas as informações foram extraídas de fontes fornecidas?"
+      status: true  # true = passou, false = falhou
+      evidence: "[Justificativa ou evidência - ex: Todos os dados têm referência ao arquivo X]"
+
+    - item: "Não há invenção ou suposição de dados?"
+      status: true
+      evidence: "[Evidência]"
+
+    - item: "Cada afirmação tem evidência rastreável?"
+      status: true
+      evidence: "[Evidência]"
+
+    - item: "Campos 'Não encontrado' estão justificados?"
+      status: true
+      evidence: "[Evidência]"
+
+    - item: "Não há contradições no output?"
+      status: true
+      evidence: "[Evidência]"
+
+  # Dynamic checklist results (específicos da tarefa)
+  dynamic_checklist_results:
+    - item: "[Item específico da tarefa #1]"
+      status: true
+      evidence: "[Evidência ou justificativa]"
+
+    - item: "[Item específico da tarefa #2]"
+      status: false
+      reason: "[Por que falhou]"
+      corrective_action: "[O que será feito no LOOP para corrigir]"
+
+  # Summary
+  summary:
+    fixed_checklist:
+      items_total: 5
+      items_passed: 5
+      items_failed: 0
+
+    dynamic_checklist:
+      items_total: 8
+      items_passed: 7
+      items_failed: 1
+
+    overall:
+      items_total: 13
+      items_passed: 12
+      items_failed: 1
+      pass_rate: "92.3%"
+      overall_status: "FAIL"  # PASS ou FAIL (basta 1 item falhar = FAIL)
+
+  # Failed items (agregado para fácil visualização)
+  failed_items:
+    - checklist: "dynamic"
+      item: "[Descrição do item que falhou]"
+      reason: "[Motivo da falha]"
+      corrective_action: "[Ação corretiva]"
+      priority: "high"  # low, medium, high
+
+  # Next action
+  next_action: "LOOP"  # LOOP (se falhou) ou VALIDATE (se passou)
+  loop_iteration: 1  # Número da iteração do loop (se aplicável)
+
+  # Output being inspected
+  inspected_output:
+    type: "[Tipo - ex: csv, json, text]"
+    location: "[Caminho do arquivo ou referência]"
+    size: "[Tamanho - ex: 2.3MB ou 150 linhas]"
+    checksum: "[Hash do arquivo - opcional]"
+
+# Metadata
+metadata:
+  shield_version: "1.0"
+  mode: "STRICT"
+  inspection_duration: "[Tempo gasto - ex: 15s]"
+  template_version: "1.0"

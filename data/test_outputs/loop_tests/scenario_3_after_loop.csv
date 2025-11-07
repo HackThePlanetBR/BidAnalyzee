@@ -1,0 +1,5 @@
+﻿ID,Item,Descrição,Categoria,Prioridade,Página,Confiança
+1,3.1,Req 1,Hardware,Alta,1,0.95
+2,3.2,Req 2,Software,Alta,2,0.93
+3,3.3,Req 3,Serviço,Média,3,0.9
+4,3.4,Req 4,Integração,Média,4,0.88

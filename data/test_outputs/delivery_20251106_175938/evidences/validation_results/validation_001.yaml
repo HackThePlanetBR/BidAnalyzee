@@ -1,0 +1,59 @@
+metrics:
+  completeness:
+    formula: (10 / 10) × 100
+    status: PASS
+    value: 100.0
+  consistency:
+    checks:
+      confidence_range: &id001 !!python/object/apply:numpy._core.multiarray.scalar
+      - !!python/object/apply:numpy.dtype
+        args:
+        - b1
+        - false
+        - true
+        state: !!python/tuple
+        - 3
+        - '|'
+        - null
+        - null
+        - null
+        - -1
+        - -1
+        - 0
+      - !!binary |
+        AQ==
+      ids_sequential: *id001
+      no_duplicates: true
+      valid_categories: *id001
+      valid_priorities: *id001
+    status: PASS
+    value: 100.0
+  integrity:
+    formula: (70 / 70) × 100
+    status: PASS
+    value: !!python/object/apply:numpy._core.multiarray.scalar
+    - !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - false
+      - true
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - !!binary |
+      AAAAAAAAWUA=
+  traceability:
+    checks:
+      all_have_items: *id001
+      all_have_pages: *id001
+      valid_page_range: *id001
+    status: PASS
+    value: 100.0
+mode: strict
+overall_status: PASS

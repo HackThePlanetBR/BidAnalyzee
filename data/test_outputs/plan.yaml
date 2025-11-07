@@ -1,0 +1,28 @@
+agent: document_structurer
+estimated_time_total: 45 seconds
+halt_checkpoints:
+- after_planning
+- low_confidence_detected
+- before_delivery
+input:
+  pages: 15
+  pdf_path: tests/fixtures/PMSP-Cameras-Test-2025-999.pdf
+  size_mb: 1.2
+mode: strict
+steps:
+- estimated_time: 10 seconds
+  id: 1
+  name: Extract text from PDF
+- estimated_time: 20 seconds
+  id: 2
+  name: Identify requirements
+- estimated_time: 5 seconds
+  id: 3
+  name: Categorize requirements
+- estimated_time: 5 seconds
+  id: 4
+  name: Assign priorities
+- estimated_time: 5 seconds
+  id: 5
+  name: Structure as CSV
+task_id: test_PMSP-Cameras-Test-2025-999

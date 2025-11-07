@@ -1,0 +1,104 @@
+# SHIELD Framework - Fixed Checklist: Anti-Alucinação
+# This checklist is MANDATORY for ALL agents in ALL phases
+# Version: 1.0
+
+checklist:
+  name: "Anti-Alucinação e Qualidade Geral"
+  type: "fixed"
+  version: "1.0"
+  applies_to: "all_agents"
+  mandatory: true
+
+  description: |
+    Este checklist garante que o agente não está inventando informações,
+    que todas as afirmações têm evidências, e que o output está em conformidade
+    com os padrões de qualidade do sistema.
+
+  items:
+    - id: "AA-01"
+      question: "Todas as informações foram extraídas de fontes fornecidas (documentos, base de conhecimento)?"
+      rationale: "O agente deve operar apenas com dados fornecidos, nunca inventando informações."
+      how_to_check: "Verifique se cada dado no output tem uma referência clara a uma fonte."
+      pass_criteria: "100% dos dados têm fonte identificada"
+      fail_criteria: "Qualquer dado sem fonte"
+      severity: "critical"
+
+    - id: "AA-02"
+      question: "Não há invenção ou suposição de dados não presentes nas fontes?"
+      rationale: "Suposições podem levar a análises incorretas e desqualificação em licitações."
+      how_to_check: "Compare cada afirmação no output com o conteúdo das fontes. Se algo não está explícito na fonte, não deve estar no output."
+      pass_criteria: "Zero suposições ou invenções"
+      fail_criteria: "Qualquer dado suposto ou inventado"
+      severity: "critical"
+
+    - id: "AA-03"
+      question: "Cada afirmação tem uma evidência rastreável (link, trecho, referência)?"
+      rationale: "Evidências permitem auditoria e validação humana posterior."
+      how_to_check: "Verifique se cada linha de análise tem um campo de evidência preenchido com link ou trecho."
+      pass_criteria: "100% das afirmações têm evidência"
+      fail_criteria: "Qualquer afirmação sem evidência"
+      severity: "high"
+
+    - id: "AA-04"
+      question: "Quando algo não foi encontrado, está explicitamente marcado como 'Não encontrado' ou similar (não como 'N/A' genérico)?"
+      rationale: "'N/A' é ambíguo. 'Não encontrado' é claro e indica que houve uma busca."
+      how_to_check: "Procure por campos vazios, 'N/A' sem explicação, ou ausência de justificativa."
+      pass_criteria: "Todos os campos não preenchidos têm justificativa clara"
+      fail_criteria: "Campos vazios ou 'N/A' sem explicação"
+      severity: "medium"
+
+    - id: "AA-05"
+      question: "Não há contradições entre diferentes partes do output?"
+      rationale: "Contradições indicam erro de lógica ou processamento."
+      how_to_check: "Compare diferentes seções do output para verificar consistência."
+      pass_criteria: "Zero contradições identificadas"
+      fail_criteria: "Qualquer contradição"
+      severity: "high"
+
+    - id: "AA-06"
+      question: "O formato do output está conforme o template definido?"
+      rationale: "Outputs padronizados facilitam processamento automatizado e leitura humana."
+      how_to_check: "Compare o output com o template esperado (ex: colunas do CSV, campos do JSON)."
+      pass_criteria: "100% conforme o template"
+      fail_criteria: "Qualquer desvio do template sem justificativa"
+      severity: "medium"
+
+    - id: "AA-07"
+      question: "Links e referências são acessíveis e apontam para o conteúdo correto?"
+      rationale: "Links quebrados ou incorretos invalidam a evidência."
+      how_to_check: "Valide uma amostra de links (mínimo 10%) para verificar acessibilidade."
+      pass_criteria: "100% dos links testados funcionam"
+      fail_criteria: "Qualquer link quebrado ou incorreto"
+      severity: "medium"
+
+    - id: "AA-08"
+      question: "A linguagem usada é objetiva, clara e livre de ambiguidades?"
+      rationale: "Linguagem ambígua pode causar interpretações incorretas."
+      how_to_check: "Leia o output como se fosse um usuário sem contexto. Há termos vagos ou ambíguos?"
+      pass_criteria: "Linguagem clara e objetiva em todo o output"
+      fail_criteria: "Termos vagos como 'provavelmente', 'talvez', 'pode ser'"
+      severity: "low"
+
+  # Scoring
+  scoring:
+    method: "all_or_nothing"
+    description: |
+      Em Modo Strict, TODOS os itens devem passar. Um único item falhando
+      resulta em status FAIL, acionando o LOOP para correção.
+
+    pass_threshold: "100%"
+    fail_action: "LOOP"
+    max_loop_iterations: 3
+
+  # Usage instructions
+  usage:
+    when_to_use: "Após CADA fase EXECUTE, antes de VALIDATE"
+    who_executes: "O próprio agente (auto-inspeção)"
+    output_format: "framework/templates/inspection_result.yaml"
+
+# Metadata
+metadata:
+  created_by: "SHIELD Framework Core Team"
+  created_at: "2025-11-06"
+  last_updated: "2025-11-06"
+  version: "1.0"
