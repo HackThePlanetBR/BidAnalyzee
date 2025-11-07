@@ -1,0 +1,49 @@
+# BidAnalyzee - Requirements
+# Python dependencies for the project
+
+# Core dependencies for Document Structurer agent
+pandas>=2.0.0       # CSV manipulation and data validation
+pyyaml>=6.0        # YAML parsing (plans, checklists, results)
+
+# PDF processing (when implementing real PDF extraction)
+# PyPDF2>=3.0.0     # PDF text extraction (uncomment when needed)
+# pdfplumber>=0.10  # Alternative PDF parser (uncomment when needed)
+
+# ============================================
+# Sprint 5 - Technical Analyst Agent (RAG)
+# ============================================
+
+# RAG Framework
+langchain>=0.1.0              # RAG orchestration framework
+langchain-community>=0.0.20   # Community integrations
+langchain-openai>=0.0.5       # OpenAI integrations (future)
+
+# Vector Store
+faiss-cpu>=1.7.4              # Local vector store (CPU-only)
+
+# Embeddings
+sentence-transformers>=2.2.2  # Local embeddings (free, multilingual)
+
+# OpenAI (Future - Cloud Migration)
+# openai>=1.10.0              # OpenAI API for embeddings (uncomment when migrating)
+
+# Utilities
+tiktoken>=0.5.2               # Token counting for OpenAI models
+python-dotenv>=1.0.0          # Environment variables management
+
+# ============================================
+# Testing
+# ============================================
+# pytest>=7.0.0     # Test framework (optional, tests work standalone)
+
+# ============================================
+# Code quality (optional)
+# ============================================
+# black>=23.0.0     # Code formatter
+# pylint>=2.17.0    # Linter
+
+# ============================================
+# Notes
+# ============================================
+# This project is designed to run in Claude Code environment
+# Some dependencies may already be available in the environment
