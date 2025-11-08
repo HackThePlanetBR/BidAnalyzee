@@ -129,7 +129,7 @@ class FAISSVectorStore(VectorStoreInterface):
         metadatas: Optional[List[Dict[str, Any]]] = None
     ) -> None:
         """Add documents to FAISS index"""
-        if not texts or not embeddings:
+        if len(texts) == 0 or len(embeddings) == 0:
             return
 
         if len(texts) != len(embeddings):
