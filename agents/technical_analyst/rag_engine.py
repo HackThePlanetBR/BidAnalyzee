@@ -18,10 +18,10 @@ from pathlib import Path
 import json
 from datetime import datetime
 
-from config import RAGConfig
-from vector_store import create_vector_store
-from embeddings_manager import EmbeddingsManager
-from ingestion_pipeline import IngestionPipeline
+from .config import RAGConfig
+from .vector_store import create_vector_store
+from .embeddings_manager import EmbeddingsManager
+from .ingestion_pipeline import IngestionPipeline
 
 
 class RAGEngine:
@@ -190,10 +190,13 @@ class RAGEngine:
         )
 
         # Filter by similarity threshold
-        filtered_results = [
-            result for result in results
-            if result["similarity_score"] >= similarity_threshold
-        ]
+        # vector_store returns 'score', rename to 'similarity_score'
+        filtered_results = []
+        for result in results:
+            if result["score"] >= similarity_threshold:
+                result_copy = result.copy()
+                result_copy["similarity_score"] = result_copy.pop("score")
+                filtered_results.append(result_copy)
 
         return filtered_results
 
