@@ -1,134 +1,29 @@
-# SHIELD Framework - Dynamic Checklist: Análise Técnica de Conformidade
-# This checklist is specific to the @AnalistaTecnico agent
-# Version: 1.0
+# SHIELD Phase I - INSPECT Checklist
+# Technical Analyst - Conformity Analysis
 
-checklist:
-  name: "Inspeção de Análise Técnica"
-  type: "dynamic"
-  agent: "technical_analyst"
-  version: "1.0"
+name: "Technical Analyst INSPECT Checklist"
+version: "1.0"
+phase: "INSPECT"
+description: "Auto-inspeção durante análise de conformidade de requisitos"
 
-  description: |
-    Este checklist valida a qualidade da análise de conformidade técnica,
-    garantindo que cada requisito foi analisado corretamente contra a base
-    de conhecimento e que o status de conformidade está bem fundamentado.
-
+pre_analysis:
+  description: "Checklist antes de analisar cada requisito"
   items:
-    - id: "AT-01"
-      question: "Cada requisito foi analisado individualmente?"
-      rationale: "Análises agregadas podem mascarar não-conformidades específicas."
-      how_to_check: "Verifique se cada linha do CSV de entrada tem uma análise correspondente no CSV de saída."
-      pass_criteria: "100% dos requisitos analisados"
-      fail_criteria: "Qualquer requisito sem análise"
-      severity: "critical"
+    - id: "I-01"
+      check: "Requisito foi lido completamente e compreendido?"
+      critical: true
 
-    - id: "AT-02"
-      question: "O status de conformidade está justificado com evidências da base de conhecimento?"
-      rationale: "Status sem evidência não é auditável nem confiável."
-      how_to_check: "Para cada status (Conforme/Não Conforme/Revisão), verifique se há evidência na coluna correspondente."
-      pass_criteria: "100% dos status têm evidência"
-      fail_criteria: "Qualquer status sem evidência"
-      severity: "critical"
+    - id: "I-02"
+      check: "Palavras-chave críticas foram identificadas?"
+      critical: true
 
-    - id: "AT-03"
-      question: "Links de evidência apontam para seções relevantes (não genéricas)?"
-      rationale: "Links genéricos (ex: homepage do manual) não são evidências válidas."
-      how_to_check: "Verifique se os links incluem âncoras/seções específicas (ex: #section-5.2) e não apenas URLs raiz."
-      pass_criteria: "100% dos links são específicos"
-      fail_criteria: "Links genéricos ou de homepage"
-      severity: "high"
-      examples:
-        good:
-          - "https://docs.example.com/manual#temperature-specs"
-          - "Manual XYZ, página 42, seção 'Especificações Ambientais'"
-        bad:
-          - "https://docs.example.com/"
-          - "Manual XYZ"
+evidence_quality:
+  description: "Checklist de qualidade das evidências"
+  items:
+    - id: "I-05"
+      check: "Busca RAG retornou pelo menos 2 evidências relevantes?"
+      critical: true
 
-    - id: "AT-04"
-      question: "Requisitos com confiança < 85% estão marcados para revisão?"
-      rationale: "Conformidade NFR2: taxa de precisão > 85% requer identificação de casos de baixa confiança."
-      how_to_check: "Verifique se requisitos com score de confiança abaixo do threshold têm status 'REVISAO_HUMANA'."
-      pass_criteria: "100% dos casos de baixa confiança marcados"
-      fail_criteria: "Casos de baixa confiança não marcados"
-      severity: "critical"
-      threshold: 0.85
-
-    - id: "AT-05"
-      question: "Produtos recomendados correspondem ao requisito analisado?"
-      rationale: "Recomendações incorretas podem causar propostas com produtos inadequados."
-      how_to_check: "Compare a descrição do requisito com o produto recomendado. Há match de funcionalidade?"
-      pass_criteria: "100% das recomendações são adequadas"
-      fail_criteria: "Recomendações inadequadas ou genéricas"
-      severity: "high"
-
-    - id: "AT-06"
-      question: "Requisitos marcados como 'Não Conforme' têm alternativas sugeridas (quando possível)?"
-      rationale: "Alternativas ajudam a equipe comercial a buscar soluções ou questionamentos."
-      how_to_check: "Para cada 'Não Conforme', verifique se há sugestão de alternativa ou justificativa de impossibilidade."
-      pass_criteria: "100% dos 'Não Conforme' têm alternativa ou justificativa"
-      fail_criteria: "Não conformidades sem orientação"
-      severity: "medium"
-
-    - id: "AT-07"
-      question: "A justificativa usa linguagem técnica precisa (não vaga)?"
-      rationale: "Justificativas vagas ('provavelmente atende') não são úteis."
-      how_to_check: "Procure por termos vagos na coluna de justificativa."
-      pass_criteria: "Linguagem objetiva e técnica"
-      fail_criteria: "Termos vagos como 'provavelmente', 'pode ser', 'talvez'"
-      severity: "medium"
-      forbidden_terms:
-        - "provavelmente"
-        - "possivelmente"
-        - "talvez"
-        - "pode ser"
-        - "aparentemente"
-
-    - id: "AT-08"
-      question: "Requisitos que dependem de configuração estão marcados adequadamente?"
-      rationale: "Alguns requisitos são atendidos 'com configuração'. Isso deve estar explícito."
-      how_to_check: "Verifique se status 'CONFORME_COM_CONFIG' é usado quando apropriado."
-      pass_criteria: "Requisitos condicionais marcados corretamente"
-      fail_criteria: "Requisitos condicionais marcados como conformes absolutos"
-      severity: "medium"
-      valid_status:
-        - "CONFORME"
-        - "NAO_CONFORME"
-        - "CONFORME_COM_CONFIG"
-        - "REVISAO_HUMANA"
-        - "NAO_APLICAVEL"
-
-    - id: "AT-09"
-      question: "Todos os scores de confiança estão no range [0.0, 1.0]?"
-      rationale: "Scores fora do range indicam erro de processamento."
-      how_to_check: "Verifique a coluna de confiança."
-      pass_criteria: "Todos os scores entre 0.0 e 1.0"
-      fail_criteria: "Qualquer score fora do range"
-      severity: "high"
-
-    - id: "AT-10"
-      question: "A análise considerou o contexto completo do requisito (não apenas palavras-chave)?"
-      rationale: "Análise superficial pode resultar em falsos positivos."
-      how_to_check: "Revise amostra de análises para verificar se o contexto foi considerado."
-      pass_criteria: "Análise contextual em 100% da amostra"
-      fail_criteria: "Análise baseada apenas em keywords"
-      severity: "high"
-
-  # Scoring
-  scoring:
-    method: "all_or_nothing"
-    pass_threshold: "100%"
-    fail_action: "LOOP"
-    max_loop_iterations: 3
-
-  # Usage
-  usage:
-    when_to_use: "Após gerar o CSV de análise, antes de VALIDATE"
-    precedes: "framework/checklists/anti_alucinacao.yaml"
-    output_format: "framework/templates/inspection_result.yaml"
-
-# Metadata
-metadata:
-  agent: "technical_analyst"
-  created_at: "2025-11-06"
-  version: "1.0"
+    - id: "I-06"
+      check: "Similaridade das evidências é ≥ 0.70?"
+      critical: true

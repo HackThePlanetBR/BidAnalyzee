@@ -1,0 +1,64 @@
+# SHIELD Phase L.5 - VALIDATE Checklist  
+# Technical Analyst - Final Validation
+
+name: "Technical Analyst VALIDATE Checklist"
+version: "1.0"
+phase: "VALIDATE"
+description: "Validação final antes de entregar análise completa"
+
+completeness:
+  description: "Validar que TODOS os requisitos foram analisados"
+  items:
+    - id: "V-01"
+      check: "Total de linhas CSV = Total de requisitos do input?"
+      critical: true
+      command: "wc -l analysis.csv vs. wc -l requirements.csv"
+
+    - id: "V-02"
+      check: "Nenhum requisito foi pulado ou esquecido?"
+      critical: true
+
+    - id: "V-03"
+      check: "Ordem dos requisitos foi preservada?"
+      critical: false
+
+format:
+  description: "Validar formato do CSV"
+  items:
+    - id: "V-04"
+      check: "CSV tem cabeçalho correto com 8 campos?"
+      critical: true
+      header: "ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações"
+
+    - id: "V-05"
+      check: "Encoding é UTF-8 sem BOM?"
+      critical: true
+      command: "file -bi analysis.csv"
+
+    - id: "V-06"
+      check: "Sem linhas vazias ou malformadas?"
+      critical: true
+      command: "python3 scripts/validate_csv.py --input analysis.csv"
+
+quality:
+  description: "Validar qualidade das análises"
+  items:
+    - id: "V-07"
+      check: "Todos os veredictos são CONFORME|NAO_CONFORME|REVISAO?"
+      critical: true
+
+    - id: "V-08"
+      check: "Todas as confianças estão entre 0.0-1.0?"
+      critical: true
+
+    - id: "V-09"
+      check: "Cada análise tem evidências citadas?"
+      critical: true
+
+    - id: "V-10"
+      check: "Cada raciocínio tem justificativa clara?"
+      critical: true
+
+    - id: "V-11"
+      check: "Recomendações são acionáveis?"
+      critical: true
