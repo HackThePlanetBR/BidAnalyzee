@@ -1,0 +1,261 @@
+# SHIELD Phase L.5 - VALIDATE Checklist
+# Orchestrator - Final Validation Before Delivery
+
+name: "Orchestrator VALIDATE Checklist"
+version: "1.0"
+phase: "VALIDATE"
+description: "Validação final antes de entregar resultados ao usuário"
+
+session_completeness:
+  description: "Verificar completude da sessão"
+  items:
+    - id: "V-01"
+      check: "Todos os stages planejados foram completados?"
+      critical: true
+      verify: "workflow.stages_completed contém todos os stages esperados"
+
+    - id: "V-02"
+      check: "Status da sessão é 'completed'?"
+      critical: true
+      verify: "session.status == 'completed'"
+
+    - id: "V-03"
+      check: "Todos os timestamps estão presentes?"
+      critical: true
+      required_fields:
+        - "created_at"
+        - "updated_at"
+        - "results.document_structurer.timestamp"
+        - "results.technical_analyst.timestamp"
+
+    - id: "V-04"
+      check: "Workflow current_stage é 'completed'?"
+      critical: true
+
+output_files:
+  description: "Verificar existência e validade de outputs"
+  items:
+    - id: "V-10"
+      check: "CSV de requisitos existe?"
+      critical: true
+      file: "{output_dir}/requirements_structured.csv"
+
+    - id: "V-11"
+      check: "CSV de análise existe?"
+      critical: true
+      file: "{output_dir}/analysis.csv"
+
+    - id: "V-12"
+      check: "Relatório markdown existe (se gerado)?"
+      critical: false
+      file: "{output_dir}/report.md"
+
+    - id: "V-13"
+      check: "Todos os CSVs são válidos (formato, encoding)?"
+      critical: true
+      tool: "python3 scripts/validate_csv.py"
+
+data_consistency:
+  description: "Verificar consistência entre componentes"
+  items:
+    - id: "V-20"
+      check: "Total de requisitos é consistente?"
+      critical: true
+      verify: |
+        count(requirements.csv) == 
+        count(analysis.csv) == 
+        session.results.document_structurer.total_requirements
+
+    - id: "V-21"
+      check: "Todos os IDs de requisitos têm análise correspondente?"
+      critical: true
+      verify: "set(requirements.ID) == set(analysis.ID)"
+
+    - id: "V-22"
+      check: "Todos os vereditos são válidos?"
+      critical: true
+      valid_values:
+        - "CONFORME"
+        - "NAO_CONFORME"
+        - "REVISAO"
+
+    - id: "V-23"
+      check: "Scores de confiança estão no range [0.0, 1.0]?"
+      critical: true
+
+    - id: "V-24"
+      check: "Todas as evidências têm formato 'doc:linha'?"
+      critical: false
+      pattern: "*.md:[0-9]+"
+
+quality_checks:
+  description: "Verificações de qualidade dos resultados"
+  items:
+    - id: "V-30"
+      check: "Nenhum campo crítico está vazio?"
+      critical: true
+      check_fields:
+        - "ID"
+        - "Requisito"
+        - "Veredicto"
+        - "Raciocínio"
+
+    - id: "V-31"
+      check: "Raciocínios têm comprimento adequado (> 20 chars)?"
+      critical: false
+      note: "Raciocínios muito curtos podem indicar baixa qualidade"
+
+    - id: "V-32"
+      check: "Recomendações foram fornecidas para todos os itens?"
+      critical: false
+
+    - id: "V-33"
+      check: "Itens NAO_CONFORME têm raciocínio claro?"
+      critical: true
+      note: "Itens não conformes DEVEM ter justificativa clara"
+
+state_persistence:
+  description: "Verificar persistência de estado"
+  items:
+    - id: "V-40"
+      check: "Sessão foi salva em data/state/sessions/{session_id}.json?"
+      critical: true
+
+    - id: "V-41"
+      check: "Índice foi atualizado em data/state/index.json?"
+      critical: true
+
+    - id: "V-42"
+      check: "Sessão foi copiada para delivery dir?"
+      critical: false
+      file: "{output_dir}/session.json"
+
+    - id: "V-43"
+      check: "Não há sessões órfãs (index referencia sessão inexistente)?"
+      critical: false
+
+statistics:
+  description: "Verificar estatísticas consolidadas"
+  items:
+    - id: "V-50"
+      check: "Taxa de conformidade foi calculada?"
+      critical: false
+      formula: "CONFORME / TOTAL"
+
+    - id: "V-51"
+      check: "Estatísticas por categoria foram geradas?"
+      critical: false
+
+    - id: "V-52"
+      check: "Itens críticos (NAO_CONFORME) foram identificados?"
+      critical: true
+
+    - id: "V-53"
+      check: "Resumo executivo contém informações-chave?"
+      critical: true
+      required_info:
+        - "Total de requisitos"
+        - "Distribuição de vereditos (%, absoluto)"
+        - "Lista de itens NAO_CONFORME"
+        - "Caminhos dos arquivos gerados"
+
+error_resilience:
+  description: "Verificar tratamento de erros e edge cases"
+  items:
+    - id: "V-60"
+      check: "Não há erros registrados sem tratamento?"
+      critical: true
+
+    - id: "V-61"
+      check: "Se houve warnings, foram documentados?"
+      critical: false
+
+    - id: "V-62"
+      check: "Logs de execução estão completos?"
+      critical: false
+
+delivery_readiness:
+  description: "Checklist final antes de apresentar ao usuário"
+  items:
+    - id: "V-70"
+      check: "Resumo executivo foi preparado?"
+      critical: true
+
+    - id: "V-71"
+      check: "Caminhos dos arquivos estão corretos e acessíveis?"
+      critical: true
+
+    - id: "V-72"
+      check: "Alertas críticos foram identificados e destacados?"
+      critical: true
+
+    - id: "V-73"
+      check: "Próximos passos sugeridos foram incluídos?"
+      critical: false
+
+    - id: "V-74"
+      check: "Tempo total de execução foi calculado?"
+      critical: false
+
+    - id: "V-75"
+      check: "Mensagem de entrega está formatada de forma clara?"
+      critical: true
+
+manual_spot_checks:
+  description: "Verificações manuais pontuais (amostragem)"
+  items:
+    - id: "V-80"
+      check: "Spot check: 3 análises aleatórias fazem sentido?"
+      critical: false
+      note: "Abrir CSV e verificar raciocínio de 3 linhas aleatórias"
+
+    - id: "V-81"
+      check: "Spot check: Itens NAO_CONFORME estão realmente não conformes?"
+      critical: true
+      note: "Revisar TODOS os itens NAO_CONFORME"
+
+    - id: "V-82"
+      check: "Spot check: Evidências citadas existem na knowledge base?"
+      critical: false
+      note: "Verificar 3-5 evidências aleatórias"
+
+acceptance_criteria:
+  description: "Critérios de aceitação finais"
+  items:
+    - id: "V-90"
+      check: "Nenhum item CRITICAL falhou neste checklist?"
+      critical: true
+      action: "Se qualquer item critical falhou, LOOP para corrigir"
+
+    - id: "V-91"
+      check: "Pelo menos 90% dos itens não-critical passaram?"
+      critical: false
+
+    - id: "V-92"
+      check: "Resultado pode ser apresentado ao usuário com confiança?"
+      critical: true
+      note: "Última chance para LOOP e corrigir problemas"
+
+notes:
+  - "Este checklist é executado na fase VALIDATE (L.5) do SHIELD"
+  - "Items CRITICAL devem SEMPRE passar - se falhar, LOOP para corrigir"
+  - "Items não-critical são recomendações de qualidade"
+  - "Se V-90 falhar, NUNCA prossiga para DELIVER - corrija primeiro"
+  - "Lembre-se: Qualidade > Velocidade. É melhor atrasar e entregar certo."
+
+recommended_tools:
+  - name: "validate_csv.py"
+    usage: "python3 scripts/validate_csv.py --input <file> --type <requirements|analysis>"
+    purpose: "Validação automatizada de formato CSV"
+
+  - name: "wc -l"
+    usage: "wc -l <file>"
+    purpose: "Contar linhas para verificar consistência"
+
+  - name: "grep"
+    usage: "grep -c 'CONFORME' analysis.csv"
+    purpose: "Contar vereditos por tipo"
+
+  - name: "head/tail"
+    usage: "head -n 5 analysis.csv"
+    purpose: "Spot check visual de dados"
