@@ -1,0 +1,309 @@
+# SHIELD Phase L.5 - VALIDATE Checklist
+# Document Structurer - Final Validation Before Delivery
+
+name: "Document Structurer VALIDATE Checklist"
+version: "1.0"
+phase: "VALIDATE"
+description: "Validação quantitativa final antes de entregar CSV estruturado"
+
+completeness:
+  description: "Verificar se TODOS os requisitos foram capturados"
+  items:
+    - id: "V-01"
+      check: "Total de requisitos no CSV == Total identificado no PDF?"
+      critical: true
+      formula: "(items_in_csv / items_found_in_pdf) × 100"
+      target: "100%"
+      note: "Zero perda de requisitos durante processamento"
+
+    - id: "V-02"
+      check: "Todas as seções técnicas do PDF foram processadas?"
+      critical: true
+      sections_to_check:
+        - "Especificações Técnicas"
+        - "Anexo Técnico"
+        - "Requisitos"
+        - "Características Mínimas"
+
+    - id: "V-03"
+      check: "Requisitos de todas as páginas técnicas foram extraídos?"
+      critical: false
+      note: "Verificar cobertura de páginas (não deve haver páginas técnicas puladas)"
+
+integrity:
+  description: "Verificar integridade estrutural do CSV"
+  items:
+    - id: "V-10"
+      check: "CSV tem exatamente 7 colunas?"
+      critical: true
+      required_columns:
+        - "ID"
+        - "Item"
+        - "Descrição"
+        - "Categoria"
+        - "Prioridade"
+        - "Página"
+        - "Confiança"
+
+    - id: "V-11"
+      check: "Nenhuma célula obrigatória está vazia?"
+      critical: true
+      required_fields: ["ID", "Descrição", "Categoria", "Prioridade", "Página", "Confiança"]
+      note: "Campo 'Item' pode ser N/A se edital não numera requisitos"
+
+    - id: "V-12"
+      check: "Encoding do CSV é UTF-8 (com ou sem BOM)?"
+      critical: true
+      note: "Garantir compatibilidade com Excel e Python"
+
+    - id: "V-13"
+      check: "CSV é válido (parse sem erros)?"
+      critical: true
+      tool: "python3 scripts/validate_csv.py --type requirements"
+
+consistency:
+  description: "Verificar consistência dos dados"
+  items:
+    - id: "V-20"
+      check: "IDs são sequenciais de 1 a N sem gaps?"
+      critical: true
+      formula: "df['ID'].diff().iloc[1:].eq(1).all()"
+      note: "Gaps podem indicar perda de dados"
+
+    - id: "V-21"
+      check: "IDs são únicos (sem duplicatas)?"
+      critical: true
+      formula: "df['ID'].is_unique"
+
+    - id: "V-22"
+      check: "Categorias são válidas?"
+      critical: true
+      valid_values: ["Hardware", "Software", "Serviço", "Integração"]
+      formula: "df['Categoria'].isin(valid_values).all()"
+
+    - id: "V-23"
+      check: "Prioridades são válidas?"
+      critical: true
+      valid_values: ["Alta", "Média", "Baixa"]
+      formula: "df['Prioridade'].isin(valid_values).all()"
+
+    - id: "V-24"
+      check: "Confiança está no range [0.0, 1.0]?"
+      critical: true
+      formula: "df['Confiança'].between(0.0, 1.0).all()"
+
+    - id: "V-25"
+      check: "Páginas estão no range [1, max_pages]?"
+      critical: true
+      formula: "df['Página'].between(1, total_pdf_pages).all()"
+
+traceability:
+  description: "Verificar rastreabilidade até fonte"
+  items:
+    - id: "V-30"
+      check: "Todos os requisitos têm página de origem?"
+      critical: true
+      formula: "df['Página'].notna().all()"
+
+    - id: "V-31"
+      check: "Páginas referenciadas existem no PDF?"
+      critical: true
+      note: "Nenhuma página > total_pages"
+
+    - id: "V-32"
+      check: "Items (quando presentes) seguem formato do edital?"
+      critical: false
+      patterns: ["^\\d+\\.\\d+", "^[A-Z]\\.\\d+", "^\\d+"]
+      note: "Validar se formato de numeração está consistente com PDF"
+
+quality_metrics:
+  description: "Métricas de qualidade da extração"
+  items:
+    - id: "V-40"
+      check: "Confiança média >= 0.85?"
+      critical: false
+      formula: "df['Confiança'].mean() >= 0.85"
+      note: "Indica extração de alta qualidade"
+
+    - id: "V-41"
+      check: "% de requisitos com confiança < 0.85 <= 30%?"
+      critical: false
+      formula: "(df['Confiança'] < 0.85).sum() / len(df) <= 0.30"
+      action_if_fail: "Gerar low_confidence_items.csv para revisão"
+
+    - id: "V-42"
+      check: "Nenhuma descrição está truncada (< 2000 chars)?"
+      critical: false
+      formula: "df['Descrição'].str.len().max() <= 2000"
+
+    - id: "V-43"
+      check: "Descrições têm comprimento adequado (> 20 chars)?"
+      critical: true
+      formula: "df['Descrição'].str.len().min() >= 20"
+      note: "Descrições muito curtas podem ser inválidas"
+
+content_quality:
+  description: "Qualidade do conteúdo extraído"
+  items:
+    - id: "V-50"
+      check: "Requisitos são únicos (sem duplicatas textuais)?"
+      critical: true
+      note: "Comparar textos de 'Descrição' - similaridade < 90%"
+
+    - id: "V-51"
+      check: "Requisitos foram adequadamente decompostos?"
+      critical: true
+      note: "Nenhuma linha deve conter múltiplos requisitos (detectar 'e' ou 'ou' listando múltiplas exigências)"
+
+    - id: "V-52"
+      check: "Referências cruzadas foram preservadas?"
+      critical: false
+      patterns: ["conforme item", "conforme anexo", "conforme especificação"]
+      note: "Verificar se menções a outros itens estão preservadas"
+
+distribution:
+  description: "Distribuição e cobertura dos requisitos"
+  items:
+    - id: "V-60"
+      check: "Distribuição de categorias é razoável?"
+      critical: false
+      note: |
+        Verificar se há desequilíbrio extremo:
+        - Se 100% é uma categoria → revisar categorização
+        - Esperado: mix de Hardware/Software/Serviço/Integração
+
+    - id: "V-61"
+      check: "Distribuição de prioridades é razoável?"
+      critical: false
+      note: |
+        Verificar se há desequilíbrio extremo:
+        - Se 100% é Alta → revisar priorização
+        - Esperado: maioria Alta, alguns Média, poucos Baixa
+
+    - id: "V-62"
+      check: "Requisitos cobrem diferentes páginas do PDF?"
+      critical: false
+      note: "Se todos os requisitos vêm de 1-2 páginas → pode ter perdido seções"
+
+output_files:
+  description: "Verificar arquivos de output"
+  items:
+    - id: "V-70"
+      check: "CSV principal foi criado?"
+      critical: true
+      file: "data/deliveries/{session_id}/outputs/requirements_structured.csv"
+
+    - id: "V-71"
+      check: "Se há items de baixa confiança, CSV separado foi criado?"
+      critical: false
+      file: "data/deliveries/{session_id}/outputs/low_confidence_items.csv"
+      condition: "Se houver items com confiança < 0.85"
+
+    - id: "V-72"
+      check: "README de delivery foi criado?"
+      critical: false
+      file: "data/deliveries/{session_id}/README.md"
+
+edge_cases:
+  description: "Validações de casos extremos"
+  items:
+    - id: "V-80"
+      check: "PDF tinha requisitos? (não está vazio)"
+      critical: true
+      minimum: 1
+      note: "Se 0 requisitos → HALT para confirmação do usuário"
+
+    - id: "V-81"
+      check: "Quantidade de requisitos é razoável para o tamanho do PDF?"
+      critical: false
+      heuristic: "~0.5 a 2 requisitos por página técnica"
+      note: "Se muito baixo/alto → revisar extração"
+
+    - id: "V-82"
+      check: "Nenhum requisito é suspeito de alucinação?"
+      critical: true
+      note: "Spot check: 5 requisitos aleatórios existem no PDF?"
+
+acceptance_criteria:
+  description: "Critérios finais de aceitação"
+  items:
+    - id: "V-90"
+      check: "Todos os items CRITICAL deste checklist passaram?"
+      critical: true
+      action_if_fail: "LOOP para corrigir problemas críticos"
+
+    - id: "V-91"
+      check: "Pelo menos 90% dos items não-critical passaram?"
+      critical: false
+      threshold: "90%"
+
+    - id: "V-92"
+      check: "4 métricas quantitativas = 100%?"
+      critical: true
+      metrics:
+        - "Completeness: 100%"
+        - "Integrity: 100%"
+        - "Consistency: 100%"
+        - "Traceability: 100%"
+
+    - id: "V-93"
+      check: "CSV pode ser entregue com confiança ao usuário?"
+      critical: true
+      note: "Última verificação holística antes de DELIVER"
+
+quantitative_metrics:
+  description: "As 4 métricas quantitativas obrigatórias (DEVEM ser 100%)"
+
+  completeness:
+    formula: "(items_in_csv / items_identified_in_step2) × 100"
+    target: "100%"
+    validates: "Nenhum requisito foi perdido durante processamento"
+    critical: true
+
+  integrity:
+    formula: "(filled_fields / total_required_fields) × 100"
+    target: "100%"
+    validates: "Nenhuma célula obrigatória está vazia"
+    critical: true
+
+  consistency:
+    checks:
+      - "IDs sequenciais"
+      - "Sem duplicatas"
+      - "Categorias válidas"
+      - "Prioridades válidas"
+      - "Confiança em [0.0, 1.0]"
+    formula: "(checks_passed / total_checks) × 100"
+    target: "100%"
+    validates: "Todos os dados seguem especificações"
+    critical: true
+
+  traceability:
+    checks:
+      - "Todos têm página"
+      - "Páginas no range válido"
+      - "Items no formato correto"
+    formula: "(checks_passed / total_checks) × 100"
+    target: "100%"
+    validates: "Todos os requisitos são rastreáveis à fonte"
+    critical: true
+
+notes:
+  - "Este checklist é executado na fase VALIDATE (após INSPECT + LOOP)"
+  - "Todos os items CRITICAL devem passar - se falhar, LOOP ou HALT"
+  - "Items não-critical são recomendações de qualidade"
+  - "As 4 métricas quantitativas são OBRIGATÓRIAS e devem = 100%"
+  - "Se V-90 falhar, NUNCA prosseguir para DELIVER - corrigir primeiro"
+
+recommended_tools:
+  - name: "validate_csv.py"
+    usage: "python3 scripts/validate_csv.py --input <file> --type requirements"
+    purpose: "Validação automatizada de estrutura CSV"
+
+  - name: "pandas"
+    usage: "import pandas as pd; df = pd.read_csv(file)"
+    purpose: "Análise e validação de dados"
+
+  - name: "wc -l"
+    usage: "wc -l requirements_structured.csv"
+    purpose: "Contar requisitos (linhas - 1 header)"
