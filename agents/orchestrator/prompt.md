@@ -583,7 +583,7 @@ Próximos passos sugeridos:
   *nova_analise <pdf>           - Iniciar análise completa (futuro)
 
 🔍 CONSULTAS:
-  *buscar "<query>"             - Busca rápida na base de conhecimento (futuro)
+  *buscar "<query>"             - Busca rápida na base de conhecimento
 
 📖 DOCUMENTAÇÃO:
   - Guia completo: docs/USER_GUIDE.md
@@ -671,6 +671,184 @@ Total: 2 análises (1 completa, 1 em progresso)
       "timestamp": "2025-11-08T15:17:00Z"
     }
   }
+}
+```
+
+### `*buscar "<query>"`
+
+**Descrição:** Busca rápida na base de conhecimento sem precisar de análise completa
+
+**Quando usar:**
+- Perguntas pontuais sobre leis (Lei 8.666, Lei 14.133)
+- Consultas rápidas sobre requisitos técnicos
+- Esclarecer dúvidas durante análise manual
+- Verificar o que diz a legislação sobre um tema específico
+
+**Execução:**
+
+1. **Receber query do usuário:**
+   ```
+   *buscar "prazo validade proposta licitação"
+   ```
+
+2. **Executar busca RAG:**
+   ```bash
+   python3 scripts/rag_search.py \
+     --requirement "{query}" \
+     --top-k 5 \
+     --threshold 0.7 \
+     --output-json
+   ```
+
+3. **Formatar e apresentar resultados:**
+
+**Saída:**
+```
+🔍 BUSCA NA BASE DE CONHECIMENTO
+=================================
+
+Query: "prazo validade proposta licitação"
+
+📚 RESULTADOS (5 encontrados):
+
+[1] Lei 8.666/93:120 (similaridade: 0.92) ⭐
+───────────────────────────────────────────
+"O prazo de validade das propostas será de 60 (sessenta) dias,
+se outro não estiver fixado no edital."
+
+📄 Fonte: data/knowledge_base/mock_documents/lei_8666_93.md
+📍 Linha: 120
+
+[2] Lei 14.133/2021:89 (similaridade: 0.87)
+────────────────────────────────────────────
+"A validade da proposta não poderá ser inferior a 60 (sessenta)
+dias, contados da data de sua entrega."
+
+📄 Fonte: data/knowledge_base/mock_documents/lei_14133_2021.md
+📍 Linha: 89
+
+[3] Lei 8.666/93:125 (similaridade: 0.82)
+──────────────────────────────────────────
+"É vedado exigir prazo de validade da proposta superior a
+60 (sessenta) dias."
+
+📄 Fonte: data/knowledge_base/mock_documents/lei_8666_93.md
+📍 Linha: 125
+
+[4] Jurisprudência TCU (similaridade: 0.75)
+────────────────────────────────────────────
+"Acórdão 1234/2022: Prazo de validade de propostas deve estar
+explícito no edital, respeitando o limite de 60 dias."
+
+📄 Fonte: data/knowledge_base/mock_documents/jurisprudencia_tcu.md
+📍 Linha: 45
+
+[5] Lei 8.666/93:108 (similaridade: 0.73)
+──────────────────────────────────────────
+"O edital fixará prazo para apresentação das propostas, garantindo
+tempo razoável para elaboração."
+
+📄 Fonte: data/knowledge_base/mock_documents/lei_8.666_93.md
+📍 Linha: 108
+
+──────────────────────────────────────────
+
+✅ Dica: Use estes resultados para embasar análises de conformidade
+📝 Nota: Similaridade >= 0.85 = alta relevância (marcados com ⭐)
+```
+
+**Variações do comando:**
+
+| Variação | Descrição | Exemplo |
+|----------|-----------|---------|
+| `*buscar "query"` | Busca padrão (top 5, threshold 0.7) | `*buscar "marca específica licitação"` |
+| `*buscar "query" --top 10` | Mais resultados | `*buscar "software livre" --top 10` |
+| `*buscar "query" --threshold 0.85` | Maior precisão | `*buscar "prazo recurso" --threshold 0.85` |
+| `*buscar "query" --verbose` | Com contexto expandido | `*buscar "pregão eletrônico" --verbose` |
+
+**Exemplo de uso em análise:**
+
+```
+User: Estou analisando um requisito que exige "prazo de proposta de 90 dias".
+      Isso é conforme?
+
+Orchestrator: Vou buscar na base de conhecimento:
+              *buscar "prazo validade proposta licitação"
+
+[Mostra resultados acima]
+
+Com base nos resultados:
+- Lei 8.666/93:120 estabelece prazo padrão de 60 dias
+- Lei 8.666/93:125 VEDA exigir prazo > 60 dias
+
+✅ Conclusão: Exigir 90 dias é NAO_CONFORME (viola Lei 8.666/93:125)
+
+Recomendação: Requisito deve ser ajustado para máximo 60 dias.
+```
+
+**Tratamento de casos especiais:**
+
+**Se nenhum resultado encontrado (similaridade < threshold):**
+```
+🔍 BUSCA NA BASE DE CONHECIMENTO
+=================================
+
+Query: "blockchain governança descentralizada"
+
+⚠️ NENHUM RESULTADO ENCONTRADO
+
+Possíveis causas:
+1. Termo não está na base de conhecimento
+2. Query muito específica (tente termos mais gerais)
+3. Threshold muito alto (padrão: 0.7)
+
+💡 Sugestões:
+- Tente: *buscar "blockchain" (termo mais geral)
+- Ou: *buscar "governança descentralizada" --threshold 0.5
+- Ou: Consulte documentação externa sobre o tema
+```
+
+**Se query vazia ou inválida:**
+```
+❌ ERRO: Query vazia
+
+Uso correto:
+  *buscar "sua pergunta aqui"
+
+Exemplos:
+  *buscar "prazo validade proposta"
+  *buscar "marca específica licitação"
+  *buscar "software livre lei 8666"
+```
+
+**Integração com scripts existentes:**
+
+O comando `*buscar` usa o script `scripts/rag_search.py` que já existe no sistema:
+
+```bash
+# Script existente
+python3 scripts/rag_search.py \
+  --requirement "prazo validade proposta" \
+  --top-k 5 \
+  --threshold 0.7 \
+  --output-json
+```
+
+**Output JSON (se --output-json):**
+```json
+{
+  "query": "prazo validade proposta licitação",
+  "results": [
+    {
+      "text": "O prazo de validade das propostas será de 60 dias...",
+      "source": "lei_8666_93.md",
+      "line": 120,
+      "similarity": 0.92
+    },
+    ...
+  ],
+  "total_found": 5,
+  "execution_time": "0.12s"
 }
 ```
 
