@@ -41,6 +41,12 @@ sentence-transformers>=2.2.2  # Local embeddings (free, multilingual)
 tiktoken>=0.5.2               # Token counting for OpenAI models
 
 # ============================================
+# Export & Reports (Sprint 10 - D.2)
+# ============================================
+reportlab>=4.0.0  # PDF report generation
+openpyxl>=3.1.0   # Excel report generation with formatting
+
+# ============================================
 # Testing
 # ============================================
 pytest>=7.0.0     # Test framework
