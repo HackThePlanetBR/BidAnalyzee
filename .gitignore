@@ -9,6 +9,7 @@
 data/analyses/*
 !data/analyses/.gitkeep
 data/state/*.json
+data/state/sessions/
 !data/state/.gitkeep
 
 # RAG specific
