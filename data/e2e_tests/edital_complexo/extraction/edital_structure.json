@@ -1,0 +1,101 @@
+{
+  "total_items": 16,
+  "items": [
+    {
+      "item_id": "11",
+      "description": "MÓDULO MULTI I/O",
+      "unit": "Unidade",
+      "quantity": 66
+    },
+    {
+      "item_id": "12",
+      "description": "SENSORES IVA (PARES)",
+      "unit": "Unidade",
+      "quantity": 258
+    },
+    {
+      "item_id": "13",
+      "description": "SENSORES DE PRESENÇA",
+      "unit": "Unidade",
+      "quantity": 196
+    },
+    {
+      "item_id": "14",
+      "description": "SIRENE",
+      "unit": "Unidade",
+      "quantity": 66
+    },
+    {
+      "item_id": "18",
+      "description": "CHIP ADESIVO DE RFID",
+      "unit": "Unidade",
+      "quantity": 6000
+    },
+    {
+      "item_id": "21",
+      "description": "SOFTWARE PARA SISTEMA DE RECONHECIMENTO FACIAL",
+      "unit": "Unidade",
+      "quantity": 22
+    },
+    {
+      "item_id": "25",
+      "description": "POSTE CFTV INSTALADO",
+      "unit": "Unidade",
+      "quantity": 10
+    },
+    {
+      "item_id": "6",
+      "description": "U/UTP",
+      "unit": "Metros",
+      "quantity": 33188
+    },
+    {
+      "item_id": "31",
+      "description": "PROJETO EXECUTIVO BÁSICO",
+      "unit": "Serviço",
+      "quantity": 52
+    },
+    {
+      "item_id": "32",
+      "description": "PROJETO EXECUTIVO INTERMEDIÁRIO",
+      "unit": "Serviço",
+      "quantity": 12
+    },
+    {
+      "item_id": "33",
+      "description": "PROJETO EXECUTIVO AVANÇADO",
+      "unit": "Serviço",
+      "quantity": 6
+    },
+    {
+      "item_id": "37",
+      "description": "CONFIGURAÇÃO SITE REMOTO BÁSICO",
+      "unit": "Serviço",
+      "quantity": 50
+    },
+    {
+      "item_id": "39",
+      "description": "CONFIGURAÇÃO SITE CENTRAL",
+      "unit": "Serviço",
+      "quantity": 6
+    },
+    {
+      "item_id": "40",
+      "description": "TREINAMENTO OPERADORES",
+      "unit": "Turma",
+      "quantity": 6
+    },
+    {
+      "item_id": "41",
+      "description": "TREINAMENTO ADMINISTRADORES",
+      "unit": "Turma",
+      "quantity": 3
+    },
+    {
+      "item_id": "24",
+      "description": "POSIÇÕES",
+      "unit": "Unidade",
+      "quantity": 78
+    }
+  ]
+}
