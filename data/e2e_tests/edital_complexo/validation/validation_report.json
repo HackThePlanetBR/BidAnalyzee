@@ -1,0 +1,565 @@
+{
+  "total_items": 16,
+  "complete_items": 8,
+  "partial_items": 3,
+  "incomplete_items": 5,
+  "total_requirements": 164,
+  "validations": [
+    {
+      "item_id": "11",
+      "item_description": "MÓDULO MULTI I/O",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 10,
+      "found_in_pdf": 10,
+      "coverage_percent": 100.0,
+      "missing_keywords_sample": [],
+      "pdf_text_length": 79813,
+      "notes": []
+    },
+    {
+      "item_id": "12",
+      "item_description": "SENSORES IVA (PARES)",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 9,
+      "found_in_pdf": 8,
+      "coverage_percent": 88.9,
+      "missing_keywords_sample": [
+        {
+          "req_id": "12.7",
+          "requisito": "tensão 12vdc",
+          "keywords": [
+            "tensão",
+            "12vdc"
+          ]
+        }
+      ],
+      "pdf_text_length": 98162,
+      "notes": []
+    },
+    {
+      "item_id": "13",
+      "item_description": "SENSORES DE PRESENÇA",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 9,
+      "found_in_pdf": 8,
+      "coverage_percent": 88.9,
+      "missing_keywords_sample": [
+        {
+          "req_id": "13.7",
+          "requisito": "tensão 12vdc",
+          "keywords": [
+            "tensão",
+            "12vdc"
+          ]
+        }
+      ],
+      "pdf_text_length": 83180,
+      "notes": []
+    },
+    {
+      "item_id": "14",
+      "item_description": "SIRENE",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 10,
+      "found_in_pdf": 10,
+      "coverage_percent": 100.0,
+      "missing_keywords_sample": [],
+      "pdf_text_length": 55847,
+      "notes": []
+    },
+    {
+      "item_id": "18",
+      "item_description": "CHIP ADESIVO DE RFID",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 10,
+      "found_in_pdf": 10,
+      "coverage_percent": 100.0,
+      "missing_keywords_sample": [],
+      "pdf_text_length": 74813,
+      "notes": []
+    },
+    {
+      "item_id": "21",
+      "item_description": "SOFTWARE PARA SISTEMA DE RECONHECIMENTO FACIAL",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 16,
+      "found_in_pdf": 14,
+      "coverage_percent": 87.5,
+      "missing_keywords_sample": [
+        {
+          "req_id": "21.6",
+          "requisito": "cliente desktop para windows e linux",
+          "keywords": [
+            "cliente",
+            "desktop",
+            "windows"
+          ]
+        },
+        {
+          "req_id": "21.16",
+          "requisito": "manual em português",
+          "keywords": [
+            "manual",
+            "português"
+          ]
+        }
+      ],
+      "pdf_text_length": 31206,
+      "notes": []
+    },
+    {
+      "item_id": "25",
+      "item_description": "POSTE CFTV INSTALADO",
+      "status": "❌ INCOMPLETO",
+      "confidence": "BAIXA",
+      "total_requirements": 10,
+      "found_in_pdf": 3,
+      "coverage_percent": 30.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "25.2",
+          "requisito": "conforme especificação técnica do edital",
+          "keywords": [
+            "conforme",
+            "especificação",
+            "técnica"
+          ]
+        },
+        {
+          "req_id": "25.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "25.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "25.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "25.7",
+          "requisito": "prazo de entrega conforme cronograma",
+          "keywords": [
+            "prazo",
+            "entrega",
+            "conforme"
+          ]
+        }
+      ],
+      "pdf_text_length": 18135,
+      "notes": []
+    },
+    {
+      "item_id": "6",
+      "item_description": "U/UTP",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 10,
+      "found_in_pdf": 10,
+      "coverage_percent": 100.0,
+      "missing_keywords_sample": [],
+      "pdf_text_length": 187247,
+      "notes": []
+    },
+    {
+      "item_id": "31",
+      "item_description": "PROJETO EXECUTIVO BÁSICO",
+      "status": "⚠️  PARCIAL",
+      "confidence": "MÉDIA",
+      "total_requirements": 10,
+      "found_in_pdf": 7,
+      "coverage_percent": 70.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "31.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "31.9",
+          "requisito": "garantia mínima de 12 meses",
+          "keywords": [
+            "garantia",
+            "mínima",
+            "meses"
+          ]
+        },
+        {
+          "req_id": "31.10",
+          "requisito": "assistência técnica em território nacional",
+          "keywords": [
+            "assistência",
+            "técnica",
+            "território"
+          ]
+        }
+      ],
+      "pdf_text_length": 18715,
+      "notes": []
+    },
+    {
+      "item_id": "32",
+      "item_description": "PROJETO EXECUTIVO INTERMEDIÁRIO",
+      "status": "❌ INCOMPLETO",
+      "confidence": "BAIXA",
+      "total_requirements": 10,
+      "found_in_pdf": 4,
+      "coverage_percent": 40.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "32.2",
+          "requisito": "conforme especificação técnica do edital",
+          "keywords": [
+            "conforme",
+            "especificação",
+            "técnica"
+          ]
+        },
+        {
+          "req_id": "32.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "32.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "32.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "32.8",
+          "requisito": "instalação por equipe técnica especializada",
+          "keywords": [
+            "instalação",
+            "equipe",
+            "técnica"
+          ]
+        }
+      ],
+      "pdf_text_length": 10802,
+      "notes": []
+    },
+    {
+      "item_id": "33",
+      "item_description": "PROJETO EXECUTIVO AVANÇADO",
+      "status": "❌ INCOMPLETO",
+      "confidence": "BAIXA",
+      "total_requirements": 10,
+      "found_in_pdf": 2,
+      "coverage_percent": 20.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "33.2",
+          "requisito": "conforme especificação técnica do edital",
+          "keywords": [
+            "conforme",
+            "especificação",
+            "técnica"
+          ]
+        },
+        {
+          "req_id": "33.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "33.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "33.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "33.6",
+          "requisito": "certificado de conformidade",
+          "keywords": [
+            "certificado",
+            "conformidade"
+          ]
+        }
+      ],
+      "pdf_text_length": 7236,
+      "notes": []
+    },
+    {
+      "item_id": "37",
+      "item_description": "CONFIGURAÇÃO SITE REMOTO BÁSICO",
+      "status": "❌ INCOMPLETO",
+      "confidence": "BAIXA",
+      "total_requirements": 10,
+      "found_in_pdf": 3,
+      "coverage_percent": 30.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "37.2",
+          "requisito": "conforme especificação técnica do edital",
+          "keywords": [
+            "conforme",
+            "especificação",
+            "técnica"
+          ]
+        },
+        {
+          "req_id": "37.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "37.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "37.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "37.6",
+          "requisito": "certificado de conformidade",
+          "keywords": [
+            "certificado",
+            "conformidade"
+          ]
+        }
+      ],
+      "pdf_text_length": 10203,
+      "notes": []
+    },
+    {
+      "item_id": "39",
+      "item_description": "CONFIGURAÇÃO SITE CENTRAL",
+      "status": "❌ INCOMPLETO",
+      "confidence": "BAIXA",
+      "total_requirements": 10,
+      "found_in_pdf": 2,
+      "coverage_percent": 20.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "39.2",
+          "requisito": "conforme especificação técnica do edital",
+          "keywords": [
+            "conforme",
+            "especificação",
+            "técnica"
+          ]
+        },
+        {
+          "req_id": "39.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "39.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "39.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "39.6",
+          "requisito": "certificado de conformidade",
+          "keywords": [
+            "certificado",
+            "conformidade"
+          ]
+        }
+      ],
+      "pdf_text_length": 9364,
+      "notes": []
+    },
+    {
+      "item_id": "40",
+      "item_description": "TREINAMENTO OPERADORES",
+      "status": "⚠️  PARCIAL",
+      "confidence": "MÉDIA",
+      "total_requirements": 10,
+      "found_in_pdf": 7,
+      "coverage_percent": 70.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "40.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "40.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "40.6",
+          "requisito": "certificado de conformidade",
+          "keywords": [
+            "certificado",
+            "conformidade"
+          ]
+        }
+      ],
+      "pdf_text_length": 13491,
+      "notes": []
+    },
+    {
+      "item_id": "41",
+      "item_description": "TREINAMENTO ADMINISTRADORES",
+      "status": "⚠️  PARCIAL",
+      "confidence": "MÉDIA",
+      "total_requirements": 10,
+      "found_in_pdf": 6,
+      "coverage_percent": 60.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "41.3",
+          "requisito": "certificação de qualidade nacional ou internacional",
+          "keywords": [
+            "certificação",
+            "qualidade",
+            "nacional"
+          ]
+        },
+        {
+          "req_id": "41.4",
+          "requisito": "conformidade com normas abnt aplicáveis",
+          "keywords": [
+            "conformidade",
+            "normas",
+            "abnt"
+          ]
+        },
+        {
+          "req_id": "41.5",
+          "requisito": "manual técnico em português",
+          "keywords": [
+            "manual",
+            "técnico",
+            "português"
+          ]
+        },
+        {
+          "req_id": "41.6",
+          "requisito": "certificado de conformidade",
+          "keywords": [
+            "certificado",
+            "conformidade"
+          ]
+        }
+      ],
+      "pdf_text_length": 6941,
+      "notes": []
+    },
+    {
+      "item_id": "24",
+      "item_description": "POSIÇÕES",
+      "status": "✅ COMPLETO",
+      "confidence": "ALTA",
+      "total_requirements": 10,
+      "found_in_pdf": 9,
+      "coverage_percent": 90.0,
+      "missing_keywords_sample": [
+        {
+          "req_id": "24.10",
+          "requisito": "assistência técnica em território nacional",
+          "keywords": [
+            "assistência",
+            "técnica",
+            "território"
+          ]
+        }
+      ],
+      "pdf_text_length": 46189,
+      "notes": []
+    }
+  ]
+}

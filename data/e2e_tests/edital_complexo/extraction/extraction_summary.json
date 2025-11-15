@@ -1,10 +1,23 @@
 {
   "pdf_path": "data/e2e_tests/edital_complexo/input/edital.pdf",
-  "items_processed": 3,
-  "total_requirements": 10,
+  "items_processed": 16,
+  "total_requirements": 164,
   "csvs_generated": [
     "data/e2e_tests/edital_complexo/extraction/item_11_MÓDULO_MULTI_I_O.csv",
     "data/e2e_tests/edital_complexo/extraction/item_12_SENSORES_IVA_(PARES).csv",
-    "data/e2e_tests/edital_complexo/extraction/item_21_SOFTWARE_PARA_SISTEMA_DE_RECON.csv"
+    "data/e2e_tests/edital_complexo/extraction/item_13_SENSORES_DE_PRESENÇA.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_14_SIRENE.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_18_CHIP_ADESIVO_DE_RFID.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_21_SOFTWARE_PARA_SISTEMA_DE_RECON.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_25_POSTE_CFTV_INSTALADO.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_06_U_UTP.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_31_PROJETO_EXECUTIVO_BÁSICO.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_32_PROJETO_EXECUTIVO_INTERMEDIÁRI.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_33_PROJETO_EXECUTIVO_AVANÇADO.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_37_CONFIGURAÇÃO_SITE_REMOTO_BÁSIC.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_39_CONFIGURAÇÃO_SITE_CENTRAL.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_40_TREINAMENTO_OPERADORES.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_41_TREINAMENTO_ADMINISTRADORES.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_24_POSIÇÕES.csv"
   ]
 }

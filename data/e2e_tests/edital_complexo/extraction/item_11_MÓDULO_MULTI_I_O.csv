@@ -1,4 +1,11 @@
 id,categoria,requisito,obrigatorio,pontuacao,observacoes
 11.1,Descrição,Item: MÓDULO MULTI I/O,SIM,N/A,Quantidade: 66 Unidade
-11.2,Qualidade,Conformidade com normas técnicas,SIM,10,Padrões de qualidade
-11.3,Garantia,Garantia mínima de 1 ano,SIM,5,Cobertura básica
+11.2,Especificação,Conforme especificação técnica do edital,SIM,20,Atendimento completo
+11.3,Qualidade,Certificação de qualidade nacional ou internacional,SIM,10,Padrões de qualidade
+11.4,Qualidade,Conformidade com normas ABNT aplicáveis,SIM,10,Normas brasileiras
+11.5,Documentação,Manual técnico em português,SIM,5,Documentação nacional
+11.6,Documentação,Certificado de conformidade,SIM,5,Atendimento a normas
+11.7,Fornecimento,Prazo de entrega conforme cronograma,SIM,10,Cumprimento de prazo
+11.8,Instalação,Instalação por equipe técnica especializada,SIM,10,Qualificação técnica
+11.9,Garantia,Garantia mínima de 12 meses,SIM,10,Cobertura básica
+11.10,Suporte,Assistência técnica em território nacional,SIM,10,Suporte local
