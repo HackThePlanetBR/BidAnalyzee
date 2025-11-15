@@ -1,0 +1,29 @@
+{
+  "total_items_in_edital": 16,
+  "selected_count": 3,
+  "selected_indices": [
+    1,
+    2,
+    6
+  ],
+  "selected_items": [
+    {
+      "item_id": "11",
+      "description": "MÓDULO MULTI I/O",
+      "unit": "Unidade",
+      "quantity": 66
+    },
+    {
+      "item_id": "12",
+      "description": "SENSORES IVA (PARES)",
+      "unit": "Unidade",
+      "quantity": 258
+    },
+    {
+      "item_id": "21",
+      "description": "SOFTWARE PARA SISTEMA DE RECONHECIMENTO FACIAL",
+      "unit": "Unidade",
+      "quantity": 22
+    }
+  ]
+}

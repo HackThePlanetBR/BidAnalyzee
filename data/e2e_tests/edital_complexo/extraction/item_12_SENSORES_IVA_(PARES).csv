@@ -1,0 +1,4 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+12.1,Descrição,Item: SENSORES IVA (PARES),SIM,N/A,Quantidade: 258 Unidade
+12.2,Detecção,Detecção de movimento confiável,SIM,10,Precisão de detecção
+12.3,Integração,Compatível com sistema VMS,SIM,5,Integração com sistema

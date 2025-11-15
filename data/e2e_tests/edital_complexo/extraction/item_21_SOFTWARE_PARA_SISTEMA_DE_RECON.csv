@@ -1,0 +1,5 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+21.1,Descrição,Item: SOFTWARE PARA SISTEMA DE RECONHECIMENTO FACIAL,SIM,N/A,Quantidade: 22 Unidade
+21.2,Licenciamento,Licença perpétua,SIM,10,Sem custos recorrentes
+21.3,Interface,Interface web para acesso remoto,SIM,10,Gestão centralizada
+21.4,Suporte,Suporte técnico em português,SIM,5,Facilita operação

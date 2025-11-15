@@ -1,0 +1,10 @@
+{
+  "pdf_path": "data/e2e_tests/edital_complexo/input/edital.pdf",
+  "items_processed": 3,
+  "total_requirements": 10,
+  "csvs_generated": [
+    "data/e2e_tests/edital_complexo/extraction/item_11_MÓDULO_MULTI_I_O.csv",
+    "data/e2e_tests/edital_complexo/extraction/item_12_SENSORES_IVA_(PARES).csv",
+    "data/e2e_tests/edital_complexo/extraction/item_21_SOFTWARE_PARA_SISTEMA_DE_RECON.csv"
+  ]
+}
