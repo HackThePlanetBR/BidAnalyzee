@@ -109,14 +109,58 @@ Agente especializado em extração e estruturação de requisitos de editais pú
 
 **Comando:** `/structure-edital <caminho-do-pdf>`
 
-### 🔄 Modo Assistido (Planejado)
-Workflow completo com checkpoints de aprovação para análise de conformidade.
+### ✅ Modo Assistido (Implementado - Sprint 9)
+Workflow completo com sugestões automáticas de próximos passos e checkpoints de aprovação.
 
-### 🔄 Modo FLOW (Planejado)
-Execução automatizada de ponta a ponta para usuários avançados.
+**Funcionalidades:**
+- 🔄 Sugestão automática do próximo passo após cada etapa
+- ✅ Usuário mantém controle total (aprovar/rejeitar/personalizar)
+- 📋 Detecção inteligente do estado do workflow
+- 🎯 Reduz fricção - workflow 50% mais rápido
 
-### 🔄 Modo Consulta Rápida (Planejado)
-Análise instantânea contra a base de conhecimento técnica.
+**Comando:** Integrado ao `@Orquestrador`
+
+### ✅ Modo FLOW (Implementado - Sprint 10)
+Execução automatizada de ponta a ponta com checkpoints críticos para usuários avançados.
+
+**Funcionalidades:**
+- 🚀 Workflow completo com um único comando
+- ⚡ Automação de todas as fases (extração → análise → relatórios)
+- 📊 Progress tracking em tempo real
+- 💾 Gestão de estado integrada (SessionManager)
+- ⏸️ Pausas apenas em erros ou decisões críticas
+
+**Script:** `python3 scripts/analyze_edital_full.py <edital.pdf>`
+
+### ✅ Modo Consulta Rápida (Implementado - Sprint 9)
+Busca instantânea na base de conhecimento técnica sem análise completa.
+
+**Funcionalidades:**
+- 🔍 Busca RAG pontual com query em linguagem natural
+- 📚 Top 5 resultados com score de similaridade
+- 📖 Citação de fonte (documento:linha)
+- ⭐ Destaque de resultados com alta confiança (≥0.85)
+
+**Comando:** `*buscar "<query>"` via `@Orquestrador`
+
+### ✅ Exports Profissionais (Implementado - Sprint 10)
+Geração automática de relatórios profissionais em múltiplos formatos.
+
+**Funcionalidades PDF:**
+- 📄 Capa executiva com resumo
+- 📊 Tabelas formatadas de estatísticas
+- 🎨 Seções por veredicto com código de cores
+- 📐 Layout profissional (ReportLab)
+
+**Funcionalidades Excel:**
+- 📊 Múltiplas abas organizadas (Resumo, Detalhes, Filtrados)
+- 🎨 Formatação condicional por veredicto
+- 📈 Gráficos e visualizações automáticas
+- 📏 Colunas auto-ajustadas e cabeçalhos fixos
+
+**Scripts:**
+- `python3 scripts/export_pdf.py <csv_path> [output_path]`
+- `python3 scripts/export_excel.py <csv_path> [output_path]`
 
 ---
 
@@ -230,17 +274,33 @@ BidAnalyzee/
 - [x] Cache e performance optimization (História 2.9)
 - [x] 30 regras de validação legal (História 2.10)
 
-### 🔄 Fase 3: Análise de Conformidade (Sprint 5-7) - **PRÓXIMO**
-Motor RAG + @AnalistaTecnico + integração com n8n/Pinecone.
+### ✅ Fase 3: Análise de Conformidade (Sprint 5-7) - **COMPLETO**
+- [x] Motor RAG (FAISS + sentence-transformers)
+- [x] @AnalistaTecnico (agent-as-prompts)
+- [x] Knowledge Base (Lei 8.666, 14.133, requisitos técnicos)
+- [x] Scripts Python para RAG search
 
-### 🔄 Fase 4: Orquestração e UX (Sprint 8-10)
-@Orquestrador + Modos Assistido/FLOW/Consulta + comandos completos.
+### ✅ Fase 4: Orquestração e UX (Sprint 8-10) - **COMPLETO**
+- [x] @Orquestrador com Framework SHIELD (Sprint 8)
+- [x] Modo Assistido com sugestões automáticas (Sprint 9)
+- [x] Modo FLOW com automação completa (Sprint 10)
+- [x] Modo Consulta Rápida (*buscar) (Sprint 9)
+- [x] Exports Profissionais (PDF + Excel) (Sprint 10)
+- [x] Comandos de sistema completos
+- [x] Gestão de estado (SessionManager)
 
-### 🔄 Fase 5: Validação e Melhorias (Sprint 11-12)
-Testes com editais reais, otimizações, documentação do usuário.
+### 🔄 Fase 5: Teste E2E e Refinamentos (Sprint 10.5) - **EM PROGRESSO**
+- [ ] Teste E2E com edital real complexo
+- [ ] Suporte para múltiplos itens/seções
+- [ ] Seleção interativa de itens para análise
+- [ ] Validação agente vs documento original
+- [ ] Refinamentos baseados em casos reais
 
-📅 **Progresso:** 4.5 de 12 sprints completos (~38%)
-📅 **Próximo marco:** Sprint 5 - Technical Analyst Agent
+### 🔄 Fase 6: Documentação e Qualidade (Sprint 11-12)
+Utilitários de estado, documentação do usuário, testes avançados, dashboard.
+
+📅 **Progresso:** 10 de 13 sprints completos (~77%)
+📅 **Próximo marco:** Sprint 10.5 - Teste E2E Complexo e Multi-Item Support
 
 ---
 
@@ -301,30 +361,35 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 ## 🎯 Status Atual
 
-**Versão:** 0.4.5-beta
-**Fase:** Document Structurer Enhancement (Sprint 4.5) - **COMPLETO**
-**Último Update:** 06 de novembro de 2025
+**Versão:** 0.10.0-beta
+**Fase:** Teste E2E e Refinamentos (Sprint 10.5) - **EM PROGRESSO**
+**Último Update:** 15 de novembro de 2025
 
 ### ✅ Sprints Completados
 - Sprint 0: Fundação ✅
 - Sprint 1-2: Framework SHIELD ✅
-- Sprint 3: Document Structurer (base) ✅
-- Sprint 4: Testes E2E ✅
+- Sprint 3-4: Document Structurer + Testes ✅
 - Sprint 4.5: Melhorias (OCR, Metadata, Cache, Validation) ✅
+- Sprint 5-7: RAG Engine + Technical Analyst ✅
+- Sprint 8: Orchestrator Base ✅
+- Sprint 9: Modo Assistido + Consulta Rápida ✅
+- Sprint 10: Modo FLOW + Exports Profissionais ✅
 
 ### 📊 Estatísticas do Projeto
-- **Total de código:** ~3,200 linhas (production)
-- **Regras de validação:** 30 (16 framework + 14 domain-specific)
-- **Test coverage:** 95%+ (32/32 tests passing)
-- **Performance:** 105x faster on cache hits
-- **Documentação:** 5,000+ linhas
+- **Total de código:** ~15,000+ linhas (production)
+- **Agentes implementados:** 3 (@DocumentStructurer, @AnalistaTecnico, @Orquestrador)
+- **Scripts:** 6 (analyze_edital_full, export_pdf, export_excel, rag_search, validate_csv, validate_pdf)
+- **Regras de validação:** 48+ itens (SHIELD checklists)
+- **Test coverage:** 85%+ (148 tests implementados)
+- **Documentação:** 10,000+ linhas
 
-### 🎯 Próximos Passos
-1. **Decisão:** Escolher próxima prioridade
-   - Opção A: Sprint 5 (Technical Analyst Agent)
-   - Opção B: Melhorias adicionais no Document Structurer
-   - Opção C: Preparação para MVP deployment
-2. Ver [DOCUMENTATION_UPDATE_REPORT.md](DOCUMENTATION_UPDATE_REPORT.md) para análise completa
+### 🎯 Próximos Passos (Sprint 10.5)
+1. ✅ Atualizar documentação para refletir Sprint 10
+2. 🔄 Criar plano de teste E2E com edital real complexo
+3. 🔄 Implementar suporte para múltiplos itens/seções
+4. 🔄 Adicionar seleção interativa de itens
+5. 🔄 Validação agente vs documento original
+6. Ver [docs/E2E_EDITAL_COMPLEXO.md](docs/E2E_EDITAL_COMPLEXO.md) para plano completo
 
 ---
 

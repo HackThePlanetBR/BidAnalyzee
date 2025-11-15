@@ -1,0 +1,11 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+37.1,Descrição,Item: CONFIGURAÇÃO SITE REMOTO BÁSICO,SIM,N/A,Quantidade: 50 Serviço
+37.2,Especificação,Conforme especificação técnica do edital,SIM,20,Atendimento completo
+37.3,Qualidade,Certificação de qualidade nacional ou internacional,SIM,10,Padrões de qualidade
+37.4,Qualidade,Conformidade com normas ABNT aplicáveis,SIM,10,Normas brasileiras
+37.5,Documentação,Manual técnico em português,SIM,5,Documentação nacional
+37.6,Documentação,Certificado de conformidade,SIM,5,Atendimento a normas
+37.7,Fornecimento,Prazo de entrega conforme cronograma,SIM,10,Cumprimento de prazo
+37.8,Instalação,Instalação por equipe técnica especializada,SIM,10,Qualificação técnica
+37.9,Garantia,Garantia mínima de 12 meses,SIM,10,Cobertura básica
+37.10,Suporte,Assistência técnica em território nacional,SIM,10,Suporte local

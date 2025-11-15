@@ -1,0 +1,17 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+21.1,Descrição,Item: SOFTWARE PARA SISTEMA DE RECONHECIMENTO FACIAL,SIM,N/A,Quantidade: 22 Unidade
+21.2,Licenciamento,Licença perpétua,SIM,15,Sem custos recorrentes
+21.3,Licenciamento,Sem limitação de usuários simultâneos,SIM,10,Escalabilidade
+21.4,Interface,Interface web responsiva,SIM,10,Acesso multiplataforma
+21.5,Interface,Suporte a múltiplos idiomas incluindo português,SIM,5,Localização
+21.6,Interface,Cliente desktop para Windows e Linux,NÃO,5,Flexibilidade
+21.7,Funcionalidades,Gravação contínua e por eventos,SIM,10,Modos de gravação
+21.8,Funcionalidades,Busca por data/hora e eventos,SIM,5,Navegação
+21.9,Funcionalidades,Exportação de vídeo em formatos padrão,SIM,5,Compartilhamento
+21.10,Integração,API REST documentada,NÃO,10,Integrações futuras
+21.11,Segurança,Controle de acesso por perfis,SIM,10,Segurança
+21.12,Segurança,Log de auditoria de ações,SIM,5,Rastreabilidade
+21.13,Segurança,Criptografia de comunicação,SIM,10,Proteção de dados
+21.14,Suporte,Suporte técnico em português,SIM,15,Atendimento nacional
+21.15,Suporte,Atualizações gratuitas por 3 anos,SIM,10,Manutenção
+21.16,Documentação,Manual em português,SIM,5,Facilita uso

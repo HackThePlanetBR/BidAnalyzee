@@ -1,0 +1,330 @@
+{
+  "total_items": 16,
+  "conforme_items": 4,
+  "partial_items": 12,
+  "nao_conforme_items": 0,
+  "total_products_analyzed": 5,
+  "analyses": [
+    {
+      "item_id": "11",
+      "item_description": "MÓDULO MULTI I/O",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "12",
+      "item_description": "SENSORES IVA (PARES)",
+      "category": "sensores",
+      "status": "✅ CONFORME",
+      "total_requirements": 9,
+      "mandatory_requirements": 9,
+      "products_analyzed": 1,
+      "best_match": {
+        "fabricante": "Bosch",
+        "modelo": "ISC-BDL2-W12G",
+        "tipo": "Sensor IVA (PIR)",
+        "mandatory_met": 7,
+        "mandatory_total": 9,
+        "optional_met": 0,
+        "optional_total": 0,
+        "score": 50.0,
+        "max_score": 53.0,
+        "score_percent": 94.3,
+        "conformidade_geral": 85
+      },
+      "all_products": [
+        {
+          "fabricante": "Bosch",
+          "modelo": "ISC-BDL2-W12G",
+          "tipo": "Sensor IVA (PIR)",
+          "mandatory_met": 7,
+          "mandatory_total": 9,
+          "optional_met": 0,
+          "optional_total": 0,
+          "score": 50.0,
+          "max_score": 53.0,
+          "score_percent": 94.3,
+          "conformidade_geral": 85
+        }
+      ],
+      "notes": []
+    },
+    {
+      "item_id": "13",
+      "item_description": "SENSORES DE PRESENÇA",
+      "category": "sensores",
+      "status": "✅ CONFORME",
+      "total_requirements": 9,
+      "mandatory_requirements": 9,
+      "products_analyzed": 1,
+      "best_match": {
+        "fabricante": "Bosch",
+        "modelo": "ISC-BDL2-W12G",
+        "tipo": "Sensor IVA (PIR)",
+        "mandatory_met": 7,
+        "mandatory_total": 9,
+        "optional_met": 0,
+        "optional_total": 0,
+        "score": 50.0,
+        "max_score": 53.0,
+        "score_percent": 94.3,
+        "conformidade_geral": 85
+      },
+      "all_products": [
+        {
+          "fabricante": "Bosch",
+          "modelo": "ISC-BDL2-W12G",
+          "tipo": "Sensor IVA (PIR)",
+          "mandatory_met": 7,
+          "mandatory_total": 9,
+          "optional_met": 0,
+          "optional_total": 0,
+          "score": 50.0,
+          "max_score": 53.0,
+          "score_percent": 94.3,
+          "conformidade_geral": 85
+        }
+      ],
+      "notes": []
+    },
+    {
+      "item_id": "14",
+      "item_description": "SIRENE",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "18",
+      "item_description": "CHIP ADESIVO DE RFID",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "21",
+      "item_description": "SOFTWARE PARA SISTEMA DE RECONHECIMENTO FACIAL",
+      "category": "software",
+      "status": "✅ CONFORME",
+      "total_requirements": 16,
+      "mandatory_requirements": 14,
+      "products_analyzed": 2,
+      "best_match": {
+        "fabricante": "Genetec",
+        "modelo": "Security Center",
+        "tipo": "VMS + PSIM",
+        "mandatory_met": 12,
+        "mandatory_total": 14,
+        "optional_met": 2,
+        "optional_total": 2,
+        "score": 130.0,
+        "max_score": 130.0,
+        "score_percent": 100.0,
+        "conformidade_geral": 90
+      },
+      "all_products": [
+        {
+          "fabricante": "Genetec",
+          "modelo": "Security Center",
+          "tipo": "VMS + PSIM",
+          "mandatory_met": 12,
+          "mandatory_total": 14,
+          "optional_met": 2,
+          "optional_total": 2,
+          "score": 130.0,
+          "max_score": 130.0,
+          "score_percent": 100.0,
+          "conformidade_geral": 90
+        },
+        {
+          "fabricante": "Milestone",
+          "modelo": "XProtect Corporate",
+          "tipo": "VMS (Video Management System)",
+          "mandatory_met": 12,
+          "mandatory_total": 14,
+          "optional_met": 2,
+          "optional_total": 2,
+          "score": 115.0,
+          "max_score": 130.0,
+          "score_percent": 88.5,
+          "conformidade_geral": 92
+        }
+      ],
+      "notes": []
+    },
+    {
+      "item_id": "25",
+      "item_description": "POSTE CFTV INSTALADO",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "6",
+      "item_description": "U/UTP",
+      "category": "acessorios",
+      "status": "✅ CONFORME",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 1,
+      "best_match": {
+        "fabricante": "Furukawa",
+        "modelo": "U/UTP Cat6",
+        "tipo": "Cabo de Rede",
+        "mandatory_met": 9,
+        "mandatory_total": 10,
+        "optional_met": 0,
+        "optional_total": 0,
+        "score": 85.0,
+        "max_score": 90.0,
+        "score_percent": 94.4,
+        "conformidade_geral": 95
+      },
+      "all_products": [
+        {
+          "fabricante": "Furukawa",
+          "modelo": "U/UTP Cat6",
+          "tipo": "Cabo de Rede",
+          "mandatory_met": 9,
+          "mandatory_total": 10,
+          "optional_met": 0,
+          "optional_total": 0,
+          "score": 85.0,
+          "max_score": 90.0,
+          "score_percent": 94.4,
+          "conformidade_geral": 95
+        }
+      ],
+      "notes": []
+    },
+    {
+      "item_id": "31",
+      "item_description": "PROJETO EXECUTIVO BÁSICO",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "32",
+      "item_description": "PROJETO EXECUTIVO INTERMEDIÁRIO",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "33",
+      "item_description": "PROJETO EXECUTIVO AVANÇADO",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "37",
+      "item_description": "CONFIGURAÇÃO SITE REMOTO BÁSICO",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "39",
+      "item_description": "CONFIGURAÇÃO SITE CENTRAL",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "40",
+      "item_description": "TREINAMENTO OPERADORES",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "41",
+      "item_description": "TREINAMENTO ADMINISTRADORES",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    },
+    {
+      "item_id": "24",
+      "item_description": "POSIÇÕES",
+      "category": "outros",
+      "status": "⚠️  SEM PRODUTOS NA KB",
+      "total_requirements": 10,
+      "mandatory_requirements": 10,
+      "products_analyzed": 0,
+      "best_match": null,
+      "notes": [
+        "Categoria não possui produtos na knowledge base mock"
+      ]
+    }
+  ]
+}

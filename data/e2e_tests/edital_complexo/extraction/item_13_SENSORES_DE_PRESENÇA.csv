@@ -1,0 +1,10 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+13.1,Descrição,Item: SENSORES DE PRESENÇA,SIM,N/A,Quantidade: 196 Unidade
+13.2,Detecção,Detecção de movimento por infravermelho passivo,SIM,10,Tecnologia PIR
+13.3,Detecção,Ângulo de cobertura mínimo de 90 graus,SIM,5,Área de detecção
+13.4,Detecção,Alcance mínimo de 10 metros,SIM,5,Distância de detecção
+13.5,Integração,Saída relé/contato seco,SIM,10,Interface padrão
+13.6,Integração,Compatível com sistema VMS,SIM,10,Integração
+13.7,Alimentação,Tensão 12VDC,SIM,3,Padrão de alimentação
+13.8,Ambiental,Grau de proteção IP adequado ao local,SIM,5,Proteção ambiental
+13.9,Garantia,Garantia mínima de 1 ano,SIM,5,Cobertura básica

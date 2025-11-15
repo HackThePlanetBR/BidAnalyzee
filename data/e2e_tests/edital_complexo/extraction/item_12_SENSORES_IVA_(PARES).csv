@@ -1,0 +1,10 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+12.1,Descrição,Item: SENSORES IVA (PARES),SIM,N/A,Quantidade: 258 Unidade
+12.2,Detecção,Detecção de movimento por infravermelho passivo,SIM,10,Tecnologia PIR
+12.3,Detecção,Ângulo de cobertura mínimo de 90 graus,SIM,5,Área de detecção
+12.4,Detecção,Alcance mínimo de 10 metros,SIM,5,Distância de detecção
+12.5,Integração,Saída relé/contato seco,SIM,10,Interface padrão
+12.6,Integração,Compatível com sistema VMS,SIM,10,Integração
+12.7,Alimentação,Tensão 12VDC,SIM,3,Padrão de alimentação
+12.8,Ambiental,Grau de proteção IP adequado ao local,SIM,5,Proteção ambiental
+12.9,Garantia,Garantia mínima de 1 ano,SIM,5,Cobertura básica

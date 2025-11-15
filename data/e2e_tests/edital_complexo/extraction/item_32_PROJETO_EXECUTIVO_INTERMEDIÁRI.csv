@@ -1,0 +1,11 @@
+id,categoria,requisito,obrigatorio,pontuacao,observacoes
+32.1,Descrição,Item: PROJETO EXECUTIVO INTERMEDIÁRIO,SIM,N/A,Quantidade: 12 Serviço
+32.2,Especificação,Conforme especificação técnica do edital,SIM,20,Atendimento completo
+32.3,Qualidade,Certificação de qualidade nacional ou internacional,SIM,10,Padrões de qualidade
+32.4,Qualidade,Conformidade com normas ABNT aplicáveis,SIM,10,Normas brasileiras
+32.5,Documentação,Manual técnico em português,SIM,5,Documentação nacional
+32.6,Documentação,Certificado de conformidade,SIM,5,Atendimento a normas
+32.7,Fornecimento,Prazo de entrega conforme cronograma,SIM,10,Cumprimento de prazo
+32.8,Instalação,Instalação por equipe técnica especializada,SIM,10,Qualificação técnica
+32.9,Garantia,Garantia mínima de 12 meses,SIM,10,Cobertura básica
+32.10,Suporte,Assistência técnica em território nacional,SIM,10,Suporte local
