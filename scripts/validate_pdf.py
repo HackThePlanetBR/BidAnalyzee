@@ -111,7 +111,7 @@ def check_pdf_integrity(filepath: Path) -> Tuple[bool, str, Dict[str, Any]]:
         return False, f"Error reading PDF: {e}", {}
 
 
-def check_pdf_size(filepath: Path, max_mb: int = 100) -> Tuple[bool, str]:
+def check_pdf_size(filepath: Path, max_mb: int = 500) -> Tuple[bool, str]:
     """Check if PDF size is within reasonable limits"""
     size_bytes = filepath.stat().st_size
     size_mb = size_bytes / (1024 * 1024)
@@ -177,8 +177,8 @@ def check_page_count(filepath: Path, max_pages: int = 500) -> Tuple[bool, str]:
 def validate_pdf(
     filepath: Path,
     strict: bool = False,
-    max_size_mb: int = 100,
-    max_pages: int = 500,
+    max_size_mb: int = 500,
+    max_pages: int = 1000,
     min_text_chars: int = 100
 ) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
     """
@@ -271,14 +271,14 @@ def main():
     parser.add_argument(
         "--max-size",
         type=int,
-        default=100,
-        help="Maximum file size in MB (default: 100)"
+        default=500,
+        help="Maximum file size in MB (default: 500)"
     )
     parser.add_argument(
         "--max-pages",
         type=int,
-        default=500,
-        help="Maximum number of pages (default: 500)"
+        default=1000,
+        help="Maximum number of pages (default: 1000)"
     )
     parser.add_argument(
         "--min-text",
