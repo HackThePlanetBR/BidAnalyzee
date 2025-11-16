@@ -18,8 +18,8 @@ purpose:
 
 input:
   format: "PDF"
-  max_size_mb: 50
-  max_pages: 500
+  max_size_mb: 500
+  max_pages: 1000
   requirements:
     - "Text-extractable PDF OR scanned PDF (OCR supported)"
     - "Brazilian Portuguese content"
@@ -256,10 +256,10 @@ capabilities:
 
 limitations:
   technical:
-    max_pdf_pages: 500
-    max_pdf_size_mb: 50
-    max_text_size_mb: 2
-    timeout_per_step_seconds: 600
+    max_pdf_pages: 1000
+    max_pdf_size_mb: 500
+    max_text_size_mb: 10
+    timeout_per_step_seconds: 900
     max_loop_iterations: 3
 
   quality:
@@ -384,7 +384,7 @@ configuration:
       description: "Timeout for PDF processing"
 
     - name: "MAX_PDF_PAGES"
-      default: 500
+      default: 1000
       description: "Maximum pages to process"
 
 testing:

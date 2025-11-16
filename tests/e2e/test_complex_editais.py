@@ -50,8 +50,8 @@ class TestComplexEditais:
         is_valid, errors, warnings, metadata = validate_pdf(
             edital_path,
             strict=False,
-            max_size_mb=100,
-            max_pages=500,
+            max_size_mb=500,
+            max_pages=1000,
             min_text_chars=100
         )
 
