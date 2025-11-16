@@ -94,13 +94,18 @@ def main():
             else:
                 for i, result in enumerate(results, 1):
                     metadata = result.get('metadata', {})
+                    title = metadata.get('title', metadata.get('filename', 'unknown'))
+                    url = metadata.get('url', '')
                     filename = metadata.get('filename', 'unknown')
                     chunk_idx = metadata.get('chunk_index', 0)
                     similarity = result.get('similarity_score', 0.0)
                     text = result.get('text', '')
 
-                    print(f"[{i}] {filename} (chunk {chunk_idx}) - Similarity: {similarity:.2f}")
-                    print(f"    {text[:200]}...")
+                    print(f"[{i}] 📄 {title}")
+                    if url:
+                        print(f"    🔗 {url}")
+                    print(f"    📁 {filename} (chunk {chunk_idx}) | Similarity: {similarity:.2f}")
+                    print(f"    📝 {text[:200]}...")
                     print()
 
         return 0
