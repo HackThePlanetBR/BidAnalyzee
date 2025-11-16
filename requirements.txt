@@ -72,3 +72,4 @@ pytest-cov>=4.0.0 # Code coverage
 #   - Ubuntu/Debian: sudo apt-get install tesseract-ocr tesseract-ocr-por
 #   - macOS: brew install tesseract tesseract-lang
 #   - Windows: Download installer from https://github.com/UB-Mannheim/tesseract/wiki
+rich>=13.0.0
