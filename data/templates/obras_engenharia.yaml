@@ -1,0 +1,107 @@
+# Template: Obras de Engenharia
+# Configurações para licitações de obras civis e de engenharia
+
+name: "Obras de Engenharia"
+description: "Template para análise de editais de obras civis, construção e reforma"
+version: "1.0"
+category: "obras"
+tags:
+  - obras
+  - engenharia
+  - construcao
+  - reforma
+
+analysis_config:
+  rag:
+    top_k: 5
+    similarity_threshold: 0.75
+    focus_areas:
+      - "Lei_8666.md"
+      - "Lei_14133.md"
+      - "normas_tecnicas.md"
+      - "especificacoes_obras.md"
+
+  expected_categories:
+    - Projeto Executivo
+    - Materiais
+    - Mão de Obra
+    - Equipamentos
+    - Serviços Especializados
+    - Documentação Técnica
+    - Licenças e Alvarás
+    - Garantia de Obra
+    - Responsável Técnico
+    - Cronograma
+    - Medições
+
+  category_weights:
+    "Projeto Executivo": 1.5
+    Materiais: 1.3
+    "Mão de Obra": 1.4
+    "Responsável Técnico": 1.5
+    default: 1.0
+
+  validations:
+    require_certifications:
+      - CREA
+      - CAU
+    require_technical_specs: true
+    require_warranties: true
+    minimum_warranty_months: 60  # 5 anos para obras
+
+export_config:
+  pdf:
+    include_diagrams: true
+    highlight_critical: true
+    group_by_category: true
+    include_timeline: true
+
+  excel:
+    freeze_panes: true
+    conditional_formatting: true
+    charts:
+      - conformity_pie
+      - category_distribution
+      - timeline_gantt
+
+alerts:
+  critical_keywords:
+    - "CREA"
+    - "CAU"
+    - "responsável técnico"
+    - "ART"
+    - "RRT"
+    - "atestado capacidade técnica"
+    - "certidão regularidade"
+
+  warning_keywords:
+    - "marca específica"
+    - "modelo exclusivo"
+    - "fornecedor único"
+
+additional_checks:
+  - name: "Projeto executivo completo"
+    category: "Projeto Executivo"
+    importance: "critical"
+
+  - name: "Responsável técnico habilitado"
+    category: "Responsável Técnico"
+    importance: "critical"
+
+  - name: "ART/RRT recolhidas"
+    category: "Documentação Técnica"
+    importance: "critical"
+
+  - name: "Garantia mínima 5 anos"
+    category: "Garantia de Obra"
+    importance: "high"
+
+  - name: "Cronograma viável"
+    category: "Cronograma"
+    importance: "high"
+
+metadata:
+  created_at: "2025-11-16"
+  created_by: "BidAnalyzee System"
+  last_updated: "2025-11-16"
+  use_count: 0

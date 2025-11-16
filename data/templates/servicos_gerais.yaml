@@ -1,0 +1,94 @@
+# Template: Serviços Gerais
+# Configurações para licitações de prestação de serviços diversos
+
+name: "Serviços Gerais"
+description: "Template genérico para análise de editais de prestação de serviços"
+version: "1.0"
+category: "servicos"
+tags:
+  - servicos
+  - prestacao-servicos
+  - manutencao
+  - consultoria
+
+analysis_config:
+  rag:
+    top_k: 5
+    similarity_threshold: 0.70
+    focus_areas:
+      - "Lei_8666.md"
+      - "Lei_14133.md"
+      - "requisitos_servicos.md"
+
+  expected_categories:
+    - Escopo de Serviços
+    - Equipe Técnica
+    - Qualificação Profissional
+    - Metodologia
+    - Ferramentas e Equipamentos
+    - Documentação
+    - Relatórios
+    - SLA
+    - Garantia
+    - Treinamento
+
+  category_weights:
+    "Escopo de Serviços": 1.5
+    "Equipe Técnica": 1.4
+    "Qualificação Profissional": 1.4
+    SLA: 1.3
+    default: 1.0
+
+  validations:
+    require_certifications: []  # Varia por tipo de serviço
+    require_technical_specs: true
+    require_warranties: false  # Não obrigatório para serviços
+    minimum_warranty_months: 12
+
+export_config:
+  pdf:
+    include_diagrams: false
+    highlight_critical: true
+    group_by_category: true
+
+  excel:
+    freeze_panes: true
+    conditional_formatting: true
+    charts:
+      - conformity_pie
+      - category_distribution
+
+alerts:
+  critical_keywords:
+    - "comprovação experiência"
+    - "atestado capacidade"
+    - "equipe mínima"
+    - "responsável técnico"
+    - "certificação"
+
+  warning_keywords:
+    - "exclusividade"
+    - "marca específica"
+
+additional_checks:
+  - name: "Equipe técnica qualificada"
+    category: "Equipe Técnica"
+    importance: "high"
+
+  - name: "Metodologia adequada"
+    category: "Metodologia"
+    importance: "medium"
+
+  - name: "SLA viável"
+    category: "SLA"
+    importance: "high"
+
+  - name: "Atestados de capacidade"
+    category: "Documentação"
+    importance: "critical"
+
+metadata:
+  created_at: "2025-11-16"
+  created_by: "BidAnalyzee System"
+  last_updated: "2025-11-16"
+  use_count: 0

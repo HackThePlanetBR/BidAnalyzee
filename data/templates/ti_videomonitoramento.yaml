@@ -1,0 +1,112 @@
+# Template: TI - Videomonitoramento
+# Configurações otimizadas para licitações de videomonitoramento e CFTV
+
+name: "TI - Videomonitoramento"
+description: "Template para análise de editais de videomonitoramento, CFTV e segurança eletrônica"
+version: "1.0"
+category: "ti"
+tags:
+  - videomonitoramento
+  - cftv
+  - seguranca-eletronica
+  - cameras
+
+# Configurações de análise
+analysis_config:
+  # RAG settings
+  rag:
+    top_k: 5
+    similarity_threshold: 0.70
+    focus_areas:
+      - "requisitos_tecnicos.md"
+      - "especificacoes_cftv.md"
+      - "Lei_8666.md"
+      - "Lei_14133.md"
+
+  # Categorias de requisitos esperadas
+  expected_categories:
+    - Hardware
+    - Software
+    - Infraestrutura
+    - Rede
+    - Storage
+    - Câmeras
+    - Servidores
+    - Licenciamento
+    - Documentação
+    - Garantia
+    - Suporte Técnico
+    - Treinamento
+
+  # Pesos por categoria (para priorização)
+  category_weights:
+    Hardware: 1.5
+    Software: 1.3
+    Câmeras: 1.5
+    Infraestrutura: 1.2
+    Rede: 1.2
+    Storage: 1.4
+    default: 1.0
+
+  # Validações específicas
+  validations:
+    require_certifications:
+      - ANATEL
+      - INMETRO
+    require_technical_specs: true
+    require_warranties: true
+    minimum_warranty_months: 36
+
+# Exportação
+export_config:
+  pdf:
+    include_diagrams: true
+    highlight_critical: true
+    group_by_category: true
+
+  excel:
+    freeze_panes: true
+    conditional_formatting: true
+    charts:
+      - conformity_pie
+      - category_distribution
+      - criticality_bar
+
+# Alertas e avisos
+alerts:
+  critical_keywords:
+    - "certificação ANATEL"
+    - "INMETRO"
+    - "ISO 9001"
+    - "comprovação técnica"
+    - "atestado de capacidade"
+
+  warning_keywords:
+    - "exclusivo"
+    - "marca específica"
+    - "fornecedor único"
+
+# Checklist adicional
+additional_checks:
+  - name: "Câmeras atendem resolução mínima"
+    category: "Hardware"
+    importance: "high"
+
+  - name: "Storage atende retenção exigida"
+    category: "Storage"
+    importance: "high"
+
+  - name: "Licenças perpétuas ou anuais"
+    category: "Software"
+    importance: "medium"
+
+  - name: "Certificações válidas"
+    category: "Documentação"
+    importance: "critical"
+
+# Metadados
+metadata:
+  created_at: "2025-11-16"
+  created_by: "BidAnalyzee System"
+  last_updated: "2025-11-16"
+  use_count: 0
