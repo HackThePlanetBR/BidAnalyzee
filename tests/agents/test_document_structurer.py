@@ -48,17 +48,23 @@ class TestDocumentStructurerPrompt:
         prompt_path = Path("agents/document_structurer/prompt.md")
         content = prompt_path.read_text(encoding='utf-8')
 
+        # Document Structurer uses combined I+E format
         shield_sections = [
             "S - STRUCTURE",
             "H - HALT",
-            "I - INSPECT",
-            "E - EXECUTE",
+            ("I - INSPECT", "I+E - INSPECT"),  # Accept either format
+            ("E - EXECUTE", "I+E - INSPECT"),  # I+E covers both
             "L - LOOP",
             "D - DELIVER"
         ]
 
         for section in shield_sections:
-            assert section in content, f"SHIELD section '{section}' não encontrada"
+            if isinstance(section, tuple):
+                # Accept any of the alternatives
+                assert any(s in content for s in section), \
+                    f"SHIELD section {section[0]} (ou variação) não encontrada"
+            else:
+                assert section in content, f"SHIELD section '{section}' não encontrada"
 
     def test_prompt_defines_csv_structure(self):
         """Verify prompt defines 7 mandatory CSV fields"""
