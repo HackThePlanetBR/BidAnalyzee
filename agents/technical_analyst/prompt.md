@@ -148,14 +148,28 @@ Para cada requisito, execute esta análise mental:
 Para cada requisito analisado, gere uma linha no CSV:
 
 ```csv
-ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações
+ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações,Fonte_Titulo,Fonte_URL
 ```
+
+**Colunas obrigatórias:**
+1. **ID:** Identificador único (REQ-001, REQ-002, ...)
+2. **Requisito:** Texto completo do requisito analisado
+3. **Categoria:** Hardware | Software | Serviço | Jurídico | Técnico
+4. **Veredicto:** CONFORME | NAO_CONFORME | REVISAO | PARCIAL
+5. **Confiança:** Score 0.0 a 1.0 (ex: 0.95)
+6. **Evidências:** Citações da knowledge base (texto resumido)
+7. **Raciocínio:** Análise detalhada (máximo 500 caracteres)
+8. **Recomendações:** Ações sugeridas
+9. **Fonte_Titulo:** Título do documento principal usado como evidência
+10. **Fonte_URL:** URL do documento (se disponível, senão vazio)
 
 **Regras de formatação:**
 - Aspas duplas em campos com vírgulas ou quebras de linha
 - Escape de aspas: `"` vira `""`
 - Raciocínio: máximo 500 caracteres
 - Evidências: separadas por ponto-e-vírgula se múltiplas
+- Fonte_Titulo: Usar o `title` do documento retornado pelo RAG
+- Fonte_URL: Usar o `url` do metadata do RAG (vazio se não houver)
 
 ### L - LOOP (Refinamento)
 
@@ -201,7 +215,8 @@ Ao final de TODAS as análises, valide:
 
 **Formato:**
 - [ ] CSV tem cabeçalho correto?
-- [ ] Todos os 8 campos obrigatórios preenchidos?
+- [ ] Todos os 10 campos obrigatórios preenchidos?
+- [ ] Fonte_Titulo e Fonte_URL preenchidos (URL pode ser vazio)?
 - [ ] Encoding UTF-8 sem BOM?
 - [ ] Sem linhas vazias ou malformadas?
 
@@ -219,11 +234,46 @@ Gere o arquivo CSV final: `data/deliveries/{session_id}/outputs/analysis.csv`
 **Formato exato:**
 
 ```csv
-ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações
-REQ-001,"Câmeras IP com resolução mínima de 4 megapixels (4MP)",Hardware,CONFORME,0.95,"requisitos_tecnicos_comuns.md:linha 145","O requisito exige resolução mínima de 4MP. A base de conhecimento estabelece em 'requisitos_tecnicos_comuns.md' que câmeras de videomonitoramento devem ter resolução mínima de 4MP para garantir qualidade de imagem adequada. O requisito está alinhado com as melhores práticas técnicas documentadas.","Incluir especificação no caderno técnico; Validar compatibilidade com sistema de gravação"
-REQ-002,"Armazenamento de imagens por 90 dias",Técnico,NAO_CONFORME,0.88,"lei_8666_1993.md:linha 120; lei_14133_2021.md:linha 89","O requisito exige armazenamento de 90 dias. Contudo, a Lei 8.666/93 (art. 23) e Lei 14.133/2021 (art. 47) estabelecem que o armazenamento de dados de segurança deve ser de no mínimo 30 dias, sem especificar máximo. Exigir 90 dias pode ser considerado restritivo e questionado por licitantes, pois ultrapassa significativamente o mínimo legal.","Revisar requisito com equipe jurídica; Considerar reduzir para 60 dias ou justificar tecnicamente a necessidade dos 90 dias; Preparar defesa para possível impugnação"
-REQ-003,"Sistema deve suportar protocolo ONVIF Profile S",Técnico,REVISAO,0.45,"Nenhuma evidência específica encontrada na base de conhecimento","Não foram encontradas evidências específicas sobre o protocolo ONVIF Profile S na base de conhecimento atual. Este é um protocolo padrão da indústria de videomonitoramento, mas sem documentação interna não é possível confirmar conformidade com políticas ou requisitos internos da organização.","Consultar especialista técnico em videomonitoramento; Pesquisar compatibilidade ONVIF com sistemas existentes; Adicionar documentação sobre ONVIF à base de conhecimento"
+ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações,Fonte_Titulo,Fonte_URL
+REQ-001,"Câmeras IP com resolução mínima de 4 megapixels (4MP)",Hardware,CONFORME,0.95,"Requisitos técnicos estabelecem resolução mínima de 4MP para garantir qualidade de imagem adequada em sistemas CFTV (chunk 23)","O requisito exige resolução mínima de 4MP. A base de conhecimento estabelece que câmeras de videomonitoramento devem ter resolução mínima de 4MP para garantir qualidade de imagem adequada. O requisito está alinhado com as melhores práticas técnicas documentadas.","Incluir especificação no caderno técnico; Validar compatibilidade com sistema de gravação","Requisitos Técnicos Comuns - Hardware e Software","https://docs.exemplo.com/requisitos-tecnicos"
+REQ-002,"Armazenamento de imagens por 90 dias",Técnico,NAO_CONFORME,0.88,"Lei 8.666/93 Art. 23 e Lei 14.133/2021 Art. 47 estabelecem armazenamento mínimo de 30 dias, sem especificar máximo","O requisito exige armazenamento de 90 dias. Contudo, as leis estabelecem que o armazenamento de dados de segurança deve ser de no mínimo 30 dias, sem especificar máximo. Exigir 90 dias pode ser considerado restritivo e questionado por licitantes, pois ultrapassa significativamente o mínimo legal.","Revisar requisito com equipe jurídica; Considerar reduzir para 60 dias ou justificar tecnicamente a necessidade dos 90 dias; Preparar defesa para possível impugnação","Lei 14.133/2021 - Nova Lei de Licitações","https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/L14133.htm"
+REQ-003,"Sistema deve suportar protocolo ONVIF Profile S",Técnico,REVISAO,0.45,"Nenhuma evidência específica encontrada na base de conhecimento","Não foram encontradas evidências específicas sobre o protocolo ONVIF Profile S na base de conhecimento atual. Este é um protocolo padrão da indústria de videomonitoramento, mas sem documentação interna não é possível confirmar conformidade com políticas ou requisitos internos da organização.","Consultar especialista técnico em videomonitoramento; Pesquisar compatibilidade ONVIF com sistemas existentes; Adicionar documentação sobre ONVIF à base de conhecimento","",""
 ```
+
+**IMPORTANTE - Preenchimento de Fonte_Titulo e Fonte_URL:**
+
+Quando o RAG retornar resultados, use o metadata para preencher:
+- **Fonte_Titulo:** Obter de `metadata['title']` (título do documento)
+- **Fonte_URL:** Obter de `metadata['url']` (URL original)
+- Se o documento NÃO tiver URL (documentos antigos), deixe a coluna vazia
+- Se não houver evidências, deixe ambas as colunas vazias (como no REQ-003 acima)
+
+**Exemplo de comando RAG e uso dos dados:**
+```bash
+python3 scripts/rag_search.py --requirement "processador" --top-k 3 --output-json
+```
+
+Retorna:
+```json
+{
+  "results": [
+    {
+      "text": "Processadores Intel Xeon Gold 6XXX ou superior...",
+      "similarity_score": 0.92,
+      "metadata": {
+        "title": "Exemplo de Artigo de Documentação Técnica",
+        "url": "https://docs.exemplo.com/artigos/especificacoes-tecnicas",
+        "filename": "exemplo_com_url.md",
+        "chunk_index": 5
+      }
+    }
+  ]
+}
+```
+
+No CSV, você usaria:
+- **Fonte_Titulo:** `"Exemplo de Artigo de Documentação Técnica"`
+- **Fonte_URL:** `"https://docs.exemplo.com/artigos/especificacoes-tecnicas"`
 
 Apresente ao usuário:
 - 📊 **Estatísticas gerais:**

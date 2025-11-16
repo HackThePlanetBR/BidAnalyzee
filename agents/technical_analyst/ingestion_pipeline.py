@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import time
+import re
 
 
 class IngestionPipeline:
@@ -43,6 +44,47 @@ class IngestionPipeline:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
 
+    def _extract_frontmatter(self, content: str) -> tuple[Dict[str, str], str]:
+        """
+        Extract YAML frontmatter from markdown content
+
+        Frontmatter format:
+        ---
+        title: "Document Title"
+        url: "https://example.com/doc"
+        source: "Source Name"
+        date: "2025-11-16"
+        ---
+
+        # Document content...
+
+        Args:
+            content: Raw markdown content
+
+        Returns:
+            Tuple of (metadata_dict, content_without_frontmatter)
+        """
+        frontmatter_pattern = re.compile(r'^---\s*\n(.*?)\n---\s*\n', re.DOTALL)
+        match = frontmatter_pattern.match(content)
+
+        if not match:
+            # No frontmatter found
+            return {}, content
+
+        frontmatter_text = match.group(1)
+        content_without_frontmatter = content[match.end():]
+
+        # Simple YAML parsing (key: value format)
+        metadata = {}
+        for line in frontmatter_text.split('\n'):
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                metadata[key] = value
+
+        return metadata, content_without_frontmatter
+
     def load_markdown_files(self, directory_path: str) -> List[Dict[str, str]]:
         """
         Load all markdown files from a directory
@@ -51,7 +93,7 @@ class IngestionPipeline:
             directory_path: Path to directory containing .md files
 
         Returns:
-            List of dicts with keys: {filename, content}
+            List of dicts with keys: {filename, content, title, url, source, path}
         """
         directory = Path(directory_path)
 
@@ -68,15 +110,28 @@ class IngestionPipeline:
         for file_path in sorted(markdown_files):
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
+                    raw_content = f.read()
 
-                documents.append({
+                # Extract frontmatter metadata (title, url, etc.)
+                frontmatter, content = self._extract_frontmatter(raw_content)
+
+                doc = {
                     "filename": file_path.name,
-                    "content": content,
-                    "path": str(file_path)
-                })
+                    "content": content,  # Content without frontmatter
+                    "path": str(file_path),
+                    "title": frontmatter.get("title", file_path.stem),  # Use filename if no title
+                    "url": frontmatter.get("url", ""),  # Empty if no URL
+                    "source": frontmatter.get("source", ""),
+                    "date": frontmatter.get("date", "")
+                }
 
-                print(f"✅ Loaded: {file_path.name} ({len(content)} chars)")
+                documents.append(doc)
+
+                # Display info
+                title_display = doc['title'][:50] + '...' if len(doc['title']) > 50 else doc['title']
+                url_display = f" | {doc['url']}" if doc['url'] else ""
+                print(f"✅ Loaded: {title_display}{url_display}")
+                print(f"   File: {file_path.name} ({len(content)} chars)")
 
             except Exception as e:
                 print(f"❌ Error loading {file_path.name}: {e}")
@@ -191,7 +246,11 @@ class IngestionPipeline:
         for doc in documents:
             metadata = {
                 "filename": doc["filename"],
-                "source_path": doc["path"]
+                "source_path": doc["path"],
+                "title": doc["title"],
+                "url": doc["url"],
+                "source": doc.get("source", ""),
+                "date": doc.get("date", "")
             }
 
             chunks = self.chunk_text(doc["content"], metadata)
