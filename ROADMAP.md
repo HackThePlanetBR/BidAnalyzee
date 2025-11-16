@@ -293,21 +293,6 @@
 
 **Esforço:** 4-6 horas
 
-#### C.5 - Adicionar Mais Exemplos na Knowledge Base
-
-**Descrição:**
-- Adicionar mais documentos mock
-- Cobrir mais cenários (licitações de TI, obras, serviços)
-- Adicionar jurisprudência TCU/TCE
-
-**Implementação:**
-- Expandir `data/knowledge_base/mock_documents/`
-- Criar `jurisprudencia_tcu.md`
-- Criar `requisitos_ti_avancados.md`
-- Re-indexar knowledge base
-
-**Esforço:** 3-5 horas
-
 ---
 
 ### Opção D - Funcionalidades Novas
@@ -509,7 +494,6 @@
 3. **Sprint 13:**
    - D.5 - Sistema de Templates (5-8h)
    - E.3 - Validação de Outputs (4-6h)
-   - C.5 - Expandir Knowledge Base (3-5h)
 
 **Entregável:** Sistema completo, enterprise-ready
 
