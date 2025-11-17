@@ -74,14 +74,15 @@ class TechDocsScraper(BaseScraper):
         self.use_selenium = use_selenium
         self.driver = None
 
+        # HTTP session always needed for sitemap discovery
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+
+        # Setup Selenium if requested (for content extraction)
         if use_selenium:
             self._setup_selenium()
-        else:
-            # HTTP session for requests
-            self.session = requests.Session()
-            self.session.headers.update({
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            })
 
         # Track discovered products
         self.discovered_products: Dict[str, str] = {}
