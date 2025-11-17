@@ -86,29 +86,48 @@ class ComplianceScraper(BaseScraper):
             })
 
     def _setup_selenium(self):
-        """Setup Selenium with undetected ChromeDriver."""
+        """Setup Selenium with ChromeDriver (tries undetected first, falls back to regular)."""
         try:
-            import undetected_chromedriver as uc
+            # Try undetected-chromedriver first (better for Cloudflare)
+            try:
+                import undetected_chromedriver as uc
+                self.logger.info("Setting up Selenium with undetected ChromeDriver...")
 
-            self.logger.info("Setting up Selenium with undetected ChromeDriver...")
+                options = uc.ChromeOptions()
+                options.add_argument('--no-sandbox')
+                options.add_argument('--disable-dev-shm-usage')
+                options.add_argument('--headless=new')
+                options.add_argument('--window-size=1920,1080')
 
-            options = uc.ChromeOptions()
+                self.driver = uc.Chrome(options=options)
+                self.driver.set_page_load_timeout(30)
+
+                self.logger.info("Selenium ready (undetected-chromedriver)")
+                return
+
+            except ImportError:
+                self.logger.warning("undetected-chromedriver not available, using regular Selenium")
+
+            # Fallback to regular Selenium
+            from selenium import webdriver
+            from selenium.webdriver.chrome.options import Options
+            from selenium.webdriver.chrome.service import Service
+
+            self.logger.info("Setting up regular Selenium ChromeDriver...")
+
+            options = Options()
             options.add_argument('--no-sandbox')
             options.add_argument('--disable-dev-shm-usage')
             options.add_argument('--headless=new')
             options.add_argument('--window-size=1920,1080')
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
-            self.driver = uc.Chrome(options=options)
+            self.driver = webdriver.Chrome(options=options)
             self.driver.set_page_load_timeout(30)
 
-            self.logger.info("Selenium ready")
+            self.logger.info("Selenium ready (regular ChromeDriver)")
 
-        except ImportError:
-            self.logger.error(
-                "undetected_chromedriver not installed. "
-                "Install with: pip install undetected-chromedriver"
-            )
-            raise
         except Exception as e:
             self.logger.error(f"Failed to setup Selenium: {e}")
             raise

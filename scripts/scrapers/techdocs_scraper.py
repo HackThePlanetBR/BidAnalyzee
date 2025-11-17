@@ -51,7 +51,8 @@ class TechDocsScraper(BaseScraper):
     def __init__(
         self,
         output_dir: str = "data/knowledge_base/genetec/techdocs",
-        delay_between_requests: float = 1.5
+        delay_between_requests: float = 1.5,
+        use_selenium: bool = False
     ):
         """
         Initialize TechDocs scraper.
@@ -59,6 +60,7 @@ class TechDocsScraper(BaseScraper):
         Args:
             output_dir: Directory to save markdown files
             delay_between_requests: Delay in seconds between requests
+            use_selenium: Whether to use Selenium for JavaScript rendering
         """
         super().__init__(
             base_url="https://techdocs.genetec.com",
@@ -69,14 +71,66 @@ class TechDocsScraper(BaseScraper):
             delay_between_requests=delay_between_requests
         )
 
-        # HTTP session
-        self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        })
+        self.use_selenium = use_selenium
+        self.driver = None
+
+        if use_selenium:
+            self._setup_selenium()
+        else:
+            # HTTP session for requests
+            self.session = requests.Session()
+            self.session.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
 
         # Track discovered products
         self.discovered_products: Dict[str, str] = {}
+
+    def _setup_selenium(self):
+        """Setup Selenium with ChromeDriver for JavaScript rendering."""
+        try:
+            # Try undetected-chromedriver first (better for bot detection)
+            try:
+                import undetected_chromedriver as uc
+                self.logger.info("Setting up Selenium with undetected ChromeDriver...")
+
+                options = uc.ChromeOptions()
+                options.add_argument('--no-sandbox')
+                options.add_argument('--disable-dev-shm-usage')
+                options.add_argument('--headless=new')
+                options.add_argument('--window-size=1920,1080')
+
+                self.driver = uc.Chrome(options=options)
+                self.driver.set_page_load_timeout(30)
+
+                self.logger.info("Selenium ready (undetected-chromedriver)")
+                return
+
+            except ImportError:
+                self.logger.warning("undetected-chromedriver not available, using regular Selenium")
+
+            # Fallback to regular Selenium
+            from selenium import webdriver
+            from selenium.webdriver.chrome.options import Options
+
+            self.logger.info("Setting up regular Selenium ChromeDriver...")
+
+            options = Options()
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--headless=new')
+            options.add_argument('--window-size=1920,1080')
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+
+            self.driver = webdriver.Chrome(options=options)
+            self.driver.set_page_load_timeout(30)
+
+            self.logger.info("Selenium ready (regular ChromeDriver)")
+
+        except Exception as e:
+            self.logger.error(f"Failed to setup Selenium: {e}")
+            raise
 
     def discover_urls(self) -> List[str]:
         """
@@ -237,6 +291,48 @@ class TechDocsScraper(BaseScraper):
         for product, count in sorted(product_counts.items(), key=lambda x: x[1], reverse=True):
             self.logger.info(f"  - {product}: {count} pages")
 
+    def _fetch_page(self, url: str) -> Optional[str]:
+        """
+        Fetch page HTML using requests or Selenium.
+
+        Args:
+            url: URL to fetch
+
+        Returns:
+            HTML content or None
+        """
+        try:
+            if self.use_selenium:
+                self.driver.get(url)
+
+                # Wait for JavaScript to render content
+                # TechDocs is a SPA, so we need to wait for the main content to load
+                import time
+                from selenium.webdriver.common.by import By
+                from selenium.webdriver.support.ui import WebDriverWait
+                from selenium.webdriver.support import expected_conditions as EC
+
+                try:
+                    # Wait up to 10 seconds for main content area to be present
+                    WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located((By.TAG_NAME, "article"))
+                    )
+                    # Additional wait for content to fully render
+                    time.sleep(2)
+                except:
+                    # If no article tag, just wait and hope for the best
+                    time.sleep(5)
+
+                return self.driver.page_source
+            else:
+                response = self.session.get(url, timeout=30)
+                response.raise_for_status()
+                return response.text
+
+        except Exception as e:
+            self.logger.error(f"Failed to fetch {url}: {e}")
+            return None
+
     def extract_content(self, url: str) -> Optional[Dict[str, Any]]:
         """
         Extract content from a single URL.
@@ -249,11 +345,12 @@ class TechDocsScraper(BaseScraper):
         """
         try:
             # Fetch page
-            response = self.session.get(url, timeout=30)
-            response.raise_for_status()
+            html = self._fetch_page(url)
+            if not html:
+                return None
 
             # Parse HTML
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = BeautifulSoup(html, 'html.parser')
 
             # Extract title
             title = self._extract_title(soup, url)
@@ -278,9 +375,6 @@ class TechDocsScraper(BaseScraper):
                 }
             }
 
-        except requests.exceptions.RequestException as e:
-            self.logger.error(f"HTTP error for {url}: {e}")
-            return None
         except Exception as e:
             self.logger.error(f"Error extracting {url}: {e}", exc_info=True)
             return None
@@ -463,6 +557,14 @@ class TechDocsScraper(BaseScraper):
 
         return product if product else "General"
 
+    def __del__(self):
+        """Cleanup Selenium driver if used."""
+        if self.driver:
+            try:
+                self.driver.quit()
+            except:
+                pass
+
 
 def main():
     """
@@ -497,6 +599,11 @@ def main():
         default=None,
         help="Filter for specific product (e.g., 'securitycenter', 'autovu')"
     )
+    parser.add_argument(
+        '--selenium',
+        action='store_true',
+        help="Use Selenium for JavaScript rendering (required for SPA content)"
+    )
 
     args = parser.parse_args()
 
@@ -509,12 +616,15 @@ def main():
         print(f"Limit: {args.limit} URLs")
     if args.product:
         print(f"Filter product: {args.product}")
+    if args.selenium:
+        print("Using Selenium: YES (JavaScript rendering enabled)")
     print()
 
     # Create scraper
     scraper = TechDocsScraper(
         output_dir=args.output,
-        delay_between_requests=args.delay
+        delay_between_requests=args.delay,
+        use_selenium=args.selenium
     )
 
     # Override discover_urls if filters specified

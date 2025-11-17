@@ -15,12 +15,13 @@ This package contains scrapers for three Genetec documentation websites:
    - Site: https://compliance.genetec.com/
    - Category: `Security/Compliance` (static)
    - Method: Section-based navigation
-   - Features: Cloudflare bypass support (Selenium)
+   - Features: Cloudflare bypass support (Selenium required)
 
 3. **TechDocs Scraper** (`techdocs_scraper.py`)
    - Site: https://techdocs.genetec.com/
    - Category: Dynamic (extracted from product name)
    - Method: Sitemap.xml discovery
+   - Features: JavaScript rendering support (Selenium required for content extraction)
 
 ## Features
 
@@ -41,34 +42,50 @@ All scrapers provide:
 pip install beautifulsoup4 lxml requests pyyaml tqdm
 ```
 
-### Optional Dependencies
+### Selenium Dependencies (Required for Compliance and TechDocs)
 
-For Compliance scraper with Cloudflare bypass:
+**Required for:**
+- **Compliance scraper:** Cloudflare bypass (site blocks basic HTTP requests)
+- **TechDocs scraper:** JavaScript rendering (SPA site, content not available without JS)
 
+**Installation:**
 ```bash
-pip install selenium undetected-chromedriver
+pip install selenium                    # Required
+pip install undetected-chromedriver    # Optional but recommended (better Cloudflare bypass)
 ```
+
+**System Requirements:**
+- Chrome or Chromium browser must be installed
+- ChromeDriver is managed automatically by Selenium
+
+**Notes:**
+- SCSaaS scraper works perfectly without Selenium (requests-based)
+- Compliance and TechDocs scrapers will use regular Selenium if undetected-chromedriver is unavailable
+- Both scrapers include graceful fallback mechanisms
 
 ## Quick Start
 
 ### Run All Scrapers
 
 ```bash
-# From project root
+# From project root (with Selenium for full coverage)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+
+# Without Selenium (only SCSaaS will work properly)
 python -m scripts.scrapers.scraper_orchestrator --sites all
 ```
 
 ### Run Individual Scrapers
 
 ```bash
-# SCSaaS Help
+# SCSaaS Help (no Selenium needed)
 python -m scripts.scrapers.scsaas_scraper
 
-# Compliance Portal
-python -m scripts.scrapers.compliance_scraper
+# Compliance Portal (REQUIRES Selenium)
+python -m scripts.scrapers.compliance_scraper --selenium
 
-# Technical Documentation
-python -m scripts.scrapers.techdocs_scraper
+# Technical Documentation (REQUIRES Selenium for content)
+python -m scripts.scrapers.techdocs_scraper --selenium
 ```
 
 ## Usage Examples
@@ -78,20 +95,20 @@ python -m scripts.scrapers.techdocs_scraper
 The orchestrator runs multiple scrapers in sequence:
 
 ```bash
-# Scrape all sites
-python -m scripts.scrapers.scraper_orchestrator --sites all
+# Scrape all sites (RECOMMENDED: with Selenium for full coverage)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
 
 # Scrape specific sites
-python -m scripts.scrapers.scraper_orchestrator --sites scsaas,techdocs
+python -m scripts.scrapers.scraper_orchestrator --sites scsaas,techdocs --selenium
 
 # Custom output directory
-python -m scripts.scrapers.scraper_orchestrator --sites all --output /path/to/output
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium --output /path/to/output
 
 # Adjust rate limiting (slower = more polite)
-python -m scripts.scrapers.scraper_orchestrator --sites all --delay 3.0
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium --delay 3.0
 
-# Test with limited URLs
-python -m scripts.scrapers.scraper_orchestrator --sites scsaas --limit 10
+# Test with limited URLs (useful before full run)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium --limit 10
 ```
 
 ### Individual Scrapers
@@ -122,14 +139,20 @@ python -m scripts.scrapers.compliance_scraper \
 #### TechDocs Scraper
 
 ```bash
-# Scrape all products
+# Scrape all products (REQUIRES Selenium for content extraction)
 python -m scripts.scrapers.techdocs_scraper \
+  --selenium \
   --output data/knowledge_base/genetec/techdocs
 
-# Filter by product
+# Filter by product (with Selenium)
 python -m scripts.scrapers.techdocs_scraper \
+  --selenium \
   --product securitycenter \
   --limit 50
+
+# Without Selenium (will only get metadata, NO content)
+python -m scripts.scrapers.techdocs_scraper \
+  --output data/knowledge_base/genetec/techdocs
 ```
 
 ## Output Format
@@ -240,17 +263,42 @@ Non-English content is automatically skipped and logged.
 
 ## Troubleshooting
 
-### Issue: Cloudflare blocks Compliance scraper
+### Issue: Compliance scraper returns 503 errors
+
+**Problem:** Cloudflare bot protection blocks requests-based scraping
 
 **Solution:** Use Selenium mode:
 ```bash
 python -m scripts.scrapers.compliance_scraper --selenium
 ```
 
-Ensure `undetected-chromedriver` is installed:
+Ensure Selenium is installed:
 ```bash
-pip install undetected-chromedriver
+pip install selenium
+pip install undetected-chromedriver  # Optional but recommended
 ```
+
+Make sure Chrome/Chromium is installed on your system.
+
+### Issue: TechDocs scraper returns empty content
+
+**Problem:** TechDocs is a Single Page Application (SPA) that requires JavaScript execution
+
+**Solution:** Use Selenium mode:
+```bash
+python -m scripts.scrapers.techdocs_scraper --selenium
+```
+
+Without Selenium, you'll get valid frontmatter metadata but no actual content.
+
+### Issue: Chrome/ChromeDriver not found
+
+**Problem:** Selenium can't find Chrome browser or ChromeDriver
+
+**Solution:**
+- Install Chrome or Chromium browser on your system
+- ChromeDriver is managed automatically by Selenium 4.x
+- If issues persist, try: `pip install --upgrade selenium`
 
 ### Issue: Rate limiting / 429 errors
 

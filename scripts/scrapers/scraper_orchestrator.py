@@ -152,13 +152,15 @@ class ScraperOrchestrator:
             output_dir = self.output_base_dir / site_key
 
             # Initialize with appropriate parameters
-            if site_key == 'compliance':
+            if site_key in ['compliance', 'techdocs']:
+                # Compliance and TechDocs support Selenium
                 scraper = scraper_class(
                     output_dir=str(output_dir),
                     delay_between_requests=self.delay,
                     use_selenium=self.use_selenium
                 )
             else:
+                # SCSaaS doesn't need Selenium
                 scraper = scraper_class(
                     output_dir=str(output_dir),
                     delay_between_requests=self.delay
@@ -305,7 +307,7 @@ Examples:
     parser.add_argument(
         '--selenium',
         action='store_true',
-        help="Use Selenium for Compliance scraper (Cloudflare bypass)"
+        help="Use Selenium for Compliance (Cloudflare bypass) and TechDocs (JavaScript rendering)"
     )
     parser.add_argument(
         '--limit',
