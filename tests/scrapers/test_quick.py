@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Quick test with proxy configuration"""
 import os
+import sys
+from pathlib import Path
+
+# Add project root to path (go up 2 levels: tests/scrapers/ -> tests/ -> root/)
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
