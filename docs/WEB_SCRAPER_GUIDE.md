@@ -10,6 +10,61 @@
 
 Este guia documenta como criar scrapers para extrair artigos de sites de documentação técnica e convertê-los em arquivos Markdown (.md) formatados para o sistema RAG do BidAnalyzee.
 
+## 🚀 Scrapers Implementados
+
+O BidAnalyzee já possui 3 scrapers prontos para documentação da Genetec:
+
+| Scraper | Site | Status | Selenium |
+|---------|------|--------|----------|
+| **SCSaaS** | https://help.securitycentersaas.genetec.cloud/en/ | ✅ 100% Funcional | ❌ Não necessário |
+| **Compliance** | https://compliance.genetec.com/ | ✅ Implementado | ✅ Recomendado (Cloudflare) |
+| **TechDocs** | https://techdocs.genetec.com/ | ✅ Implementado | ✅ Necessário (SPA/JavaScript) |
+
+### Uso dos Scrapers
+
+```bash
+# Configurar no .env (ver seção abaixo)
+# Depois executar:
+
+# Testar com 5 URLs
+python -m scripts.scrapers.scraper_orchestrator --sites scsaas --limit 5
+
+# Rodar todos com Selenium
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+
+# Ver configuração atual
+python -m scripts.scrapers.scraper_orchestrator --print-config
+```
+
+### Configuração via .env
+
+Adicione ao seu arquivo `.env`:
+
+```bash
+# ============================================
+# WEB SCRAPERS CONFIGURATION
+# ============================================
+# Selenium
+SCRAPERS_USE_SELENIUM=true          # Habilita Selenium (necessário para TechDocs/Compliance)
+SCRAPERS_HEADLESS=true             # Browser headless (true = sem janela)
+
+# Proxy
+SCRAPERS_USE_PROXY=false           # Habilita proxy
+SCRAPERS_PROXY_URL=                # URL do proxy (deixe vazio para auto-detect HTTP_PROXY)
+
+# Rate Limiting
+SCRAPERS_DELAY_BETWEEN_REQUESTS=1.5 # Segundos entre requests
+
+# Output
+SCRAPERS_OUTPUT_DIR=data/knowledge_base/genetec
+
+# Browser (opcional - auto-detect se vazio)
+SCRAPERS_CHROME_BINARY_PATH=       # Caminho para Chrome/Chromium
+SCRAPERS_CHROMEDRIVER_PATH=        # Caminho para ChromeDriver
+```
+
+**Documentação Completa:** Ver [scripts/scrapers/README.md](../scripts/scrapers/README.md)
+
 ---
 
 ## 📄 Formato dos Arquivos .md

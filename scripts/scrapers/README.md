@@ -42,6 +42,53 @@ All scrapers provide:
 pip install beautifulsoup4 lxml requests pyyaml tqdm
 ```
 
+### Configuration (.env)
+
+**NEW:** All settings are now configurable via environment variables!
+
+Add to your `.env` file:
+
+```bash
+# ============================================
+# WEB SCRAPERS CONFIGURATION
+# ============================================
+# Selenium Configuration
+SCRAPERS_USE_SELENIUM=true                # Enable Selenium for Compliance and TechDocs
+SCRAPERS_HEADLESS=true                    # Run browser in headless mode
+
+# Proxy Configuration
+SCRAPERS_USE_PROXY=false                  # Enable proxy for Selenium
+SCRAPERS_PROXY_URL=                       # Proxy URL (e.g., http://proxy.example.com:8080)
+# If empty and USE_PROXY=true, will auto-detect from HTTP_PROXY environment variable
+
+# Rate Limiting
+SCRAPERS_DELAY_BETWEEN_REQUESTS=1.5       # Seconds between requests (be polite!)
+
+# Output Configuration
+SCRAPERS_OUTPUT_DIR=data/knowledge_base/genetec
+
+# Browser Configuration (optional - auto-detect if empty)
+SCRAPERS_CHROME_BINARY_PATH=              # Path to Chrome/Chromium
+SCRAPERS_CHROMEDRIVER_PATH=               # Path to ChromeDriver
+```
+
+**View Current Configuration:**
+```bash
+python -m scripts.scrapers.scraper_orchestrator --print-config
+```
+
+**CLI Overrides:** You can override .env settings via command-line flags:
+```bash
+# Use proxy (override .env)
+python -m scripts.scrapers.scraper_orchestrator --sites all --use-proxy --proxy-url http://proxy:8080
+
+# Disable headless mode (see browser)
+python -m scripts.scrapers.scraper_orchestrator --sites techdocs --selenium --no-headless
+
+# Enable headless mode
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium --headless
+```
+
 ### Selenium Dependencies (Required for Compliance and TechDocs)
 
 **Required for:**
