@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 import re
 
 from .base_scraper import BaseScraper
+from .config import ScrapersConfig
 
 
 class TechDocsScraper(BaseScraper):
@@ -50,28 +51,42 @@ class TechDocsScraper(BaseScraper):
 
     def __init__(
         self,
-        output_dir: str = "data/knowledge_base/genetec/techdocs",
-        delay_between_requests: float = 1.5,
-        use_selenium: bool = False
+        output_dir: Optional[str] = None,
+        delay_between_requests: Optional[float] = None,
+        use_selenium: Optional[bool] = None,
+        config: Optional[ScrapersConfig] = None
     ):
         """
         Initialize TechDocs scraper.
 
         Args:
-            output_dir: Directory to save markdown files
-            delay_between_requests: Delay in seconds between requests
-            use_selenium: Whether to use Selenium for JavaScript rendering
+            output_dir: Directory to save markdown files (overrides config)
+            delay_between_requests: Delay in seconds between requests (overrides config)
+            use_selenium: Whether to use Selenium (overrides config)
+            config: ScrapersConfig instance (if None, loads from environment)
         """
+        # Load config if not provided
+        if config is None:
+            from .config import get_config
+            config = get_config()
+
+        self.config = config
+
+        # Use provided values or fall back to config
+        _output_dir = output_dir or config.output_dir
+        _delay = delay_between_requests if delay_between_requests is not None else config.delay_between_requests
+        _use_selenium = use_selenium if use_selenium is not None else config.use_selenium
+
         super().__init__(
             base_url="https://techdocs.genetec.com",
             source_name="Genetec Technical Documentation",
-            output_dir=output_dir,
+            output_dir=_output_dir,
             language="en",
             min_confidence=0.7,
-            delay_between_requests=delay_between_requests
+            delay_between_requests=_delay
         )
 
-        self.use_selenium = use_selenium
+        self.use_selenium = _use_selenium
         self.driver = None
 
         # HTTP session always needed for sitemap discovery
@@ -81,7 +96,7 @@ class TechDocsScraper(BaseScraper):
         })
 
         # Setup Selenium if requested (for content extraction)
-        if use_selenium:
+        if self.use_selenium:
             self._setup_selenium()
 
         # Track discovered products
@@ -98,10 +113,29 @@ class TechDocsScraper(BaseScraper):
                 options = uc.ChromeOptions()
                 options.add_argument('--no-sandbox')
                 options.add_argument('--disable-dev-shm-usage')
-                options.add_argument('--headless=new')
+
+                # Headless mode from config
+                if self.config.headless:
+                    options.add_argument('--headless=new')
+
                 options.add_argument('--window-size=1920,1080')
 
-                self.driver = uc.Chrome(options=options)
+                # Chrome binary path from config
+                if self.config.chrome_binary_path:
+                    options.binary_location = self.config.chrome_binary_path
+
+                # Proxy from config
+                proxy_url = self.config.get_proxy_config()
+                if proxy_url:
+                    options.add_argument(f'--proxy-server={proxy_url}')
+                    self.logger.info(f"Using proxy: {proxy_url[:50]}...")
+
+                # ChromeDriver path from config
+                driver_kwargs = {'options': options}
+                if self.config.chromedriver_path:
+                    driver_kwargs['driver_executable_path'] = self.config.chromedriver_path
+
+                self.driver = uc.Chrome(**driver_kwargs)
                 self.driver.set_page_load_timeout(30)
 
                 self.logger.info("Selenium ready (undetected-chromedriver)")
@@ -113,25 +147,40 @@ class TechDocsScraper(BaseScraper):
             # Fallback to regular Selenium
             from selenium import webdriver
             from selenium.webdriver.chrome.options import Options
+            from selenium.webdriver.chrome.service import Service
 
             self.logger.info("Setting up regular Selenium ChromeDriver...")
 
             options = Options()
             options.add_argument('--no-sandbox')
             options.add_argument('--disable-dev-shm-usage')
-            options.add_argument('--headless=new')
+
+            # Headless mode from config
+            if self.config.headless:
+                options.add_argument('--headless=new')
+
             options.add_argument('--window-size=1920,1080')
             options.add_argument('--disable-blink-features=AutomationControlled')
             options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
-            # Configure proxy if HTTP_PROXY environment variable is set
-            import os
-            proxy = os.environ.get('HTTP_PROXY') or os.environ.get('http_proxy')
-            if proxy:
-                options.add_argument(f'--proxy-server={proxy}')
-                self.logger.info(f"Using proxy: {proxy[:50]}...")
+            # Chrome binary path from config
+            if self.config.chrome_binary_path:
+                options.binary_location = self.config.chrome_binary_path
 
-            self.driver = webdriver.Chrome(options=options)
+            # Proxy from config
+            proxy_url = self.config.get_proxy_config()
+            if proxy_url:
+                options.add_argument(f'--proxy-server={proxy_url}')
+                self.logger.info(f"Using proxy: {proxy_url[:50]}...")
+
+            # ChromeDriver service
+            service_kwargs = {}
+            if self.config.chromedriver_path:
+                service_kwargs['executable_path'] = self.config.chromedriver_path
+
+            service = Service(**service_kwargs) if service_kwargs else None
+
+            self.driver = webdriver.Chrome(service=service, options=options)
             self.driver.set_page_load_timeout(30)
 
             self.logger.info("Selenium ready (regular ChromeDriver)")

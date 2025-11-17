@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 import time
 
 from .base_scraper import BaseScraper
+from .config import ScrapersConfig
 
 
 class SCSaaSScraper(BaseScraper):
@@ -32,23 +33,36 @@ class SCSaaSScraper(BaseScraper):
 
     def __init__(
         self,
-        output_dir: str = "data/knowledge_base/genetec/scsaas",
-        delay_between_requests: float = 1.5
+        output_dir: Optional[str] = None,
+        delay_between_requests: Optional[float] = None,
+        config: Optional[ScrapersConfig] = None
     ):
         """
         Initialize SCSaaS scraper.
 
         Args:
-            output_dir: Directory to save markdown files
-            delay_between_requests: Delay in seconds between requests
+            output_dir: Directory to save markdown files (overrides config)
+            delay_between_requests: Delay in seconds between requests (overrides config)
+            config: ScrapersConfig instance (if None, loads from environment)
         """
+        # Load config if not provided
+        if config is None:
+            from .config import get_config
+            config = get_config()
+
+        self.config = config
+
+        # Use provided values or fall back to config
+        _output_dir = output_dir or config.output_dir
+        _delay = delay_between_requests if delay_between_requests is not None else config.delay_between_requests
+
         super().__init__(
             base_url="https://help.securitycentersaas.genetec.cloud/en/",
             source_name="Security Center SaaS Help",
-            output_dir=output_dir,
+            output_dir=_output_dir,
             language="en",
             min_confidence=0.7,
-            delay_between_requests=delay_between_requests
+            delay_between_requests=_delay
         )
 
         # HTTP session for efficient connections

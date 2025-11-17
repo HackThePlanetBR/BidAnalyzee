@@ -19,6 +19,7 @@ import json
 from .scsaas_scraper import SCSaaSScraper
 from .compliance_scraper import ComplianceScraper
 from .techdocs_scraper import TechDocsScraper
+from .config import ScrapersConfig, get_config
 
 
 class ScraperOrchestrator:
@@ -47,25 +48,32 @@ class ScraperOrchestrator:
     def __init__(
         self,
         sites: List[str],
-        output_base_dir: str = "data/knowledge_base/genetec",
-        delay: float = 1.5,
-        use_selenium: bool = False,
-        limit: int = None
+        output_base_dir: str = None,
+        delay: float = None,
+        use_selenium: bool = None,
+        limit: int = None,
+        config: ScrapersConfig = None
     ):
         """
         Initialize orchestrator.
 
         Args:
             sites: List of site keys to scrape ('scsaas', 'compliance', 'techdocs', or 'all')
-            output_base_dir: Base directory for output
-            delay: Delay between requests
-            use_selenium: Whether to use Selenium (for compliance)
+            output_base_dir: Base directory for output (overrides config)
+            delay: Delay between requests (overrides config)
+            use_selenium: Whether to use Selenium (overrides config)
             limit: Limit URLs per scraper (for testing)
+            config: ScrapersConfig instance (if None, loads from environment)
         """
+        # Load config if not provided
+        if config is None:
+            config = get_config()
+
+        self.config = config
         self.sites = self._expand_sites(sites)
-        self.output_base_dir = Path(output_base_dir)
-        self.delay = delay
-        self.use_selenium = use_selenium
+        self.output_base_dir = Path(output_base_dir) if output_base_dir else Path(config.output_dir)
+        self.delay = delay if delay is not None else config.delay_between_requests
+        self.use_selenium = use_selenium if use_selenium is not None else config.use_selenium
         self.limit = limit
 
         self.overall_stats = {
@@ -114,7 +122,13 @@ class ScraperOrchestrator:
         if self.limit:
             print(f"Limit: {self.limit} URLs per scraper")
         if self.use_selenium:
-            print("Selenium: ENABLED (for Compliance)")
+            print(f"Selenium: ENABLED")
+            print(f"  Headless: {self.config.headless}")
+            proxy_url = self.config.get_proxy_config()
+            if proxy_url:
+                # Mask sensitive parts
+                masked = proxy_url[:50] + "..." if len(proxy_url) > 50 else proxy_url
+                print(f"  Proxy: {masked}")
         print("=" * 80)
         print()
 
@@ -157,13 +171,15 @@ class ScraperOrchestrator:
                 scraper = scraper_class(
                     output_dir=str(output_dir),
                     delay_between_requests=self.delay,
-                    use_selenium=self.use_selenium
+                    use_selenium=self.use_selenium,
+                    config=self.config
                 )
             else:
                 # SCSaaS doesn't need Selenium
                 scraper = scraper_class(
                     output_dir=str(output_dir),
-                    delay_between_requests=self.delay
+                    delay_between_requests=self.delay,
+                    config=self.config
                 )
 
             # Apply limit if specified
@@ -316,20 +332,66 @@ Examples:
         default=None,
         help="Limit URLs per scraper (for testing)"
     )
+    parser.add_argument(
+        '--use-proxy',
+        action='store_true',
+        help="Enable proxy for Selenium (overrides .env)"
+    )
+    parser.add_argument(
+        '--proxy-url',
+        type=str,
+        default=None,
+        help="Proxy URL (e.g., http://proxy.example.com:8080, overrides .env)"
+    )
+    parser.add_argument(
+        '--headless',
+        action='store_true',
+        default=None,
+        help="Run browser in headless mode (overrides .env, default: true)"
+    )
+    parser.add_argument(
+        '--no-headless',
+        dest='headless',
+        action='store_false',
+        help="Run browser in visible mode (overrides .env)"
+    )
+    parser.add_argument(
+        '--print-config',
+        action='store_true',
+        help="Print current configuration and exit"
+    )
 
     args = parser.parse_args()
+
+    # Handle --print-config
+    if args.print_config:
+        config = get_config()
+        config.print_config()
+        sys.exit(0)
 
     # Parse sites
     sites = [s.strip() for s in args.sites.split(',')]
 
     try:
+        # Load config and apply CLI overrides
+        config = get_config()
+
+        # Apply CLI overrides to config
+        if args.use_proxy:
+            config.use_proxy = True
+        if args.proxy_url:
+            config.proxy_url = args.proxy_url
+        if args.headless is not None:
+            config.headless = args.headless
+
         # Create orchestrator
         orchestrator = ScraperOrchestrator(
             sites=sites,
-            output_base_dir=args.output,
-            delay=args.delay,
-            use_selenium=args.selenium,
-            limit=args.limit
+            output_base_dir=args.output if args.output != "data/knowledge_base/genetec" else None,
+            delay=args.delay if args.delay != 1.5 else None,
+            use_selenium=args.selenium if args.selenium else None,
+            limit=args.limit,
+            config=config
         )
 
         # Run
