@@ -80,10 +80,10 @@ class TechDocsScraper(BaseScraper):
 
     def discover_urls(self) -> List[str]:
         """
-        Discover URLs from sitemap.xml.
+        Discover URLs from sitemap.xml (handles sitemap index).
 
         Returns:
-            List of documentation URLs
+            List of English documentation URLs
         """
         self.logger.info(f"Fetching sitemap: {self.SITEMAP_URL}")
 
@@ -97,25 +97,13 @@ class TechDocsScraper(BaseScraper):
             # XML namespace
             namespace = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
 
-            # Extract all <loc> elements
-            urls = []
-
-            for url_element in root.findall('.//ns:loc', namespace):
-                url = url_element.text
-
-                if url and self._is_valid_doc_url(url):
-                    urls.append(url)
-
-            # Remove duplicates and sort
-            urls = sorted(list(set(urls)))
-
-            # Log discovered products
-            self._analyze_discovered_products(urls)
-
-            self.stats['urls_discovered'] = len(urls)
-            self.logger.info(f"Discovered {len(urls)} URLs from sitemap")
-
-            return urls
+            # Check if this is a sitemap index
+            if root.tag.endswith('sitemapindex'):
+                self.logger.info("Detected sitemap index, fetching sub-sitemaps...")
+                return self._discover_from_sitemap_index(root, namespace)
+            else:
+                # Direct sitemap with URLs
+                return self._extract_urls_from_sitemap(root, namespace)
 
         except ET.ParseError as e:
             self.logger.error(f"Failed to parse sitemap XML: {e}")
@@ -127,35 +115,103 @@ class TechDocsScraper(BaseScraper):
             self.logger.error(f"Unexpected error discovering URLs: {e}", exc_info=True)
             return []
 
+    def _discover_from_sitemap_index(self, root: ET.Element, namespace: dict) -> List[str]:
+        """
+        Discover URLs from a sitemap index (sitemap of sitemaps).
+
+        Args:
+            root: XML root element
+            namespace: XML namespace dict
+
+        Returns:
+            List of URLs from all sub-sitemaps
+        """
+        all_urls = []
+
+        # Get all sub-sitemap URLs
+        sitemap_urls = []
+        for sitemap_element in root.findall('.//ns:sitemap/ns:loc', namespace):
+            sitemap_url = sitemap_element.text
+            if sitemap_url:
+                sitemap_urls.append(sitemap_url)
+
+        self.logger.info(f"Found {len(sitemap_urls)} sub-sitemaps")
+
+        # Fetch each sub-sitemap (focus on structured content)
+        for sitemap_url in sitemap_urls:
+            # Prioritize structured content
+            if 'structured' in sitemap_url or 'pages' in sitemap_url:
+                self.logger.info(f"Fetching sub-sitemap: {sitemap_url}")
+
+                try:
+                    response = self.session.get(sitemap_url, timeout=30)
+                    response.raise_for_status()
+
+                    sub_root = ET.fromstring(response.content)
+                    urls = self._extract_urls_from_sitemap(sub_root, namespace)
+                    all_urls.extend(urls)
+
+                except Exception as e:
+                    self.logger.warning(f"Failed to fetch sub-sitemap {sitemap_url}: {e}")
+
+        # Remove duplicates and sort
+        all_urls = sorted(list(set(all_urls)))
+
+        # Log stats
+        self._analyze_discovered_products(all_urls)
+        self.stats['urls_discovered'] = len(all_urls)
+        self.logger.info(f"Discovered {len(all_urls)} total URLs from sitemap index")
+
+        return all_urls
+
+    def _extract_urls_from_sitemap(self, root: ET.Element, namespace: dict) -> List[str]:
+        """
+        Extract URLs from a single sitemap.
+
+        Args:
+            root: XML root element
+            namespace: XML namespace dict
+
+        Returns:
+            List of valid documentation URLs
+        """
+        urls = []
+
+        for url_element in root.findall('.//ns:url/ns:loc', namespace):
+            url = url_element.text
+
+            if url and self._is_valid_doc_url(url):
+                urls.append(url)
+
+        return urls
+
     def _is_valid_doc_url(self, url: str) -> bool:
         """
-        Check if URL is a valid documentation page.
+        Check if URL is a valid English documentation page.
 
         Args:
             url: URL to check
 
         Returns:
-            True if valid documentation URL
+            True if valid English documentation URL
         """
-        # Filter out non-English content
-        # TechDocs doesn't use /en/ path, but may have language in different format
-        # For now, accept all since we'll filter by content language later
+        # IMPORTANT: Filter only English content
+        # TechDocs URL format: /r/en-US/Document-Title or /r/LANG/...
+        if '/r/en-US/' not in url:
+            return False
 
-        # Skip index pages, search pages, etc.
+        # Skip non-documentation pages
         skip_patterns = [
             '/search',
             '/genindex',
             '/index.html',
-            '/404.html'
+            '/404.html',
+            '/p/'  # Product pages, not documentation
         ]
 
         for pattern in skip_patterns:
             if pattern in url.lower():
                 return False
-
-        # Must be .html page
-        if not url.endswith('.html'):
-            return False
 
         return True
 
@@ -305,9 +361,9 @@ class TechDocsScraper(BaseScraper):
 
     def _extract_product_and_version(self, url: str) -> Tuple[str, Optional[str]]:
         """
-        Extract product name and version from URL.
+        Extract product name and version from URL/document title.
 
-        URL pattern: https://techdocs.genetec.com/{product}/{version}/...
+        TechDocs URL format: https://techdocs.genetec.com/r/en-US/Security-Center-Release-Notes-5.12.2.10
 
         Args:
             url: Documentation URL
@@ -316,41 +372,74 @@ class TechDocsScraper(BaseScraper):
             Tuple of (product_name, version) or (None, None)
 
         Example:
-            >>> _extract_product_and_version("https://techdocs.genetec.com/securitycenter/5.11/admin/...")
-            ("Security Center", "5.11")
+            >>> _extract_product_and_version("https://techdocs.genetec.com/r/en-US/Security-Center-Admin-Guide-5.12")
+            ("Security Center", "5.12")
         """
+        # Extract document slug from URL
+        # Format: /r/en-US/Document-Title-With-Version
         parsed = urlparse(url)
         path_parts = [p for p in parsed.path.split('/') if p]
 
-        if len(path_parts) < 2:
+        if len(path_parts) < 3:
             return None, None
 
-        # First part is typically the product slug
-        product_slug = path_parts[0].lower()
+        # Document title is the last part
+        doc_title = path_parts[-1]
 
-        # Second part might be version
-        potential_version = path_parts[1] if len(path_parts) > 1 else None
-
-        # Check if it looks like a version number
+        # Extract version from title (usually at the end)
+        # Pattern: ...version-X.Y.Z or ...X.Y.Z
         version = None
-        if potential_version and re.match(r'^\d+\.\d+', potential_version):
-            version = potential_version
+        version_match = re.search(r'(\d+\.\d+(?:\.\d+)?(?:\.\d+)?)$', doc_title)
+        if version_match:
+            version = version_match.group(1)
+            # Remove version from title for product extraction
+            doc_title = doc_title[:version_match.start()].rstrip('-')
 
-        # Map product slug to friendly name
-        product_name = self.PRODUCT_MAPPINGS.get(product_slug)
+        # Extract product name from title
+        # Common patterns:
+        # - Security-Center-...
+        # - SynergisTM-...
+        # - AutoVuTM-...
+        product_name = None
 
+        # Check known products
+        for slug, friendly_name in self.PRODUCT_MAPPINGS.items():
+            slug_pattern = slug.replace(' ', '-').replace('_', '-').lower()
+            if doc_title.lower().startswith(slug_pattern):
+                product_name = friendly_name
+                break
+
+        # If not found, try to extract first few words as product
         if not product_name:
-            # Try to create friendly name from slug
-            product_name = product_slug.replace('-', ' ').replace('_', ' ').title()
+            # Remove TM suffix if present
+            doc_title_clean = doc_title.replace('TM', '').replace('Tm', '')
+
+            # Get first 1-3 words as product name
+            words = doc_title_clean.split('-')
+            if words:
+                # Try 2-word product names first (e.g., "Security Center")
+                if len(words) >= 2:
+                    potential_product = ' '.join(words[:2])
+                    # Check if it's a known product
+                    for friendly_name in self.PRODUCT_MAPPINGS.values():
+                        if friendly_name.lower() == potential_product.lower():
+                            product_name = friendly_name
+                            break
+
+                # Fallback to single word
+                if not product_name and words:
+                    product_name = words[0].replace('-', ' ').title()
 
             # Log unknown product
-            if product_slug not in self.discovered_products:
-                self.logger.warning(
-                    f"Unknown product slug: '{product_slug}' → using '{product_name}'"
-                )
-                self.discovered_products[product_slug] = product_name
+            if product_name and product_name not in self.PRODUCT_MAPPINGS.values():
+                slug = doc_title.split('-')[0].lower() if '-' in doc_title else doc_title.lower()
+                if slug not in self.discovered_products:
+                    self.logger.info(
+                        f"Discovered product: '{product_name}' from document: {doc_title}"
+                    )
+                    self.discovered_products[slug] = product_name
 
-        return product_name, version
+        return product_name if product_name else "General", version
 
     def get_category(self, url: str, content: Optional[Dict[str, Any]] = None) -> str:
         """
