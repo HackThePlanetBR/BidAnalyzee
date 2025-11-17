@@ -425,20 +425,71 @@ None
   - Added usage instructions and testing guidance
   - Documented expected results
 
-**Status:** Implementation complete, ready for user testing
+**Commits:**
+- e058b60: Selenium implementation
+- 5385dc8: Session initialization fix
+- fcc8f6c: Test report
+- 724b13a: Test scripts
+- 5d0db30: Proxy support
+- 8e6289e: Test scripts update
 
-**Note:** Local testing not possible due to Chrome/Chromium unavailability in environment. Code follows established patterns and should work when tested with Chrome installed.
+---
+
+### Session 4: 2025-11-17 (Configuration System)
+**Completed:**
+- ✅ Created comprehensive configuration module (`scripts/scrapers/config.py`)
+  - ScrapersConfig class with all settings from environment
+  - Proxy configuration: SCRAPERS_USE_PROXY, SCRAPERS_PROXY_URL
+  - Auto-detection from HTTP_PROXY if SCRAPERS_PROXY_URL empty
+  - Browser settings: headless mode, Chrome paths
+  - Rate limiting, output directory configuration
+  - Validation with detailed error messages
+  - Debug helper: print_config() method
+
+- ✅ Updated all scrapers to use configuration
+  - Compliance, TechDocs, SCSaaS now accept config parameter
+  - Parameters override config values (CLI > .env > defaults)
+  - Proxy settings from config instead of direct env access
+  - Headless mode configurable
+  - Chrome binary and ChromeDriver paths configurable
+
+- ✅ Enhanced orchestrator
+  - Centralized configuration management
+  - New CLI flags: --use-proxy, --proxy-url, --headless, --no-headless
+  - New command: --print-config to display current configuration
+  - Displays proxy settings when Selenium enabled
+
+- ✅ Updated .env.example
+  - Added comprehensive scraper configuration section
+  - All settings documented with examples
+  - Backward compatible with existing env vars
+
+**Status:** Configuration complete, all settings now via .env
 
 **Commits:**
-- Pending: Selenium implementation for Compliance and TechDocs scrapers
+- 10c8f8d: feat: Add configurable proxy and browser settings via .env
 
 ---
 
 ## 🎯 Next Steps
 
-1. **Immediate:** Push Selenium implementation to remote
-2. **User Testing:** Test scrapers with Selenium on system with Chrome installed
-3. **After Testing:** Phase 7 - RAG Integration (populate knowledge base)
+1. **User Testing:** Test scrapers in your environment
+   ```bash
+   # Test without Selenium (SCSaaS works 100%)
+   python -m scripts.scrapers.scraper_orchestrator --sites scsaas --limit 5
+
+   # Test with Selenium (TechDocs and Compliance)
+   python -m scripts.scrapers.scraper_orchestrator --sites techdocs --selenium --limit 5
+   ```
+
+2. **Configure .env:** Set proxy and browser settings if needed
+
+3. **Production Run:** When tests pass, run full scraping
+   ```bash
+   python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+   ```
+
+4. **Phase 7 - RAG Integration:** Populate knowledge base with scraped data
 
 ---
 

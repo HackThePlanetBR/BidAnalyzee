@@ -26,6 +26,44 @@ python3 scripts/validate_structure.py
 
 ---
 
+### `scrapers/` - Web Scrapers para Knowledge Base
+
+**Propósito:** Extrai documentação técnica de sites da Genetec e converte para Markdown com frontmatter YAML para popular a knowledge base do RAG.
+
+**Scrapers Disponíveis:**
+- **SCSaaS** - Security Center SaaS Help (sitemap.xml)
+- **Compliance** - Genetec Compliance Portal (seção-based + Selenium)
+- **TechDocs** - Genetec Technical Documentation (sitemap.xml + Selenium)
+
+**Uso Rápido:**
+```bash
+# Ver configuração atual
+python -m scripts.scrapers.scraper_orchestrator --print-config
+
+# Testar com limite de 5 URLs
+python -m scripts.scrapers.scraper_orchestrator --sites scsaas --limit 5
+
+# Rodar todos os scrapers (produção)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+```
+
+**Configuração (.env):**
+```bash
+SCRAPERS_USE_SELENIUM=true           # Selenium para Compliance/TechDocs
+SCRAPERS_HEADLESS=true              # Browser headless
+SCRAPERS_USE_PROXY=false            # Habilita proxy
+SCRAPERS_PROXY_URL=                 # URL do proxy (auto-detect de HTTP_PROXY)
+SCRAPERS_DELAY_BETWEEN_REQUESTS=1.5 # Rate limiting
+```
+
+**Documentação Completa:**
+- [Guia de Uso](../docs/WEB_SCRAPER_GUIDE.md)
+- [Status de Implementação](../docs/WEB_SCRAPER_STATUS.md)
+- [Relatório de Testes](../docs/WEB_SCRAPER_TEST_REPORT.md)
+- [README dos Scrapers](scrapers/README.md)
+
+---
+
 ## Scripts Futuros (Próximos Sprints)
 
 ### `test_pinecone_connection.py` (Sprint 1)
