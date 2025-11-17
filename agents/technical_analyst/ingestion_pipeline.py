@@ -53,6 +53,7 @@ class IngestionPipeline:
         title: "Document Title"
         url: "https://example.com/doc"
         source: "Source Name"
+        category: "Hardware"
         date: "2025-11-16"
         ---
 
@@ -122,6 +123,7 @@ class IngestionPipeline:
                     "title": frontmatter.get("title", file_path.stem),  # Use filename if no title
                     "url": frontmatter.get("url", ""),  # Empty if no URL
                     "source": frontmatter.get("source", ""),
+                    "category": frontmatter.get("category", ""),  # Category from source
                     "date": frontmatter.get("date", "")
                 }
 
@@ -250,6 +252,7 @@ class IngestionPipeline:
                 "title": doc["title"],
                 "url": doc["url"],
                 "source": doc.get("source", ""),
+                "category": doc.get("category", ""),
                 "date": doc.get("date", "")
             }
 

@@ -154,7 +154,7 @@ ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendaç�
 **Colunas obrigatórias:**
 1. **ID:** Identificador único (REQ-001, REQ-002, ...)
 2. **Requisito:** Texto completo do requisito analisado
-3. **Categoria:** Hardware | Software | Serviço | Jurídico | Técnico
+3. **Categoria:** Categoria do documento fonte (extraída do RAG metadata)
 4. **Veredicto:** CONFORME | NAO_CONFORME | REVISAO | PARCIAL
 5. **Confiança:** Score 0.0 a 1.0 (ex: 0.95)
 6. **Evidências:** Citações da knowledge base (texto resumido)
@@ -168,8 +168,9 @@ ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendaç�
 - Escape de aspas: `"` vira `""`
 - Raciocínio: máximo 500 caracteres
 - Evidências: separadas por ponto-e-vírgula se múltiplas
-- Fonte_Titulo: Usar o `title` do documento retornado pelo RAG
-- Fonte_URL: Usar o `url` do metadata do RAG (vazio se não houver)
+- **Categoria:** Obter de `metadata['category']` do resultado RAG com maior similarity
+- **Fonte_Titulo:** Usar o `title` do documento retornado pelo RAG
+- **Fonte_URL:** Usar o `url` do metadata do RAG (vazio se não houver)
 
 ### L - LOOP (Refinamento)
 
@@ -236,17 +237,34 @@ Gere o arquivo CSV final: `data/deliveries/{session_id}/outputs/analysis.csv`
 ```csv
 ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações,Fonte_Titulo,Fonte_URL
 REQ-001,"Câmeras IP com resolução mínima de 4 megapixels (4MP)",Hardware,CONFORME,0.95,"Requisitos técnicos estabelecem resolução mínima de 4MP para garantir qualidade de imagem adequada em sistemas CFTV (chunk 23)","O requisito exige resolução mínima de 4MP. A base de conhecimento estabelece que câmeras de videomonitoramento devem ter resolução mínima de 4MP para garantir qualidade de imagem adequada. O requisito está alinhado com as melhores práticas técnicas documentadas.","Incluir especificação no caderno técnico; Validar compatibilidade com sistema de gravação","Requisitos Técnicos Comuns - Hardware e Software","https://docs.exemplo.com/requisitos-tecnicos"
-REQ-002,"Armazenamento de imagens por 90 dias",Técnico,NAO_CONFORME,0.88,"Lei 8.666/93 Art. 23 e Lei 14.133/2021 Art. 47 estabelecem armazenamento mínimo de 30 dias, sem especificar máximo","O requisito exige armazenamento de 90 dias. Contudo, as leis estabelecem que o armazenamento de dados de segurança deve ser de no mínimo 30 dias, sem especificar máximo. Exigir 90 dias pode ser considerado restritivo e questionado por licitantes, pois ultrapassa significativamente o mínimo legal.","Revisar requisito com equipe jurídica; Considerar reduzir para 60 dias ou justificar tecnicamente a necessidade dos 90 dias; Preparar defesa para possível impugnação","Lei 14.133/2021 - Nova Lei de Licitações","https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/L14133.htm"
-REQ-003,"Sistema deve suportar protocolo ONVIF Profile S",Técnico,REVISAO,0.45,"Nenhuma evidência específica encontrada na base de conhecimento","Não foram encontradas evidências específicas sobre o protocolo ONVIF Profile S na base de conhecimento atual. Este é um protocolo padrão da indústria de videomonitoramento, mas sem documentação interna não é possível confirmar conformidade com políticas ou requisitos internos da organização.","Consultar especialista técnico em videomonitoramento; Pesquisar compatibilidade ONVIF com sistemas existentes; Adicionar documentação sobre ONVIF à base de conhecimento","",""
+REQ-002,"Armazenamento de imagens por 90 dias",Legislação,NAO_CONFORME,0.88,"Lei 8.666/93 Art. 23 e Lei 14.133/2021 Art. 47 estabelecem armazenamento mínimo de 30 dias, sem especificar máximo","O requisito exige armazenamento de 90 dias. Contudo, as leis estabelecem que o armazenamento de dados de segurança deve ser de no mínimo 30 dias, sem especificar máximo. Exigir 90 dias pode ser considerado restritivo e questionado por licitantes, pois ultrapassa significativamente o mínimo legal.","Revisar requisito com equipe jurídica; Considerar reduzir para 60 dias ou justificar tecnicamente a necessidade dos 90 dias; Preparar defesa para possível impugnação","Lei 14.133/2021 - Nova Lei de Licitações","https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/L14133.htm"
+REQ-003,"Sistema deve suportar protocolo ONVIF Profile S","",REVISAO,0.45,"Nenhuma evidência específica encontrada na base de conhecimento","Não foram encontradas evidências específicas sobre o protocolo ONVIF Profile S na base de conhecimento atual. Este é um protocolo padrão da indústria de videomonitoramento, mas sem documentação interna não é possível confirmar conformidade com políticas ou requisitos internos da organização.","Consultar especialista técnico em videomonitoramento; Pesquisar compatibilidade ONVIF com sistemas existentes; Adicionar documentação sobre ONVIF à base de conhecimento","",""
 ```
 
-**IMPORTANTE - Preenchimento de Fonte_Titulo e Fonte_URL:**
+**Observações sobre os exemplos:**
+- REQ-001: Categoria "Hardware" vem do metadata do documento sobre requisitos técnicos
+- REQ-002: Categoria "Legislação" vem do metadata do documento sobre Lei 14.133
+- REQ-003: Categoria vazia porque não há evidências RAG (sem resultados)
 
-Quando o RAG retornar resultados, use o metadata para preencher:
-- **Fonte_Titulo:** Obter de `metadata['title']` (título do documento)
-- **Fonte_URL:** Obter de `metadata['url']` (URL original)
+**IMPORTANTE - Preenchimento de Categoria, Fonte_Titulo e Fonte_URL:**
+
+Quando o RAG retornar resultados, use o metadata para preencher as colunas:
+
+**1. Categoria:**
+- Obter de `metadata['category']` do resultado com **maior similarity_score**
+- Esta categoria foi definida no site de origem pelo scraper
+- Exemplos: "Hardware", "Software", "Legislação", "Normas Técnicas", "Certificações"
+- Se não houver category no metadata, deixe vazio
+
+**2. Fonte_Titulo:**
+- Obter de `metadata['title']` (título do documento)
+
+**3. Fonte_URL:**
+- Obter de `metadata['url']` (URL original)
 - Se o documento NÃO tiver URL (documentos antigos), deixe a coluna vazia
-- Se não houver evidências, deixe ambas as colunas vazias (como no REQ-003 acima)
+
+**4. Sem evidências:**
+- Se não houver resultados RAG, deixe Categoria, Fonte_Titulo e Fonte_URL vazios
 
 **Exemplo de comando RAG e uso dos dados:**
 ```bash
@@ -261,19 +279,32 @@ Retorna:
       "text": "Processadores Intel Xeon Gold 6XXX ou superior...",
       "similarity_score": 0.92,
       "metadata": {
-        "title": "Exemplo de Artigo de Documentação Técnica",
-        "url": "https://docs.exemplo.com/artigos/especificacoes-tecnicas",
-        "filename": "exemplo_com_url.md",
+        "title": "Especificações Técnicas - Processadores Intel Xeon",
+        "url": "https://docs.intel.com/processors/xeon-gold",
+        "category": "Hardware",
+        "filename": "intel_xeon_specs.md",
         "chunk_index": 5
+      }
+    },
+    {
+      "text": "Processadores AMD EPYC 7003 Series...",
+      "similarity_score": 0.87,
+      "metadata": {
+        "title": "Especificações AMD EPYC",
+        "url": "https://docs.amd.com/epyc-7003",
+        "category": "Hardware",
+        "filename": "amd_epyc_specs.md",
+        "chunk_index": 12
       }
     }
   ]
 }
 ```
 
-No CSV, você usaria:
-- **Fonte_Titulo:** `"Exemplo de Artigo de Documentação Técnica"`
-- **Fonte_URL:** `"https://docs.exemplo.com/artigos/especificacoes-tecnicas"`
+No CSV, você usaria (pegando o resultado com maior similarity - primeiro):
+- **Categoria:** `"Hardware"` (de `metadata['category']`)
+- **Fonte_Titulo:** `"Especificações Técnicas - Processadores Intel Xeon"`
+- **Fonte_URL:** `"https://docs.intel.com/processors/xeon-gold"`
 
 Apresente ao usuário:
 - 📊 **Estatísticas gerais:**

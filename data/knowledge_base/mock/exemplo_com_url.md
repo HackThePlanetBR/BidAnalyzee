@@ -2,6 +2,7 @@
 title: "Exemplo de Artigo de Documentação Técnica"
 url: "https://docs.exemplo.com/artigos/especificacoes-tecnicas"
 source: "Documentação Oficial - Exemplo Corp"
+category: "Hardware"
 date: "2025-11-16"
 ---
 
