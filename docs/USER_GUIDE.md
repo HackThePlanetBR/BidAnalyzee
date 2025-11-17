@@ -10,12 +10,13 @@
 
 1. [Introdução](#introdução)
 2. [Primeiros Passos](#primeiros-passos)
-3. [Workflows Disponíveis](#workflows-disponíveis)
-4. [Comandos e Ferramentas](#comandos-e-ferramentas)
-5. [Interpretando Resultados](#interpretando-resultados)
-6. [Boas Práticas](#boas-práticas)
-7. [Troubleshooting](#troubleshooting)
-8. [Referências](#referências)
+3. [Populando a Base de Conhecimento](#populando-a-base-de-conhecimento)
+4. [Workflows Disponíveis](#workflows-disponíveis)
+5. [Comandos e Ferramentas](#comandos-e-ferramentas)
+6. [Interpretando Resultados](#interpretando-resultados)
+7. [Boas Práticas](#boas-práticas)
+8. [Troubleshooting](#troubleshooting)
+9. [Referências](#referências)
 
 ---
 
@@ -87,6 +88,81 @@ python scripts/validate_pdf.py --help
 # Teste se tudo está funcionando
 python -c "from agents.orchestrator.state import StateManager; print('✅ OK')"
 ```
+
+---
+
+## 📚 Populando a Base de Conhecimento
+
+### Opção 1: Web Scrapers Automatizados ⭐ (Recomendado)
+
+O BidAnalyzee possui scrapers prontos para documentação técnica da Genetec:
+
+```bash
+# 1. Configure no .env (se necessário)
+# Ver seção de configuração abaixo
+
+# 2. Execute scraping completo (primeira vez)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+
+# Isso irá scrape:
+# - Security Center SaaS Help (~500 artigos)
+# - Genetec Compliance Portal (~100 artigos)
+# - Genetec Technical Documentation (~800+ artigos)
+
+# 3. Indexe na base vetorial
+python scripts/index_knowledge_base.py --force
+```
+
+**Tempo estimado:** 30-60 minutos (scraping) + 5-10 min (indexação)
+
+**Sites suportados:**
+- ✅ **SCSaaS** - Security Center SaaS Help
+- ✅ **Compliance** - Compliance Portal (certificações, normas)
+- ✅ **TechDocs** - Documentação técnica de produtos
+
+### Configuração dos Scrapers (.env)
+
+```bash
+# Selenium (necessário para Compliance e TechDocs)
+SCRAPERS_USE_SELENIUM=true
+SCRAPERS_HEADLESS=true
+
+# Proxy (opcional)
+SCRAPERS_USE_PROXY=false
+SCRAPERS_PROXY_URL=
+
+# Rate limiting (seja educado com os servidores!)
+SCRAPERS_DELAY_BETWEEN_REQUESTS=1.5
+
+# Output
+SCRAPERS_OUTPUT_DIR=data/knowledge_base/genetec
+```
+
+### Teste Antes de Rodar Tudo
+
+```bash
+# Teste com apenas 5 URLs de cada site
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium --limit 5
+
+# Se funcionar, rode completo
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+```
+
+### Opção 2: Adicionar Documentos Manualmente
+
+Para documentos que não têm scraper:
+
+```bash
+# 1. Adicione arquivos .md em data/knowledge_base/
+cp meus_documentos/*.md data/knowledge_base/
+
+# 2. Re-indexe
+python scripts/index_knowledge_base.py --force
+```
+
+**Formato:** Apenas Markdown (.md) com frontmatter YAML opcional.
+
+**Ver também:** [Web Scraper Guide](scrapers/WEB_SCRAPER_GUIDE.md) para detalhes completos.
 
 ---
 
