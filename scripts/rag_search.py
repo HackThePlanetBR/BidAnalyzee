@@ -77,7 +77,7 @@ def main():
         else:
             # Human-readable output
             print(f"\n{'='*70}")
-            print(f"🔍 RAG SEARCH RESULTS")
+            print(f"RAG SEARCH RESULTS")
             print(f"{'='*70}")
             print(f"Query: {args.requirement}")
             print(f"Top-K: {args.top_k}")
@@ -86,7 +86,7 @@ def main():
             print(f"{'='*70}\n")
 
             if not results:
-                print("⚠️  No evidence found. Consider:")
+                print("WARNING: No evidence found. Consider:")
                 print("  - Lowering similarity threshold")
                 print("  - Rephrasing query")
                 print("  - Using broader search terms")
@@ -101,21 +101,21 @@ def main():
                     similarity = result.get('similarity_score', 0.0)
                     text = result.get('text', '')
 
-                    print(f"[{i}] 📄 {title}")
+                    print(f"[{i}] {title}")
                     if url:
-                        print(f"    🔗 {url}")
-                    print(f"    📁 {filename} (chunk {chunk_idx}) | Similarity: {similarity:.2f}")
-                    print(f"    📝 {text[:200]}...")
+                        print(f"    URL: {url}")
+                    print(f"    File: {filename} (chunk {chunk_idx}) | Similarity: {similarity:.2f}")
+                    print(f"    Text: {text[:200]}...")
                     print()
 
         return 0
 
     except FileNotFoundError as e:
-        print(f"❌ Error: {e}", file=sys.stderr)
-        print("💡 Hint: Run knowledge base ingestion first", file=sys.stderr)
+        print(f"ERROR: {e}", file=sys.stderr)
+        print("HINT: Run knowledge base ingestion first", file=sys.stderr)
         return 1
     except Exception as e:
-        print(f"❌ Unexpected error: {e}", file=sys.stderr)
+        print(f"ERROR: Unexpected error: {e}", file=sys.stderr)
         return 1
 
 

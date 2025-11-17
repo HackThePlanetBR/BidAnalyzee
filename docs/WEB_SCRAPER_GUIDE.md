@@ -23,6 +23,7 @@ Todos os arquivos .md gerados pelo scraper **devem** incluir frontmatter YAML co
 title: "Título Completo do Artigo"
 url: "https://docs.exemplo.com/artigos/caminho-completo"
 source: "Nome do Site de Documentação"
+category: "Hardware"
 date: "2025-11-16"
 ---
 
@@ -38,14 +39,29 @@ Texto do artigo aqui...
 | **title** | Título completo do artigo | `"Especificações Técnicas - Processadores Intel Xeon"` |
 | **url** | URL completa da página original | `"https://docs.intel.com/processors/xeon-gold-specs"` |
 | **source** | Nome da fonte/site | `"Intel ARK - Product Specifications"` |
+| **category** | **Categoria do conteúdo (OBRIGATÓRIO)** | `"Hardware"`, `"Software"`, `"Legislação"` |
 | **date** | Data da extração (YYYY-MM-DD) | `"2025-11-16"` |
+
+**IMPORTANTE sobre `category`:**
+- Este campo é **obrigatório** e será usado na coluna "Categoria" do CSV de análise
+- O scraper deve determinar a categoria do artigo baseado no site/seção de origem
+- A categoria aparecerá no CSV final de conformidade
+
+**Categorias Comuns:**
+- `"Hardware"` - Especificações de equipamentos, servidores, componentes
+- `"Software"` - Requisitos de software, licenças, APIs
+- `"Legislação"` - Leis, decretos, portarias
+- `"Normas Técnicas"` - NBR, ISO, IEC, ABNT
+- `"Certificações"` - ANATEL, INMETRO, ISO
+- `"Segurança"` - Protocolos de segurança, criptografia
+- `"Redes"` - Topologias, protocolos de rede
+- `"Qualificação"` - Documentação, atestados técnicos
 
 ### Campos Opcionais
 
 | Campo | Descrição | Exemplo |
 |-------|-----------|---------|
 | **author** | Autor do artigo (se disponível) | `"Intel Corporation"` |
-| **category** | Categoria do artigo | `"Hardware"` ou `"Software"` |
 | **tags** | Tags/palavras-chave (separadas por vírgula) | `"processador, xeon, servidor, datacenter"` |
 | **version** | Versão da documentação (se aplicável) | `"v3.2"` |
 | **last_updated** | Data de última atualização no site original | `"2025-10-15"` |
@@ -68,6 +84,7 @@ doc = {
     "title": frontmatter.get("title", file_path.stem),
     "url": frontmatter.get("url", ""),
     "source": frontmatter.get("source", ""),
+    "category": frontmatter.get("category", ""),  # OBRIGATÓRIO
     "date": frontmatter.get("date", "")
 }
 ```
@@ -86,6 +103,7 @@ O `rag_search.py` retorna o metadata com cada resultado:
       "metadata": {
         "title": "Especificações Técnicas - Processadores",
         "url": "https://docs.intel.com/processors/xeon",
+        "category": "Hardware",
         "filename": "intel_xeon_specs.md",
         "chunk_index": 5
       }
@@ -96,12 +114,15 @@ O `rag_search.py` retorna o metadata com cada resultado:
 
 ### 3. **No CSV de Análise**
 
-As colunas `Fonte_Titulo` e `Fonte_URL` são preenchidas automaticamente:
+As colunas `Categoria`, `Fonte_Titulo` e `Fonte_URL` são preenchidas automaticamente do RAG:
 
 ```csv
 ID,Requisito,Categoria,Veredicto,Confiança,Evidências,Raciocínio,Recomendações,Fonte_Titulo,Fonte_URL
 1,"Processador Intel Xeon...",Hardware,CONFORME,0.95,"...","...","...","Especificações Técnicas - Processadores","https://docs.intel.com/processors/xeon"
 ```
+
+**Observação:** A coluna `Categoria` vem do campo `category` do frontmatter do documento scraped.
+Este é o principal motivo pelo qual `category` é obrigatório no scraper.
 
 ---
 
@@ -180,13 +201,59 @@ class TechDocsScraper:
         source_name = soup.find('meta', {'property': 'og:site_name'})
         source_text = source_name.get('content') if source_name else "Documentação Técnica"
 
+        # IMPORTANTE: Detectar categoria baseada no site/URL
+        category = self.detect_category(url, soup)
+
         return {
             'title': title_text,
             'url': url,
             'source': source_text,
+            'category': category,  # OBRIGATÓRIO
             'content': markdown_content,
             'date': datetime.now().strftime('%Y-%m-%d')
         }
+
+    def detect_category(self, url: str, soup: BeautifulSoup) -> str:
+        """
+        Detecta a categoria do artigo baseado na URL ou conteúdo
+
+        IMPORTANTE: Adapte esta lógica para cada site específico!
+
+        Args:
+            url: URL da página
+            soup: BeautifulSoup da página
+
+        Returns:
+            Categoria do documento
+        """
+        # Estratégia 1: Detectar pela URL
+        if '/hardware/' in url or '/processors/' in url or '/servers/' in url:
+            return "Hardware"
+        elif '/software/' in url or '/apps/' in url or '/api/' in url:
+            return "Software"
+        elif '/law/' in url or '/legislation/' in url or '/legal/' in url:
+            return "Legislação"
+        elif '/standards/' in url or '/norms/' in url or '/iso/' in url:
+            return "Normas Técnicas"
+        elif '/certification/' in url or '/compliance/' in url:
+            return "Certificações"
+
+        # Estratégia 2: Detectar por tags HTML (se o site usar)
+        category_tag = soup.find('meta', {'name': 'category'})
+        if category_tag:
+            return category_tag.get('content', 'Geral')
+
+        # Estratégia 3: Detectar por breadcrumb
+        breadcrumb = soup.find('nav', {'aria-label': 'breadcrumb'})
+        if breadcrumb:
+            links = breadcrumb.find_all('a')
+            if len(links) > 1:
+                # Pega segunda categoria do breadcrumb
+                second_category = links[1].get_text().strip()
+                return second_category
+
+        # Default: tente inferir do título ou retorne "Geral"
+        return "Geral"
 
     def html_to_markdown(self, element) -> str:
         """
@@ -236,6 +303,7 @@ class TechDocsScraper:
 title: "{article['title']}"
 url: "{article['url']}"
 source: "{article['source']}"
+category: "{article['category']}"
 date: "{article['date']}"
 ---
 

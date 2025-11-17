@@ -53,6 +53,7 @@ class IngestionPipeline:
         title: "Document Title"
         url: "https://example.com/doc"
         source: "Source Name"
+        category: "Hardware"
         date: "2025-11-16"
         ---
 
@@ -103,7 +104,7 @@ class IngestionPipeline:
         markdown_files = list(directory.glob("*.md"))
 
         if not markdown_files:
-            print(f"⚠️  No markdown files found in {directory_path}")
+            print(f"WARNING: No markdown files found in {directory_path}")
             return []
 
         documents = []
@@ -122,6 +123,7 @@ class IngestionPipeline:
                     "title": frontmatter.get("title", file_path.stem),  # Use filename if no title
                     "url": frontmatter.get("url", ""),  # Empty if no URL
                     "source": frontmatter.get("source", ""),
+                    "category": frontmatter.get("category", ""),  # Category from source
                     "date": frontmatter.get("date", "")
                 }
 
@@ -130,13 +132,13 @@ class IngestionPipeline:
                 # Display info
                 title_display = doc['title'][:50] + '...' if len(doc['title']) > 50 else doc['title']
                 url_display = f" | {doc['url']}" if doc['url'] else ""
-                print(f"✅ Loaded: {title_display}{url_display}")
+                print(f"Loaded: {title_display}{url_display}")
                 print(f"   File: {file_path.name} ({len(content)} chars)")
 
             except Exception as e:
-                print(f"❌ Error loading {file_path.name}: {e}")
+                print(f"ERROR loading {file_path.name}: {e}")
 
-        print(f"\n📚 Loaded {len(documents)} documents")
+        print(f"\nLoaded {len(documents)} documents")
         return documents
 
     def chunk_text(self, text: str, metadata: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -226,7 +228,7 @@ class IngestionPipeline:
         print("=" * 60)
 
         # Step 1: Load documents
-        print("\n📚 Step 1: Loading markdown files...")
+        print("\nStep 1: Loading markdown files...")
         documents = self.load_markdown_files(directory_path)
 
         if not documents:
@@ -239,7 +241,7 @@ class IngestionPipeline:
             }
 
         # Step 2: Chunk documents
-        print(f"\n✂️  Step 2: Chunking documents (size={self.chunk_size}, overlap={self.chunk_overlap})...")
+        print(f"\nStep 2: Chunking documents (size={self.chunk_size}, overlap={self.chunk_overlap})...")
         all_chunks = []
         files_processed = []
 
@@ -250,6 +252,7 @@ class IngestionPipeline:
                 "title": doc["title"],
                 "url": doc["url"],
                 "source": doc.get("source", ""),
+                "category": doc.get("category", ""),
                 "date": doc.get("date", "")
             }
 
@@ -264,22 +267,22 @@ class IngestionPipeline:
 
             print(f"   {doc['filename']}: {len(chunks)} chunks")
 
-        print(f"\n✅ Total chunks: {len(all_chunks)}")
+        print(f"\nTotal chunks: {len(all_chunks)}")
 
         # Step 3: Generate embeddings
-        print(f"\n🔮 Step 3: Generating embeddings...")
+        print(f"\nStep 3: Generating embeddings...")
         texts = [chunk["text"] for chunk in all_chunks]
         embeddings = self.embeddings.embed_documents(texts, show_progress=True)
 
-        print(f"✅ Generated {len(embeddings)} embeddings")
+        print(f"Generated {len(embeddings)} embeddings")
 
         # Step 4: Store in vector store
-        print(f"\n💾 Step 4: Storing in vector store...")
+        print(f"\nStep 4: Storing in vector store...")
         metadatas = [chunk["metadata"] for chunk in all_chunks]
         self.vector_store.add_documents(texts, embeddings, metadatas)
 
         # Step 5: Save vector store
-        print(f"\n💾 Step 5: Saving vector store to disk...")
+        print(f"\nStep 5: Saving vector store to disk...")
         self.vector_store.save()
 
         # Calculate stats
@@ -298,11 +301,11 @@ class IngestionPipeline:
         print("\n" + "=" * 60)
         print("INGESTION COMPLETE")
         print("=" * 60)
-        print(f"📚 Documents: {stats['documents_loaded']}")
-        print(f"✂️  Chunks: {stats['total_chunks']}")
-        print(f"🔮 Embeddings: {stats['total_embeddings']}")
-        print(f"⏱️  Time: {stats['time_elapsed']:.2f} seconds")
-        print(f"📊 Avg time per document: {stats['time_elapsed'] / max(stats['documents_loaded'], 1):.2f}s")
+        print(f"Documents: {stats['documents_loaded']}")
+        print(f"Chunks: {stats['total_chunks']}")
+        print(f"Embeddings: {stats['total_embeddings']}")
+        print(f"Time: {stats['time_elapsed']:.2f} seconds")
+        print(f"Avg time per document: {stats['time_elapsed'] / max(stats['documents_loaded'], 1):.2f}s")
         print("=" * 60)
 
         return stats
@@ -328,7 +331,7 @@ class IngestionPipeline:
         if metadata is None:
             metadata = {}
 
-        print(f"📄 Ingesting single document ({len(text)} chars)...")
+        print(f"Ingesting single document ({len(text)} chars)...")
 
         # Chunk
         chunks = self.chunk_text(text, metadata)
@@ -345,7 +348,7 @@ class IngestionPipeline:
         # Save
         self.vector_store.save()
 
-        print(f"✅ Document ingested successfully")
+        print(f"Document ingested successfully")
 
         return {
             "chunks": len(chunks),
@@ -364,7 +367,7 @@ if __name__ == "__main__":
         from embeddings_manager import EmbeddingsManager
 
         # Initialize components
-        print("🔧 Initializing components...")
+        print("Initializing components...")
 
         vector_store = create_vector_store(
             store_type=RAGConfig.VECTOR_STORE,
@@ -385,10 +388,10 @@ if __name__ == "__main__":
         )
 
         # Run ingestion
-        print("\n🚀 Running ingestion...")
+        print("\nRunning ingestion...")
         stats = pipeline.ingest_from_directory(RAGConfig.KNOWLEDGE_BASE_PATH)
 
-        print("\n📊 Final Stats:")
+        print("\nFinal Stats:")
         print(f"   Documents: {stats['documents_loaded']}")
         print(f"   Chunks: {stats['total_chunks']}")
         print(f"   Time: {stats['time_elapsed']:.2f}s")
