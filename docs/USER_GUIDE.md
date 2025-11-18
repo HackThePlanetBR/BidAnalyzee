@@ -166,26 +166,63 @@ python scripts/index_knowledge_base.py --force
 
 ---
 
+## 🖥️ Interface do Sistema
+
+**BidAnalyzee opera através do Claude Code** - você interage diretamente comigo (Claude) usando:
+
+### Slash Commands (Principais)
+
+- `/structure-edital <caminho-pdf>` - Extrai requisitos de PDF do edital
+- `/analyze-edital <caminho-csv>` - Analisa conformidade dos requisitos
+
+### Conversação Natural
+
+Você também pode conversar naturalmente:
+- "Analise o edital edital_001.pdf"
+- "Mostre estatísticas da última análise"
+- "Gere relatório PDF da análise"
+
+**Importante:** Você **não precisa** executar scripts Python manualmente. Eu (Claude) executo os scripts para você quando necessário.
+
+---
+
 ## 🔄 Workflows Disponíveis
 
-### 1. Modo FLOW (Automação Completa) - RECOMENDADO ⭐
+### 1. Workflow Completo (Recomendado) ⭐
 
-**Quando usar:** Análise completa de edital, do início ao fim, sem intervenção.
+**Como usar via Claude Code:**
 
-```bash
-python scripts/analyze_edital_full.py edital.pdf
+**Opção A: Slash Command Direto**
+```
+/structure-edital data/uploads/edital_001.pdf
+```
+Depois que terminar:
+```
+/analyze-edital <caminho-do-csv-gerado>
 ```
 
-**O que faz:**
-1. ✅ Valida PDF (tamanho, formato, OCR)
-2. ✅ Extrai requisitos (usando Document Structurer)
-3. ✅ Analisa conformidade (usando Technical Analyst)
-4. ✅ Gera relatórios (CSV, PDF, Excel)
-5. ✅ Salva estado da sessão
+**Opção B: Conversação Natural**
+```
+"Analise o edital edital_001.pdf completamente"
+```
+Eu vou guiá-lo pelo processo completo.
+
+**O que acontece nos bastidores:**
+1. ✅ Valido o PDF (tamanho, formato, OCR)
+2. ✅ Extraio requisitos (Document Structurer agent)
+3. ✅ Analiso conformidade (Technical Analyst agent)
+4. ✅ Gero relatórios (CSV, PDF, Excel)
+5. ✅ Apresento resultados e estatísticas
 
 **Duração típica:** 15-45 minutos (depende do tamanho do edital)
 
-**Saída:**
+**Você acompanha em tempo real:**
+- Progresso de cada etapa
+- Quantidade de requisitos encontrados
+- Veredictos (Conforme/Não Conforme/Revisão)
+- Alertas críticos
+
+**Saída final:**
 ```
 data/deliveries/YYYYMMDD_HHMMSS_<nome-edital>/
 ├── requirements.csv          # Requisitos extraídos
@@ -200,13 +237,22 @@ data/deliveries/YYYYMMDD_HHMMSS_<nome-edital>/
 
 **Quando usar:** Quando você quer controlar cada etapa, revisar intermediários, ou customizar processo.
 
-#### Passo 1: Validar PDF
+#### Passo 1: Enviar Edital
 
-```bash
-python scripts/validate_pdf.py edital.pdf
+**Via Claude Code:**
+
+```
+"Preciso analisar o edital edital_001.pdf - podemos fazer passo a passo?"
 ```
 
-**Verifica:**
+Ou simplesmente envie o arquivo PDF pela interface do Claude Code (upload).
+
+Eu vou:
+1. Validar o PDF automaticamente
+2. Perguntar se você quer prosseguir
+3. Mostrar plano de extração
+
+**Validações automáticas que faço:**
 - ✅ Arquivo existe e está acessível
 - ✅ Tamanho dentro do limite (500MB)
 - ✅ Formato PDF válido
@@ -214,7 +260,7 @@ python scripts/validate_pdf.py edital.pdf
 - ✅ Não está corrompido
 - ✅ Possui metadados básicos
 
-**Saída exemplo:**
+**Você verá algo como:**
 ```
 ✅ VALIDAÇÃO COMPLETA - PDF APROVADO
 
@@ -224,20 +270,28 @@ Detalhes:
 - Páginas: 45
 - Texto extraível: Sim
 - OCR necessário: Não
+
+Posso prosseguir com a extração? (s/n)
 ```
 
 #### Passo 2: Extrair Requisitos
 
-Use o slash command `/structure-edital`:
+Quando você confirmar, eu executo:
 
 ```
-/structure-edital edital.pdf
+/structure-edital edital_001.pdf
 ```
 
-**O que faz:**
-- Extrai requisitos usando Document Structurer Agent
-- Valida cada requisito (30 regras)
-- Gera CSV estruturado
+**O que acontece:**
+- Eu (Document Structurer Agent) extraio requisitos
+- Valido cada requisito (30 regras SHIELD)
+- Gero CSV estruturado
+- Apresento estatísticas
+
+**Você acompanha:**
+- Progresso da extração
+- Quantidade de requisitos encontrados
+- Alertas de validação
 
 **Saída:** `data/deliveries/.../requirements.csv`
 
@@ -278,15 +332,24 @@ Use o slash command `/analyze-edital`:
 
 #### Passo 4: Gerar Relatórios
 
-**PDF:**
-```bash
-python scripts/export_pdf.py data/deliveries/.../analysis_conformidade.csv
+Após a análise, peça a mim:
+
+**Para PDF:**
+```
+"Gere o relatório PDF da análise"
 ```
 
-**Excel:**
-```bash
-python scripts/export_excel.py data/deliveries/.../analysis_conformidade.csv
+**Para Excel:**
 ```
+"Gere o relatório Excel da análise"
+```
+
+**Ou ambos:**
+```
+"Gere os relatórios PDF e Excel"
+```
+
+Eu vou executar os scripts de exportação e informar onde os arquivos foram salvos.
 
 ---
 
@@ -314,50 +377,63 @@ python scripts/export_excel.py data/deliveries/.../analysis_conformidade.csv
 
 ---
 
-## 🛠️ Comandos e Ferramentas
+## 🛠️ Como Interagir com o Sistema
 
-### Comandos do Orchestrator
+### Interface Principal: Claude Code
 
-Execute via Claude Code ou diretamente:
+Você **não precisa executar scripts Python manualmente**. Tudo é feito através de mim (Claude).
+
+### Slash Commands Disponíveis
 
 | Comando | Função | Exemplo |
 |---------|--------|---------|
-| `*ajuda` | Lista comandos disponíveis | `*ajuda` |
-| `*buscar "<query>"` | Busca RAG rápida | `*buscar "prazo recurso"` |
-| `*listar_analises` | Histórico de análises | `*listar_analises` |
-| `*sessao <id>` | Detalhes de uma sessão | `*sessao abc123` |
+| `/structure-edital` | Extrai requisitos de PDF | `/structure-edital edital.pdf` |
+| `/analyze-edital` | Analisa conformidade | `/analyze-edital requirements.csv` |
 
-### Scripts Python Utilitários
+### Conversação Natural
 
-**Validação:**
-```bash
-# Validar PDF antes de processar
-python scripts/validate_pdf.py edital.pdf
+Você pode simplesmente conversar comigo:
 
-# Validar CSV de requisitos
-python scripts/validate_csv.py requirements.csv
+**Exemplos:**
 
-# Validar CSV de análise
-python scripts/validate_csv.py analysis_conformidade.csv --type analysis
-```
+| O que você quer | Como pedir |
+|----------------|------------|
+| Analisar edital | "Analise o edital edital_001.pdf" |
+| Buscar na base | "Busque informações sobre prazo de validade de propostas" |
+| Ver estatísticas | "Mostre as estatísticas da última análise" |
+| Gerar relatório | "Gere o relatório PDF da análise" |
+| Validar PDF | "Valide se o PDF edital_002.pdf está ok" |
+| Ver histórico | "Mostre as 10 últimas análises" |
 
-**Busca RAG:**
-```bash
-# Buscar na base de conhecimento
-python scripts/rag_search.py "prazo validade proposta"
+### O que eu faço automaticamente
 
-# Top 10 resultados
-python scripts/rag_search.py "marca especificada" --top-k 10
-```
+Quando você pede algo, **eu executo os scripts Python necessários** para você:
 
-**State Management:**
-```bash
-# Listar sessões recentes
-python scripts/orchestrator_list.py 10
+**Quando você pede:** "Analise o edital.pdf"
 
-# Ver detalhes de sessão
-python scripts/orchestrator_session.py <session-id>
-```
+**Eu executo nos bastidores:**
+1. `python scripts/validate_pdf.py edital.pdf` ← Valido o PDF
+2. `/structure-edital edital.pdf` ← Extraio requisitos
+3. `python scripts/rag_search.py ...` ← Busco evidências
+4. `/analyze-edital requirements.csv` ← Analiso conformidade
+5. `python scripts/export_pdf.py ...` ← Gero relatório
+
+**Você só vê:**
+- Progresso em tempo real
+- Estatísticas
+- Resultados finais
+- Alertas importantes
+
+### Comandos Rápidos via Conversação
+
+| Comando | Função |
+|---------|--------|
+| `*ajuda` | Lista comandos disponíveis |
+| `*buscar "query"` | Busca RAG rápida |
+| `*listar_analises` | Histórico de análises |
+| `*sessao <id>` | Detalhes de uma sessão |
+
+**Nota:** Estes comandos são opcionais - você pode pedir a mesma coisa em linguagem natural.
 
 ---
 
@@ -400,13 +476,21 @@ Evidências:
 ### Antes de Processar
 
 1. **Valide o PDF primeiro**
-   ```bash
-   python scripts/validate_pdf.py edital.pdf
+
+   Peça a mim:
    ```
+   "Valide o PDF edital.pdf antes de processar"
+   ```
+
+   Eu vou verificar:
+   - Tamanho (deve ser < 500MB)
+   - Formato válido
+   - Texto extraível
+   - OCR necessário ou não
 
 2. **Confira tamanho** (editais > 100 páginas podem demorar)
 
-3. **Verifique OCR** - PDFs escaneados precisam de OCR (mais lento)
+3. **Tenha consciência do tempo** - PDFs escaneados precisam de OCR (mais lento)
 
 ### Durante o Processamento
 
@@ -445,13 +529,17 @@ Evidências:
 **Causa:** PDF corrompido, muito grande, ou sem texto.
 
 **Solução:**
-```bash
-# Verifique detalhes
-python scripts/validate_pdf.py edital.pdf --verbose
 
-# Se PDF for escaneado, use OCR
-# (mais lento, mas funciona)
+Peça a mim:
 ```
+"Valide o PDF edital.pdf e mostre detalhes do erro"
+```
+
+Eu vou analisar e informar:
+- Se o PDF está corrompido
+- Se é muito grande (> 500MB)
+- Se é escaneado (precisa OCR)
+- Se há texto extraível
 
 #### 2. "No requirements extracted"
 
