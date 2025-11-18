@@ -134,11 +134,18 @@ Isso cria `data/knowledge_base/faiss_index/` com embeddings.
 
 ### Como uso o Modo FLOW?
 
-```bash
-python scripts/analyze_edital_full.py edital.pdf
+**Via Claude Code** (conversação comigo):
+
+```
+"Analise o edital edital.pdf completamente"
 ```
 
-Aguarde 15-45 minutos (depende do edital).
+Ou use o slash command:
+```
+/structure-edital edital.pdf
+```
+
+Eu vou executar todo o fluxo automaticamente. Aguarde 15-45 minutos (depende do edital).
 
 ### Como acompanho o progresso?
 
@@ -231,15 +238,24 @@ Lei 8.666/93:120 - "prazo será de 60 dias"
 
 ### Como exporto para outros formatos?
 
-**PDF:**
-```bash
-python scripts/export_pdf.py analysis_conformidade.csv
+**Via Claude Code** - simplesmente peça:
+
+**Para PDF:**
+```
+"Gere o relatório PDF da análise"
 ```
 
-**Excel:**
-```bash
-python scripts/export_excel.py analysis_conformidade.csv
+**Para Excel:**
 ```
+"Gere o relatório Excel da análise"
+```
+
+**Ambos:**
+```
+"Gere os relatórios PDF e Excel"
+```
+
+Eu vou executar os scripts de exportação e informar onde foram salvos os arquivos.
 
 ---
 
