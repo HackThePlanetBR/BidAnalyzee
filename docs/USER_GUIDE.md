@@ -168,21 +168,33 @@ python scripts/index_knowledge_base.py --force
 
 ## 🖥️ Interface do Sistema
 
-**BidAnalyzee opera através do Claude Code** - você interage diretamente comigo (Claude) usando:
+**BidAnalyzee opera através do Claude Code** - uma interface conversacional com IA que executa comandos estruturados.
 
-### Slash Commands (Principais)
+### Tipos de Comandos
 
-- `/structure-edital <caminho-pdf>` - Extrai requisitos de PDF do edital
-- `/analyze-edital <caminho-csv>` - Analisa conformidade dos requisitos
+**1. Slash Commands** - Para workflows complexos:
+- `/structure-edital <pdf>` - Extrai requisitos de edital
+- `/analyze-edital <csv>` - Analisa conformidade
+
+**2. Comandos Rápidos (*)** - Para ações pontuais:
+- `*ajuda` - Lista comandos disponíveis
+- `*buscar "query"` - Busca na base de conhecimento
+- `*validar <pdf>` - Valida PDF
+- `*exportar-pdf <csv>` - Gera relatório PDF
+- `*exportar-excel <csv>` - Gera relatório Excel
+- `*listar_analises` - Histórico de análises
+- `*sessao <id>` - Detalhes de sessão
+
+**Referência Completa:** Ver [COMMAND_REFERENCE.md](COMMAND_REFERENCE.md)
 
 ### Conversação Natural
 
-Você também pode conversar naturalmente:
-- "Analise o edital edital_001.pdf"
-- "Mostre estatísticas da última análise"
-- "Gere relatório PDF da análise"
+O sistema também aceita linguagem natural:
+- "Valide o PDF edital.pdf"
+- "Analise o edital completamente"
+- "Mostre as últimas análises"
 
-**Importante:** Você **não precisa** executar scripts Python manualmente. Eu (Claude) executo os scripts para você quando necessário.
+O agente Claude interpreta a intenção e executa o comando apropriado.
 
 ---
 
@@ -190,69 +202,50 @@ Você também pode conversar naturalmente:
 
 ### 1. Workflow Completo (Recomendado) ⭐
 
-**Como usar via Claude Code:**
+**Passo 1: Validar PDF**
+```
+*validar edital_001.pdf
+```
+**Saída:** Status de validação, tamanho, páginas, necessidade de OCR
 
-**Opção A: Slash Command Direto**
+**Passo 2: Extrair Requisitos**
 ```
-/structure-edital data/uploads/edital_001.pdf
+/structure-edital edital_001.pdf
 ```
-Depois que terminar:
-```
-/analyze-edital <caminho-do-csv-gerado>
-```
+**Tempo:** 10-30 minutos
+**Saída:** `data/deliveries/.../requirements_structured.csv`
 
-**Opção B: Conversação Natural**
+**Passo 3: Analisar Conformidade**
 ```
-"Analise o edital edital_001.pdf completamente"
+/analyze-edital data/deliveries/.../requirements_structured.csv
 ```
-Eu vou guiá-lo pelo processo completo.
+**Tempo:** 15-45 minutos
+**Saída:** `data/deliveries/.../analysis_conformidade.csv`
 
-**O que acontece nos bastidores:**
-1. ✅ Valido o PDF (tamanho, formato, OCR)
-2. ✅ Extraio requisitos (Document Structurer agent)
-3. ✅ Analiso conformidade (Technical Analyst agent)
-4. ✅ Gero relatórios (CSV, PDF, Excel)
-5. ✅ Apresento resultados e estatísticas
-
-**Duração típica:** 15-45 minutos (depende do tamanho do edital)
-
-**Você acompanha em tempo real:**
-- Progresso de cada etapa
-- Quantidade de requisitos encontrados
-- Veredictos (Conforme/Não Conforme/Revisão)
-- Alertas críticos
-
-**Saída final:**
+**Passo 4: Gerar Relatórios**
 ```
-data/deliveries/YYYYMMDD_HHMMSS_<nome-edital>/
-├── requirements.csv          # Requisitos extraídos
-├── analysis_conformidade.csv # Análise completa
-├── relatorio.pdf             # Relatório PDF profissional
-└── relatorio.xlsx            # Planilha Excel com abas
+*exportar-pdf data/deliveries/.../analysis_conformidade.csv
+*exportar-excel data/deliveries/.../analysis_conformidade.csv
 ```
+**Tempo:** < 1 minuto
+**Saída:** Arquivos PDF e Excel com análise formatada
+
+**Tempo Total:** 30-80 minutos
 
 ---
 
-### 2. Modo Assistido (Passo a Passo)
+### 2. Workflow Assistido (Passo a Passo)
 
-**Quando usar:** Quando você quer controlar cada etapa, revisar intermediários, ou customizar processo.
+**Quando usar:** Para controlar cada etapa, revisar resultados intermediários, ou customizar o processo.
 
-#### Passo 1: Enviar Edital
+**Passo 1: Enviar e Validar Edital**
 
-**Via Claude Code:**
-
+Comando:
 ```
-"Preciso analisar o edital edital_001.pdf - podemos fazer passo a passo?"
+*validar edital_001.pdf
 ```
 
-Ou simplesmente envie o arquivo PDF pela interface do Claude Code (upload).
-
-Eu vou:
-1. Validar o PDF automaticamente
-2. Perguntar se você quer prosseguir
-3. Mostrar plano de extração
-
-**Validações automáticas que faço:**
+O sistema executa validações automáticas:
 - ✅ Arquivo existe e está acessível
 - ✅ Tamanho dentro do limite (500MB)
 - ✅ Formato PDF válido
@@ -260,7 +253,7 @@ Eu vou:
 - ✅ Não está corrompido
 - ✅ Possui metadados básicos
 
-**Você verá algo como:**
+**Saída exemplo:**
 ```
 ✅ VALIDAÇÃO COMPLETA - PDF APROVADO
 
@@ -271,7 +264,7 @@ Detalhes:
 - Texto extraível: Sim
 - OCR necessário: Não
 
-Posso prosseguir com a extração? (s/n)
+Pronto para processar.
 ```
 
 #### Passo 2: Extrair Requisitos
