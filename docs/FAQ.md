@@ -134,11 +134,18 @@ Isso cria `data/knowledge_base/faiss_index/` com embeddings.
 
 ### Como uso o Modo FLOW?
 
-```bash
-python scripts/analyze_edital_full.py edital.pdf
+**Via Claude Code** (conversação comigo):
+
+```
+"Analise o edital edital.pdf completamente"
 ```
 
-Aguarde 15-45 minutos (depende do edital).
+Ou use o slash command:
+```
+/structure-edital edital.pdf
+```
+
+Eu vou executar todo o fluxo automaticamente. Aguarde 15-45 minutos (depende do edital).
 
 ### Como acompanho o progresso?
 
@@ -231,15 +238,24 @@ Lei 8.666/93:120 - "prazo será de 60 dias"
 
 ### Como exporto para outros formatos?
 
-**PDF:**
-```bash
-python scripts/export_pdf.py analysis_conformidade.csv
+**Via Claude Code** - simplesmente peça:
+
+**Para PDF:**
+```
+"Gere o relatório PDF da análise"
 ```
 
-**Excel:**
-```bash
-python scripts/export_excel.py analysis_conformidade.csv
+**Para Excel:**
 ```
+"Gere o relatório Excel da análise"
+```
+
+**Ambos:**
+```
+"Gere os relatórios PDF e Excel"
+```
+
+Eu vou executar os scripts de exportação e informar onde foram salvos os arquivos.
 
 ---
 
@@ -370,29 +386,95 @@ python scripts/index_knowledge_base.py
 
 ### O que é a "base de conhecimento mock"?
 
-**Mock = Simulada.** A versão atual usa documentos de exemplo para demonstração:
+**Mock = Simulada.** A versão base usa documentos de exemplo para demonstração:
 - Lei 8.666/93 (mock)
 - Lei 14.133/2021 (mock)
 - Requisitos técnicos genéricos
 
-**Para produção:** Substitua por documentos reais.
+**Para produção:** Use os **web scrapers automatizados** ou adicione documentos manualmente.
 
-### Como adiciono documentos à base?
+### Como populo a base com documentação real? ⭐ **NOVO**
 
-**Passo 1:** Adicione arquivos Markdown em `data/knowledge_base/`
+**Opção 1: Web Scrapers Automatizados (Recomendado)**
+
+O BidAnalyzee possui scrapers prontos para documentação da Genetec:
 
 ```bash
-# Exemplo
-cp meu_documento.md data/knowledge_base/
+# Scrape toda documentação Genetec (SCSaaS, Compliance, TechDocs)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+
+# Ou apenas um site específico
+python -m scripts.scrapers.scraper_orchestrator --sites scsaas --limit 10
 ```
 
-**Passo 2:** Re-indexe
+**Sites suportados:**
+- ✅ **SCSaaS** - Security Center SaaS Help (100% funcional)
+- ✅ **Compliance** - Genetec Compliance Portal (requer Selenium)
+- ✅ **TechDocs** - Genetec Technical Documentation (requer Selenium)
+
+**Documentação completa:** Ver [docs/scrapers/WEB_SCRAPER_GUIDE.md](scrapers/WEB_SCRAPER_GUIDE.md)
+
+**Opção 2: Adicionar Manualmente**
+
+Para documentos que não têm scraper:
 
 ```bash
+# Passo 1: Adicione arquivo Markdown
+cp meu_documento.md data/knowledge_base/
+
+# Passo 2: Re-indexe
 python scripts/index_knowledge_base.py
 ```
 
-**Formatos suportados:** Apenas Markdown (.md) atualmente.
+**Formatos suportados:** Apenas Markdown (.md).
+
+### Como configuro os web scrapers?
+
+**1. Configure no .env:**
+
+```bash
+# Selenium (necessário para Compliance e TechDocs)
+SCRAPERS_USE_SELENIUM=true
+SCRAPERS_HEADLESS=true
+
+# Proxy (opcional)
+SCRAPERS_USE_PROXY=false
+SCRAPERS_PROXY_URL=
+
+# Rate limiting (seja educado!)
+SCRAPERS_DELAY_BETWEEN_REQUESTS=1.5
+```
+
+**2. Execute:**
+
+```bash
+# Teste primeiro (apenas 5 URLs)
+python -m scripts.scrapers.scraper_orchestrator --sites scsaas --limit 5
+
+# Produção (scrape tudo)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+```
+
+**Requisitos:**
+- Chrome/Chromium instalado (para Selenium)
+- Conexão com internet
+- ~30-60 min para scraping completo
+
+### Preciso de Selenium para os scrapers?
+
+**Depende do site:**
+
+| Scraper | Selenium? | Motivo |
+|---------|-----------|--------|
+| SCSaaS | ❌ Não | Site estático, requests funciona |
+| Compliance | ✅ Sim | Cloudflare bot protection |
+| TechDocs | ✅ Sim | SPA com JavaScript |
+
+**Instalação Selenium:**
+```bash
+pip install selenium
+pip install undetected-chromedriver  # Opcional, melhora bypass Cloudflare
+```
 
 ### Qual o formato ideal de documentos?
 
@@ -450,6 +532,61 @@ Mais informações técnicas.
 1. Converta PDF → Markdown (ferramentas: pandoc, online converters)
 2. Adicione .md à base
 3. Re-indexe
+
+### Os scrapers funcionam com proxy?
+
+**Sim!** Configure no .env:
+
+```bash
+SCRAPERS_USE_PROXY=true
+SCRAPERS_PROXY_URL=http://proxy.example.com:8080
+```
+
+Ou use a variável de ambiente `HTTP_PROXY` (auto-detectada).
+
+### Com que frequência devo atualizar a documentação scraped?
+
+**Recomendação:** Mensal ou trimestral.
+
+**Documentação técnica da Genetec** é relativamente estável, mas pode ter:
+- Novos produtos/features
+- Atualizações de versão
+- Novos artigos de suporte
+
+**Para re-scrape:**
+```bash
+# Limpe pasta antiga
+rm -rf data/knowledge_base/genetec/*
+
+# Re-scrape
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+
+# Re-indexe
+python scripts/index_knowledge_base.py --force
+```
+
+### Posso criar scrapers para outros sites?
+
+**Sim!** O sistema é extensível.
+
+**Passo 1:** Crie novo scraper herdando de `BaseScraper`
+
+```python
+from scripts.scrapers.base_scraper import BaseScraper
+
+class MeuScraper(BaseScraper):
+    def discover_urls(self):
+        # Implementar descoberta de URLs
+        pass
+
+    def extract_content(self, url):
+        # Implementar extração
+        pass
+```
+
+**Passo 2:** Registre no orchestrator
+
+**Documentação:** Ver [docs/scrapers/WEB_SCRAPER_IMPLEMENTATION.md](scrapers/WEB_SCRAPER_IMPLEMENTATION.md)
 
 ---
 

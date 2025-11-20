@@ -145,6 +145,26 @@ Busca instantânea na base de conhecimento técnica sem análise completa.
 
 **Comando:** `*buscar "<query>"` via `@Orquestrador`
 
+### ✅ Web Scrapers para Knowledge Base (Implementado - Nov 2025)
+Scrapers automatizados para popular a base de conhecimento com documentação técnica da Genetec.
+
+**Funcionalidades:**
+- 🕷️ **3 scrapers prontos**: SCSaaS, Compliance Portal, TechDocs
+- 🔄 **Automação completa**: Descoberta de URLs + extração + conversão Markdown
+- 📝 **Frontmatter YAML**: Metadados estruturados (title, url, category, etc.)
+- ⚙️ **Configurável via .env**: Proxy, headless mode, rate limiting
+- 🌐 **Selenium integrado**: Bypass Cloudflare + renderização JavaScript
+- 📊 **Estatísticas**: Tracking de URLs descobertas/processadas/extraídas
+
+**Sites suportados:**
+- ✅ Security Center SaaS Help (~500 artigos)
+- ✅ Genetec Compliance Portal (~100 artigos)
+- ✅ Genetec Technical Documentation (~800+ artigos)
+
+**Script:** `python -m scripts.scrapers.scraper_orchestrator --sites all --selenium`
+
+**Documentação:** [docs/scrapers/](docs/scrapers/)
+
 ### ✅ Exports Profissionais (Implementado - Sprint 10)
 Geração automática de relatórios profissionais em múltiplos formatos.
 

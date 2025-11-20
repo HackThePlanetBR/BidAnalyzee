@@ -10,12 +10,13 @@
 
 1. [Introdução](#introdução)
 2. [Primeiros Passos](#primeiros-passos)
-3. [Workflows Disponíveis](#workflows-disponíveis)
-4. [Comandos e Ferramentas](#comandos-e-ferramentas)
-5. [Interpretando Resultados](#interpretando-resultados)
-6. [Boas Práticas](#boas-práticas)
-7. [Troubleshooting](#troubleshooting)
-8. [Referências](#referências)
+3. [Populando a Base de Conhecimento](#populando-a-base-de-conhecimento)
+4. [Workflows Disponíveis](#workflows-disponíveis)
+5. [Comandos e Ferramentas](#comandos-e-ferramentas)
+6. [Interpretando Resultados](#interpretando-resultados)
+7. [Boas Práticas](#boas-práticas)
+8. [Troubleshooting](#troubleshooting)
+9. [Referências](#referências)
 
 ---
 
@@ -90,47 +91,161 @@ python -c "from agents.orchestrator.state import StateManager; print('✅ OK')"
 
 ---
 
-## 🔄 Workflows Disponíveis
+## 📚 Populando a Base de Conhecimento
 
-### 1. Modo FLOW (Automação Completa) - RECOMENDADO ⭐
+### Opção 1: Web Scrapers Automatizados ⭐ (Recomendado)
 
-**Quando usar:** Análise completa de edital, do início ao fim, sem intervenção.
+O BidAnalyzee possui scrapers prontos para documentação técnica da Genetec:
 
 ```bash
-python scripts/analyze_edital_full.py edital.pdf
+# 1. Configure no .env (se necessário)
+# Ver seção de configuração abaixo
+
+# 2. Execute scraping completo (primeira vez)
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
+
+# Isso irá scrape:
+# - Security Center SaaS Help (~500 artigos)
+# - Genetec Compliance Portal (~100 artigos)
+# - Genetec Technical Documentation (~800+ artigos)
+
+# 3. Indexe na base vetorial
+python scripts/index_knowledge_base.py --force
 ```
 
-**O que faz:**
-1. ✅ Valida PDF (tamanho, formato, OCR)
-2. ✅ Extrai requisitos (usando Document Structurer)
-3. ✅ Analisa conformidade (usando Technical Analyst)
-4. ✅ Gera relatórios (CSV, PDF, Excel)
-5. ✅ Salva estado da sessão
+**Tempo estimado:** 30-60 minutos (scraping) + 5-10 min (indexação)
 
-**Duração típica:** 15-45 minutos (depende do tamanho do edital)
+**Sites suportados:**
+- ✅ **SCSaaS** - Security Center SaaS Help
+- ✅ **Compliance** - Compliance Portal (certificações, normas)
+- ✅ **TechDocs** - Documentação técnica de produtos
 
-**Saída:**
+### Configuração dos Scrapers (.env)
+
+```bash
+# Selenium (necessário para Compliance e TechDocs)
+SCRAPERS_USE_SELENIUM=true
+SCRAPERS_HEADLESS=true
+
+# Proxy (opcional)
+SCRAPERS_USE_PROXY=false
+SCRAPERS_PROXY_URL=
+
+# Rate limiting (seja educado com os servidores!)
+SCRAPERS_DELAY_BETWEEN_REQUESTS=1.5
+
+# Output
+SCRAPERS_OUTPUT_DIR=data/knowledge_base/genetec
 ```
-data/deliveries/YYYYMMDD_HHMMSS_<nome-edital>/
-├── requirements.csv          # Requisitos extraídos
-├── analysis_conformidade.csv # Análise completa
-├── relatorio.pdf             # Relatório PDF profissional
-└── relatorio.xlsx            # Planilha Excel com abas
+
+### Teste Antes de Rodar Tudo
+
+```bash
+# Teste com apenas 5 URLs de cada site
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium --limit 5
+
+# Se funcionar, rode completo
+python -m scripts.scrapers.scraper_orchestrator --sites all --selenium
 ```
+
+### Opção 2: Adicionar Documentos Manualmente
+
+Para documentos que não têm scraper:
+
+```bash
+# 1. Adicione arquivos .md em data/knowledge_base/
+cp meus_documentos/*.md data/knowledge_base/
+
+# 2. Re-indexe
+python scripts/index_knowledge_base.py --force
+```
+
+**Formato:** Apenas Markdown (.md) com frontmatter YAML opcional.
+
+**Ver também:** [Web Scraper Guide](scrapers/WEB_SCRAPER_GUIDE.md) para detalhes completos.
 
 ---
 
-### 2. Modo Assistido (Passo a Passo)
+## 🖥️ Interface do Sistema
 
-**Quando usar:** Quando você quer controlar cada etapa, revisar intermediários, ou customizar processo.
+**BidAnalyzee opera através do Claude Code** - uma interface conversacional com IA que executa comandos estruturados.
 
-#### Passo 1: Validar PDF
+### Tipos de Comandos
 
-```bash
-python scripts/validate_pdf.py edital.pdf
+**1. Slash Commands** - Para workflows complexos:
+- `/structure-edital <pdf>` - Extrai requisitos de edital
+- `/analyze-edital <csv>` - Analisa conformidade
+
+**2. Comandos Rápidos (*)** - Para ações pontuais:
+- `*ajuda` - Lista comandos disponíveis
+- `*buscar "query"` - Busca na base de conhecimento
+- `*validar <pdf>` - Valida PDF
+- `*exportar-pdf <csv>` - Gera relatório PDF
+- `*exportar-excel <csv>` - Gera relatório Excel
+- `*listar_analises` - Histórico de análises
+- `*sessao <id>` - Detalhes de sessão
+
+**Referência Completa:** Ver [COMMAND_REFERENCE.md](COMMAND_REFERENCE.md)
+
+### Conversação Natural
+
+O sistema também aceita linguagem natural:
+- "Valide o PDF edital.pdf"
+- "Analise o edital completamente"
+- "Mostre as últimas análises"
+
+O agente Claude interpreta a intenção e executa o comando apropriado.
+
+---
+
+## 🔄 Workflows Disponíveis
+
+### 1. Workflow Completo (Recomendado) ⭐
+
+**Passo 1: Validar PDF**
+```
+*validar edital_001.pdf
+```
+**Saída:** Status de validação, tamanho, páginas, necessidade de OCR
+
+**Passo 2: Extrair Requisitos**
+```
+/structure-edital edital_001.pdf
+```
+**Tempo:** 10-30 minutos
+**Saída:** `data/deliveries/.../requirements_structured.csv`
+
+**Passo 3: Analisar Conformidade**
+```
+/analyze-edital data/deliveries/.../requirements_structured.csv
+```
+**Tempo:** 15-45 minutos
+**Saída:** `data/deliveries/.../analysis_conformidade.csv`
+
+**Passo 4: Gerar Relatórios**
+```
+*exportar-pdf data/deliveries/.../analysis_conformidade.csv
+*exportar-excel data/deliveries/.../analysis_conformidade.csv
+```
+**Tempo:** < 1 minuto
+**Saída:** Arquivos PDF e Excel com análise formatada
+
+**Tempo Total:** 30-80 minutos
+
+---
+
+### 2. Workflow Assistido (Passo a Passo)
+
+**Quando usar:** Para controlar cada etapa, revisar resultados intermediários, ou customizar o processo.
+
+**Passo 1: Enviar e Validar Edital**
+
+Comando:
+```
+*validar edital_001.pdf
 ```
 
-**Verifica:**
+O sistema executa validações automáticas:
 - ✅ Arquivo existe e está acessível
 - ✅ Tamanho dentro do limite (500MB)
 - ✅ Formato PDF válido
@@ -148,20 +263,28 @@ Detalhes:
 - Páginas: 45
 - Texto extraível: Sim
 - OCR necessário: Não
+
+Pronto para processar.
 ```
 
 #### Passo 2: Extrair Requisitos
 
-Use o slash command `/structure-edital`:
+Quando você confirmar, eu executo:
 
 ```
-/structure-edital edital.pdf
+/structure-edital edital_001.pdf
 ```
 
-**O que faz:**
-- Extrai requisitos usando Document Structurer Agent
-- Valida cada requisito (30 regras)
-- Gera CSV estruturado
+**O que acontece:**
+- Eu (Document Structurer Agent) extraio requisitos
+- Valido cada requisito (30 regras SHIELD)
+- Gero CSV estruturado
+- Apresento estatísticas
+
+**Você acompanha:**
+- Progresso da extração
+- Quantidade de requisitos encontrados
+- Alertas de validação
 
 **Saída:** `data/deliveries/.../requirements.csv`
 
@@ -202,15 +325,24 @@ Use o slash command `/analyze-edital`:
 
 #### Passo 4: Gerar Relatórios
 
-**PDF:**
-```bash
-python scripts/export_pdf.py data/deliveries/.../analysis_conformidade.csv
+Após a análise, peça a mim:
+
+**Para PDF:**
+```
+"Gere o relatório PDF da análise"
 ```
 
-**Excel:**
-```bash
-python scripts/export_excel.py data/deliveries/.../analysis_conformidade.csv
+**Para Excel:**
 ```
+"Gere o relatório Excel da análise"
+```
+
+**Ou ambos:**
+```
+"Gere os relatórios PDF e Excel"
+```
+
+Eu vou executar os scripts de exportação e informar onde os arquivos foram salvos.
 
 ---
 
@@ -238,50 +370,63 @@ python scripts/export_excel.py data/deliveries/.../analysis_conformidade.csv
 
 ---
 
-## 🛠️ Comandos e Ferramentas
+## 🛠️ Como Interagir com o Sistema
 
-### Comandos do Orchestrator
+### Interface Principal: Claude Code
 
-Execute via Claude Code ou diretamente:
+Você **não precisa executar scripts Python manualmente**. Tudo é feito através de mim (Claude).
+
+### Slash Commands Disponíveis
 
 | Comando | Função | Exemplo |
 |---------|--------|---------|
-| `*ajuda` | Lista comandos disponíveis | `*ajuda` |
-| `*buscar "<query>"` | Busca RAG rápida | `*buscar "prazo recurso"` |
-| `*listar_analises` | Histórico de análises | `*listar_analises` |
-| `*sessao <id>` | Detalhes de uma sessão | `*sessao abc123` |
+| `/structure-edital` | Extrai requisitos de PDF | `/structure-edital edital.pdf` |
+| `/analyze-edital` | Analisa conformidade | `/analyze-edital requirements.csv` |
 
-### Scripts Python Utilitários
+### Conversação Natural
 
-**Validação:**
-```bash
-# Validar PDF antes de processar
-python scripts/validate_pdf.py edital.pdf
+Você pode simplesmente conversar comigo:
 
-# Validar CSV de requisitos
-python scripts/validate_csv.py requirements.csv
+**Exemplos:**
 
-# Validar CSV de análise
-python scripts/validate_csv.py analysis_conformidade.csv --type analysis
-```
+| O que você quer | Como pedir |
+|----------------|------------|
+| Analisar edital | "Analise o edital edital_001.pdf" |
+| Buscar na base | "Busque informações sobre prazo de validade de propostas" |
+| Ver estatísticas | "Mostre as estatísticas da última análise" |
+| Gerar relatório | "Gere o relatório PDF da análise" |
+| Validar PDF | "Valide se o PDF edital_002.pdf está ok" |
+| Ver histórico | "Mostre as 10 últimas análises" |
 
-**Busca RAG:**
-```bash
-# Buscar na base de conhecimento
-python scripts/rag_search.py "prazo validade proposta"
+### O que eu faço automaticamente
 
-# Top 10 resultados
-python scripts/rag_search.py "marca especificada" --top-k 10
-```
+Quando você pede algo, **eu executo os scripts Python necessários** para você:
 
-**State Management:**
-```bash
-# Listar sessões recentes
-python scripts/orchestrator_list.py 10
+**Quando você pede:** "Analise o edital.pdf"
 
-# Ver detalhes de sessão
-python scripts/orchestrator_session.py <session-id>
-```
+**Eu executo nos bastidores:**
+1. `python scripts/validate_pdf.py edital.pdf` ← Valido o PDF
+2. `/structure-edital edital.pdf` ← Extraio requisitos
+3. `python scripts/rag_search.py ...` ← Busco evidências
+4. `/analyze-edital requirements.csv` ← Analiso conformidade
+5. `python scripts/export_pdf.py ...` ← Gero relatório
+
+**Você só vê:**
+- Progresso em tempo real
+- Estatísticas
+- Resultados finais
+- Alertas importantes
+
+### Comandos Rápidos via Conversação
+
+| Comando | Função |
+|---------|--------|
+| `*ajuda` | Lista comandos disponíveis |
+| `*buscar "query"` | Busca RAG rápida |
+| `*listar_analises` | Histórico de análises |
+| `*sessao <id>` | Detalhes de uma sessão |
+
+**Nota:** Estes comandos são opcionais - você pode pedir a mesma coisa em linguagem natural.
 
 ---
 
@@ -324,13 +469,21 @@ Evidências:
 ### Antes de Processar
 
 1. **Valide o PDF primeiro**
-   ```bash
-   python scripts/validate_pdf.py edital.pdf
+
+   Peça a mim:
    ```
+   "Valide o PDF edital.pdf antes de processar"
+   ```
+
+   Eu vou verificar:
+   - Tamanho (deve ser < 500MB)
+   - Formato válido
+   - Texto extraível
+   - OCR necessário ou não
 
 2. **Confira tamanho** (editais > 100 páginas podem demorar)
 
-3. **Verifique OCR** - PDFs escaneados precisam de OCR (mais lento)
+3. **Tenha consciência do tempo** - PDFs escaneados precisam de OCR (mais lento)
 
 ### Durante o Processamento
 
@@ -369,13 +522,17 @@ Evidências:
 **Causa:** PDF corrompido, muito grande, ou sem texto.
 
 **Solução:**
-```bash
-# Verifique detalhes
-python scripts/validate_pdf.py edital.pdf --verbose
 
-# Se PDF for escaneado, use OCR
-# (mais lento, mas funciona)
+Peça a mim:
 ```
+"Valide o PDF edital.pdf e mostre detalhes do erro"
+```
+
+Eu vou analisar e informar:
+- Se o PDF está corrompido
+- Se é muito grande (> 500MB)
+- Se é escaneado (precisa OCR)
+- Se há texto extraível
 
 #### 2. "No requirements extracted"
 
