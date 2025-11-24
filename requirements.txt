@@ -23,11 +23,6 @@ Pillow>=10.0.0        # Image processing
 # Technical Analyst Agent (Sprint 5 - RAG)
 # ============================================
 
-# RAG Framework
-langchain>=0.1.0              # RAG orchestration framework
-langchain-community>=0.0.20   # Community integrations
-langchain-openai>=0.0.5       # OpenAI integrations (future)
-
 # Vector Store
 faiss-cpu>=1.7.4              # Local vector store (CPU-only)
 

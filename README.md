@@ -5,7 +5,7 @@
 [![Status](https://img.shields.io/badge/status-Production%20Ready-brightgreen)]()
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
 [![Framework](https://img.shields.io/badge/framework-SHIELD%201.0-blue)]()
-[![Tests](https://img.shields.io/badge/tests-116%2F116%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-357%20passing-brightgreen)]()
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
@@ -261,10 +261,10 @@ Ferramenta para comparar múltiplos editais e identificar padrões.
 **Documentação:** [COMPARISON.md](docs/COMPARISON.md)
 
 ### ✅ Testes Automatizados (Implementado - Sprint 12)
-Suite completa de 116 testes cobrindo todos os agentes.
+Suite completa de 357 testes cobrindo todos os agentes.
 
 **Funcionalidades:**
-- 🧪 116 tests (100% passing)
+- 🧪 357 tests (100% passing)
 - 📦 Fixtures reutilizáveis (conftest.py)
 - 🎯 Cobertura: Document Structurer (24), Technical Analyst (30), Orchestrator (35), SHIELD (27)
 - ✅ Validação de prompts, SHIELD compliance, workflows
@@ -341,7 +341,7 @@ BidAnalyzee/
 | **Cache** | Disk-based cache (SHA256) | Performance optimization |
 | **Persistência** | Sistema de arquivos (JSON, CSV, YAML) | Estado e histórico |
 | **Reports** | ReportLab (PDF) + OpenPyXL (Excel) | Geração de relatórios profissionais |
-| **Testes** | pytest (116 tests) | Testes unitários e integração |
+| **Testes** | pytest (357 tests) | Testes unitários e integração |
 | **Dashboard** | Rich library | Interface CLI interativa |
 
 ---
@@ -360,7 +360,7 @@ BidAnalyzee/
 - 📋 [Estratégia de Implementação](IMPLEMENTATION_STRATEGY.md) - Roadmap completo do projeto
 - 🏛️ [Decisões Arquiteturais (ADRs)](ARCHITECTURE_DECISIONS.md) - Registros de decisões técnicas
 - 🛡️ [Framework SHIELD](OPERATING_PRINCIPLES.md) - Metodologia de governança
-- 🧪 [Documentação de Testes](tests/agents/README.md) - 116 testes automatizados
+- 🧪 [Documentação de Testes](tests/agents/README.md) - 357 testes automatizados
 
 ---
 
@@ -422,7 +422,7 @@ BidAnalyzee/
 - [x] E.3 - Sistema de validação de outputs (0-100 pontos)
 
 **Sprint 12 - Testes e Comparação:**
-- [x] E.1 - Testes automatizados completos (116 tests, 100% passing)
+- [x] E.1 - Testes automatizados completos (357 tests, 100% passing)
 - [x] D.4 - Ferramenta de comparação de editais
 
 📅 **Progresso:** 16 de 16 itens completos (100%)
@@ -510,7 +510,7 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 - **Agentes implementados:** 3 (@DocumentStructurer, @AnalistaTecnico, @Orquestrador)
 - **Scripts:** 12 (structure, analyze, export_pdf, export_excel, compare, validate, dashboard, rag_search, etc.)
 - **Regras de validação:** 48+ itens (SHIELD checklists)
-- **Testes:** 116 tests (100% passing)
+- **Testes:** 357 tests (100% passing)
 - **Documentação:** 15,000+ linhas (dev + usuário)
 - **Templates:** Sistema YAML configurável
 - **Knowledge Base:** 6 documentos mock (~153KB) para validação
@@ -518,7 +518,7 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 ### 🎉 Sistema Production-Ready!
 ✅ Todas as 16 features do roadmap implementadas
 ✅ Documentação completa de usuário e desenvolvedor
-✅ Suite de testes abrangente (116 tests passing)
+✅ Suite de testes abrangente (357 tests passing)
 ✅ Sistema de qualidade (validação 0-100 pontos)
 ✅ Ferramentas auxiliares (dashboard, comparação, templates)
 ✅ RAG totalmente funcional (FAISS + sentence-transformers)
