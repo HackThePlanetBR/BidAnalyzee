@@ -48,7 +48,7 @@ Um sistema inteligente que:
 ```
 ┌─────────────────────────────────────────────────┐
 │  Interface (Claude Code + Slash Commands)       │
-│  /iniciar-analise | /flow | /consulta-rapida   │
+│  /structure-edital | /analyze-edital | /search  │
 └─────────────────────────────────────────────────┘
                       ↓
 ┌─────────────────────────────────────────────────┐
@@ -81,6 +81,29 @@ Metodologia proprietária de governança que garante qualidade e confiabilidade:
 - **D**ELIVER: Entrega formal com evidências
 
 📖 **Documentação completa:** [OPERATING_PRINCIPLES.md](OPERATING_PRINCIPLES.md)
+
+---
+
+## 💻 Comandos Disponíveis
+
+BidAnalyzee utiliza **slash commands** executados através do Claude Code. Total de **9 comandos**:
+
+**Workflows Completos:**
+- `/structure-edital <pdf>` - Extrai e estrutura requisitos de edital
+- `/analyze-edital <csv>` - Analisa conformidade contra base de conhecimento
+
+**Ações Rápidas:**
+- `/validate-pdf <pdf>` - Valida PDF antes de processar
+- `/export-pdf <csv> [output]` - Gera relatório profissional em PDF
+- `/export-excel <csv> [output]` - Gera planilha Excel com múltiplas abas
+- `/search "<query>"` - Busca rápida RAG na base de conhecimento
+
+**Navegação e Histórico:**
+- `/list-analyses [n]` - Lista histórico de análises realizadas
+- `/session <id>` - Exibe detalhes completos de uma sessão
+- `/help` - Mostra todos os comandos disponíveis
+
+📖 **Referência completa:** [COMMAND_REFERENCE.md](docs/COMMAND_REFERENCE.md)
 
 ---
 
@@ -143,7 +166,7 @@ Busca instantânea na base de conhecimento técnica sem análise completa.
 - 📖 Citação de fonte (documento:linha)
 - ⭐ Destaque de resultados com alta confiança (≥0.85)
 
-**Comando:** `*buscar "<query>"` via `@Orquestrador`
+**Comando:** `/search "<query>"`
 
 ### ✅ Web Scrapers para Knowledge Base (Implementado - Nov 2025)
 Scrapers automatizados para popular a base de conhecimento com documentação técnica da Genetec.
@@ -180,7 +203,11 @@ Geração automática de relatórios profissionais em múltiplos formatos.
 - 📈 Gráficos e visualizações automáticas
 - 📏 Colunas auto-ajustadas e cabeçalhos fixos
 
-**Scripts:**
+**Comandos:**
+- `/export-pdf <csv> [output]`
+- `/export-excel <csv> [output]`
+
+**Scripts (alternativa):**
 - `python3 scripts/export_pdf.py <csv_path> [output_path]`
 - `python3 scripts/export_excel.py <csv_path> [output_path]`
 
@@ -253,7 +280,7 @@ Suite completa de 116 testes cobrindo todos os agentes.
 ```
 BidAnalyzee/
 ├── .claude/                    # Claude Code configuration
-│   └── commands/               # Slash commands (/iniciar-analise, etc.)
+│   └── commands/               # Slash commands (9 comandos disponíveis)
 ├── agents/                     # Agentes como prompts estruturados
 │   ├── orchestrator/
 │   ├── document_structurer/
@@ -462,7 +489,8 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 **Versão:** 1.0.0
 **Fase:** Production-Ready - Sistema 100% implementado
-**Último Update:** 16 de novembro de 2025
+**Último Update:** 24 de novembro de 2025
+**Interface:** Claude Code (slash commands)
 
 ### ✅ Todos os Sprints Completados
 - Sprint 0: Fundação ✅
