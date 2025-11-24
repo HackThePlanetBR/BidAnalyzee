@@ -1,7 +1,7 @@
 # BidAnalyzee - Guia do Usuário
 
-**Versão:** 1.0
-**Data:** 16 de novembro de 2025
+**Versão:** 2.0
+**Data:** 24 de novembro de 2025
 **Audiência:** Analistas de Propostas, Engenheiros de Vendas, Gerentes Comerciais
 
 ---
@@ -168,33 +168,28 @@ python scripts/index_knowledge_base.py --force
 
 ## 🖥️ Interface do Sistema
 
-**BidAnalyzee opera através do Claude Code** - uma interface conversacional com IA que executa comandos estruturados.
+**BidAnalyzee opera através do Claude Code** - uma interface conversacional com IA que executa comandos slash estruturados.
 
-### Tipos de Comandos
+### Comandos Disponíveis
 
-**1. Slash Commands** - Para workflows complexos:
+Todos os comandos utilizam a sintaxe `/comando <obrigatorio> [opcional]` e são executados diretamente no Claude Code.
+
+**Workflows Completos:**
 - `/structure-edital <pdf>` - Extrai requisitos de edital
 - `/analyze-edital <csv>` - Analisa conformidade
 
-**2. Comandos Rápidos (*)** - Para ações pontuais:
-- `*ajuda` - Lista comandos disponíveis
-- `*buscar "query"` - Busca na base de conhecimento
-- `*validar <pdf>` - Valida PDF
-- `*exportar-pdf <csv>` - Gera relatório PDF
-- `*exportar-excel <csv>` - Gera relatório Excel
-- `*listar_analises` - Histórico de análises
-- `*sessao <id>` - Detalhes de sessão
+**Ações Rápidas:**
+- `/validate-pdf <pdf>` - Valida PDF antes de processar
+- `/export-pdf <csv> [output]` - Gera relatório PDF
+- `/export-excel <csv> [output]` - Gera planilha Excel
+- `/search "<query>"` - Busca na base de conhecimento
+
+**Navegação:**
+- `/list-analyses [n]` - Lista histórico de análises
+- `/session <id>` - Detalhes de sessão específica
+- `/help` - Lista todos os comandos
 
 **Referência Completa:** Ver [COMMAND_REFERENCE.md](COMMAND_REFERENCE.md)
-
-### Conversação Natural
-
-O sistema também aceita linguagem natural:
-- "Valide o PDF edital.pdf"
-- "Analise o edital completamente"
-- "Mostre as últimas análises"
-
-O agente Claude interpreta a intenção e executa o comando apropriado.
 
 ---
 
@@ -204,7 +199,7 @@ O agente Claude interpreta a intenção e executa o comando apropriado.
 
 **Passo 1: Validar PDF**
 ```
-*validar edital_001.pdf
+/validate-pdf edital_001.pdf
 ```
 **Saída:** Status de validação, tamanho, páginas, necessidade de OCR
 
@@ -224,8 +219,8 @@ O agente Claude interpreta a intenção e executa o comando apropriado.
 
 **Passo 4: Gerar Relatórios**
 ```
-*exportar-pdf data/deliveries/.../analysis_conformidade.csv
-*exportar-excel data/deliveries/.../analysis_conformidade.csv
+/export-pdf data/deliveries/.../analysis_conformidade.csv
+/export-excel data/deliveries/.../analysis_conformidade.csv
 ```
 **Tempo:** < 1 minuto
 **Saída:** Arquivos PDF e Excel com análise formatada
@@ -234,15 +229,15 @@ O agente Claude interpreta a intenção e executa o comando apropriado.
 
 ---
 
-### 2. Workflow Assistido (Passo a Passo)
+### 2. Workflow Detalhado (Passo a Passo)
 
 **Quando usar:** Para controlar cada etapa, revisar resultados intermediários, ou customizar o processo.
 
-**Passo 1: Enviar e Validar Edital**
+**Passo 1: Validar Edital**
 
 Comando:
 ```
-*validar edital_001.pdf
+/validate-pdf edital_001.pdf
 ```
 
 O sistema executa validações automáticas:
@@ -267,22 +262,21 @@ Detalhes:
 Pronto para processar.
 ```
 
-#### Passo 2: Extrair Requisitos
+**Passo 2: Extrair Requisitos**
 
-Quando você confirmar, eu executo:
-
+Comando:
 ```
 /structure-edital edital_001.pdf
 ```
 
 **O que acontece:**
-- Eu (Document Structurer Agent) extraio requisitos
-- Valido cada requisito (30 regras SHIELD)
-- Gero CSV estruturado
-- Apresento estatísticas
+- Document Structurer Agent extrai requisitos
+- Sistema valida cada requisito (30 regras SHIELD)
+- CSV estruturado é gerado
+- Estatísticas são apresentadas
 
-**Você acompanha:**
-- Progresso da extração
+**Progresso exibido:**
+- Status da extração
 - Quantidade de requisitos encontrados
 - Alertas de validação
 
@@ -298,21 +292,20 @@ Quando você confirmar, eu executo:
 - `obrigatorio`: Sim/Não/Desejável
 - `observacoes`: Notas adicionais
 
-#### Passo 3: Analisar Conformidade
+**Passo 3: Analisar Conformidade**
 
-Use o slash command `/analyze-edital`:
-
+Comando:
 ```
 /analyze-edital data/deliveries/.../requirements.csv
 ```
 
-**O que faz:**
-- Carrega requisitos do CSV
+**O que acontece:**
+- Sistema carrega requisitos do CSV
 - Para cada requisito:
   - Busca na base de conhecimento (RAG)
   - Analisa conformidade
   - Gera veredicto + evidências
-- Valida completude (100% obrigatório)
+- Valida completude (100% dos requisitos analisados)
 
 **Saída:** `data/deliveries/.../analysis_conformidade.csv`
 
@@ -323,26 +316,25 @@ Use o slash command `/analyze-edital`:
 - `recomendacoes`: Ações sugeridas
 - `nivel_confianca`: Alto / Médio / Baixo
 
-#### Passo 4: Gerar Relatórios
-
-Após a análise, peça a mim:
+**Passo 4: Gerar Relatórios**
 
 **Para PDF:**
 ```
-"Gere o relatório PDF da análise"
+/export-pdf data/deliveries/.../analysis_conformidade.csv
 ```
 
 **Para Excel:**
 ```
-"Gere o relatório Excel da análise"
+/export-excel data/deliveries/.../analysis_conformidade.csv
 ```
 
-**Ou ambos:**
+**Ambos:**
 ```
-"Gere os relatórios PDF e Excel"
+/export-pdf data/deliveries/.../analysis_conformidade.csv
+/export-excel data/deliveries/.../analysis_conformidade.csv
 ```
 
-Eu vou executar os scripts de exportação e informar onde os arquivos foram salvos.
+Sistema gera arquivos formatados e exibe caminhos dos relatórios gerados.
 
 ---
 
@@ -351,7 +343,7 @@ Eu vou executar os scripts de exportação e informar onde os arquivos foram sal
 **Quando usar:** Consulta pontual sem análise completa.
 
 ```
-*buscar "prazo validade proposta licitação"
+/search "prazo validade proposta licitação"
 ```
 
 **Saída:**
@@ -370,63 +362,52 @@ Eu vou executar os scripts de exportação e informar onde os arquivos foram sal
 
 ---
 
-## 🛠️ Como Interagir com o Sistema
+## 🛠️ Comandos e Ferramentas
 
-### Interface Principal: Claude Code
+### Interface: Claude Code
 
-Você **não precisa executar scripts Python manualmente**. Tudo é feito através de mim (Claude).
+Todos os comandos são executados através do Claude Code utilizando slash commands. Não é necessário executar scripts Python manualmente.
 
-### Slash Commands Disponíveis
+### Referência Rápida de Comandos
+
+**Workflows Completos:**
 
 | Comando | Função | Exemplo |
 |---------|--------|---------|
 | `/structure-edital` | Extrai requisitos de PDF | `/structure-edital edital.pdf` |
 | `/analyze-edital` | Analisa conformidade | `/analyze-edital requirements.csv` |
 
-### Conversação Natural
+**Ações Rápidas:**
 
-Você pode simplesmente conversar comigo:
+| Comando | Função | Exemplo |
+|---------|--------|---------|
+| `/validate-pdf` | Valida PDF | `/validate-pdf edital.pdf` |
+| `/export-pdf` | Gera relatório PDF | `/export-pdf analysis.csv` |
+| `/export-excel` | Gera planilha Excel | `/export-excel analysis.csv` |
+| `/search` | Busca RAG | `/search "prazo proposta"` |
 
-**Exemplos:**
+**Navegação:**
 
-| O que você quer | Como pedir |
-|----------------|------------|
-| Analisar edital | "Analise o edital edital_001.pdf" |
-| Buscar na base | "Busque informações sobre prazo de validade de propostas" |
-| Ver estatísticas | "Mostre as estatísticas da última análise" |
-| Gerar relatório | "Gere o relatório PDF da análise" |
-| Validar PDF | "Valide se o PDF edital_002.pdf está ok" |
-| Ver histórico | "Mostre as 10 últimas análises" |
+| Comando | Função | Exemplo |
+|---------|--------|---------|
+| `/list-analyses` | Lista histórico | `/list-analyses 10` |
+| `/session` | Detalhes de sessão | `/session 20251118_143022` |
+| `/help` | Lista comandos | `/help` |
 
-### O que eu faço automaticamente
+### Execução Automática
 
-Quando você pede algo, **eu executo os scripts Python necessários** para você:
+Quando um comando slash é executado, o sistema automaticamente:
+1. Valida parâmetros fornecidos
+2. Executa scripts Python necessários
+3. Processa dados conforme workflow
+4. Apresenta resultados formatados
+5. Salva estado da sessão
 
-**Quando você pede:** "Analise o edital.pdf"
-
-**Eu executo nos bastidores:**
-1. `python scripts/validate_pdf.py edital.pdf` ← Valido o PDF
-2. `/structure-edital edital.pdf` ← Extraio requisitos
-3. `python scripts/rag_search.py ...` ← Busco evidências
-4. `/analyze-edital requirements.csv` ← Analiso conformidade
-5. `python scripts/export_pdf.py ...` ← Gero relatório
-
-**Você só vê:**
+**Usuário vê:**
 - Progresso em tempo real
-- Estatísticas
+- Estatísticas e métricas
 - Resultados finais
-- Alertas importantes
-
-### Comandos Rápidos via Conversação
-
-| Comando | Função |
-|---------|--------|
-| `*ajuda` | Lista comandos disponíveis |
-| `*buscar "query"` | Busca RAG rápida |
-| `*listar_analises` | Histórico de análises |
-| `*sessao <id>` | Detalhes de uma sessão |
-
-**Nota:** Estes comandos são opcionais - você pode pedir a mesma coisa em linguagem natural.
+- Alertas e validações
 
 ---
 
@@ -470,12 +451,12 @@ Evidências:
 
 1. **Valide o PDF primeiro**
 
-   Peça a mim:
+   Comando:
    ```
-   "Valide o PDF edital.pdf antes de processar"
+   /validate-pdf edital.pdf
    ```
 
-   Eu vou verificar:
+   Sistema verifica:
    - Tamanho (deve ser < 500MB)
    - Formato válido
    - Texto extraível
@@ -523,12 +504,12 @@ Evidências:
 
 **Solução:**
 
-Peça a mim:
+Execute:
 ```
-"Valide o PDF edital.pdf e mostre detalhes do erro"
+/validate-pdf edital.pdf
 ```
 
-Eu vou analisar e informar:
+Sistema analisa e informa:
 - Se o PDF está corrompido
 - Se é muito grande (> 500MB)
 - Se é escaneado (precisa OCR)
@@ -611,5 +592,6 @@ cat data/state/sessions/<session-id>.json
 
 ---
 
-**Última atualização:** 16/11/2025
-**Versão do sistema:** Sprint 10 (Modo FLOW + Exports + CI/CD)
+**Última atualização:** 24/11/2025
+**Versão do sistema:** Sprint 10 (Slash Commands + Web Scrapers + CI/CD)
+**Interface:** Claude Code (slash commands)
