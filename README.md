@@ -401,9 +401,9 @@ BidAnalyzee/
 - [x] @Orquestrador com Framework SHIELD (Sprint 8)
 - [x] Modo Assistido com sugestões automáticas (Sprint 9)
 - [x] Modo FLOW com automação completa (Sprint 10)
-- [x] Modo Consulta Rápida (*buscar) (Sprint 9)
+- [x] Modo Consulta Rápida (/search) (Sprint 9)
 - [x] Exports Profissionais (PDF + Excel) (Sprint 10)
-- [x] Comandos de sistema completos
+- [x] Comandos slash unificados (9 comandos disponíveis)
 - [x] Gestão de estado (SessionManager)
 
 ### ✅ Fase 5: Teste E2E e Refinamentos (Sprint 10.5) - **COMPLETO**
