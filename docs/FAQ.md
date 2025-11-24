@@ -1,7 +1,7 @@
 # BidAnalyzee - Perguntas Frequentes (FAQ)
 
-**Versão:** 1.0
-**Data:** 16 de novembro de 2025
+**Versão:** 2.0
+**Data:** 24 de novembro de 2025
 
 ---
 
@@ -134,18 +134,14 @@ Isso cria `data/knowledge_base/faiss_index/` com embeddings.
 
 ### Como uso o Modo FLOW?
 
-**Via Claude Code** (conversação comigo):
+**Via Claude Code** usando slash commands:
 
-```
-"Analise o edital edital.pdf completamente"
-```
-
-Ou use o slash command:
 ```
 /structure-edital edital.pdf
+/analyze-edital data/deliveries/.../requirements_structured.csv
 ```
 
-Eu vou executar todo o fluxo automaticamente. Aguarde 15-45 minutos (depende do edital).
+Sistema executa todo o fluxo automaticamente. Aguardar 15-45 minutos (depende do edital).
 
 ### Como acompanho o progresso?
 
@@ -238,24 +234,25 @@ Lei 8.666/93:120 - "prazo será de 60 dias"
 
 ### Como exporto para outros formatos?
 
-**Via Claude Code** - simplesmente peça:
+**Via Claude Code** usando slash commands:
 
 **Para PDF:**
 ```
-"Gere o relatório PDF da análise"
+/export-pdf data/deliveries/.../analysis_conformidade.csv
 ```
 
 **Para Excel:**
 ```
-"Gere o relatório Excel da análise"
+/export-excel data/deliveries/.../analysis_conformidade.csv
 ```
 
 **Ambos:**
 ```
-"Gere os relatórios PDF e Excel"
+/export-pdf data/deliveries/.../analysis_conformidade.csv
+/export-excel data/deliveries/.../analysis_conformidade.csv
 ```
 
-Eu vou executar os scripts de exportação e informar onde foram salvos os arquivos.
+Sistema executa scripts de exportação e informa caminhos dos arquivos gerados.
 
 ---
 
@@ -628,5 +625,6 @@ Ver [CONTRIBUTING.md](../CONTRIBUTING.md) (se existir).
 
 ---
 
-**Última atualização:** 16/11/2025
-**Versão:** Sprint 10
+**Última atualização:** 24/11/2025
+**Versão:** Sprint 10 (Slash Commands + Web Scrapers)
+**Interface:** Claude Code (slash commands)

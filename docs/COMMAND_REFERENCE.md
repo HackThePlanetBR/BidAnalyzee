@@ -1,22 +1,36 @@
 # BidAnalyzee - Referência de Comandos
 
-**Versão:** 1.0
-**Última atualização:** 18 de novembro de 2025
+**Versão:** 2.0
+**Última atualização:** 24 de novembro de 2025
 
 ---
 
 ## 📋 Índice
 
-1. [Slash Commands](#slash-commands) - Workflows estruturados
-2. [Comandos Rápidos](#comandos-rápidos) - Ações pontuais
-3. [Sintaxe e Exemplos](#sintaxe-e-exemplos)
-4. [Fluxos de Trabalho](#fluxos-de-trabalho)
+1. [Visão Geral](#visão-geral)
+2. [Workflows Completos](#workflows-completos)
+3. [Ações Rápidas](#ações-rápidas)
+4. [Navegação e Histórico](#navegação-e-histórico)
+5. [Sintaxe e Convenções](#sintaxe-e-convenções)
+6. [Fluxos de Trabalho](#fluxos-de-trabalho)
 
 ---
 
-## ⚡ Slash Commands
+## 🎯 Visão Geral
 
-Comandos estruturados para workflows complexos. Expandem prompts completos com governança SHIELD.
+BidAnalyzee utiliza **slash commands** executados através do Claude Code. Todos os comandos seguem a sintaxe `/comando <obrigatorio> [opcional]`.
+
+**Características:**
+- ✅ Executados diretamente no Claude Code
+- ✅ Autocompletar com TAB
+- ✅ Documentação integrada
+- ✅ Governança SHIELD quando aplicável
+
+---
+
+## 🔄 Workflows Completos
+
+Comandos para workflows de análise de editais que envolvem processamento extenso.
 
 ### `/structure-edital`
 
@@ -24,11 +38,11 @@ Comandos estruturados para workflows complexos. Expandem prompts completos com g
 
 **Sintaxe:**
 ```
-/structure-edital <caminho-do-pdf>
+/structure-edital <pdf>
 ```
 
 **Parâmetros:**
-- `<caminho-do-pdf>` (obrigatório): Caminho para arquivo PDF do edital
+- `<pdf>` (obrigatório): Caminho para arquivo PDF do edital
 
 **Exemplos:**
 ```
@@ -51,11 +65,11 @@ Comandos estruturados para workflows complexos. Expandem prompts completos com g
 
 **Sintaxe:**
 ```
-/analyze-edital <caminho-do-csv>
+/analyze-edital <csv>
 ```
 
 **Parâmetros:**
-- `<caminho-do-csv>` (obrigatório): Caminho para CSV de requisitos (gerado por `/structure-edital`)
+- `<csv>` (obrigatório): Caminho para CSV de requisitos (gerado por `/structure-edital`)
 
 **Exemplos:**
 ```
@@ -72,121 +86,26 @@ Comandos estruturados para workflows complexos. Expandem prompts completos com g
 
 ---
 
-## 🎯 Comandos Rápidos
+## ⚡ Ações Rápidas
 
-Comandos simples para ações pontuais. Use prefixo `*` seguido do comando.
+Comandos para validação, exportação e consultas rápidas.
 
-### `*ajuda`
+### `/validate-pdf`
 
-**Função:** Lista todos os comandos disponíveis.
-
-**Sintaxe:**
-```
-*ajuda
-```
-
-**Exemplos:**
-```
-*ajuda
-```
-
-**Saída:** Lista de comandos com descrições.
-
----
-
-### `*buscar`
-
-**Função:** Busca rápida na base de conhecimento usando RAG.
+**Função:** Valida PDF antes de processar (tamanho, formato, OCR).
 
 **Sintaxe:**
 ```
-*buscar "<query>"
+/validate-pdf <pdf>
 ```
 
 **Parâmetros:**
-- `<query>` (obrigatório): Texto da busca (entre aspas)
+- `<pdf>` (obrigatório): Caminho para arquivo PDF
 
 **Exemplos:**
 ```
-*buscar "prazo validade proposta"
-*buscar "requisitos câmera IP 4MP"
-*buscar "certificação INMETRO"
-```
-
-**Saída:**
-- Top 5 resultados com score de similaridade
-- Citação de fonte (documento:linha)
-- Destaque de alta confiança (≥0.85)
-
-**Tempo estimado:** Instantâneo (< 5 segundos)
-
----
-
-### `*listar_analises`
-
-**Função:** Exibe histórico de análises de editais realizadas.
-
-**Sintaxe:**
-```
-*listar_analises [quantidade]
-```
-
-**Parâmetros:**
-- `[quantidade]` (opcional): Número de análises a listar (padrão: 10)
-
-**Exemplos:**
-```
-*listar_analises
-*listar_analises 20
-```
-
-**Saída:**
-- Lista com ID, data, edital, status
-
----
-
-### `*sessao`
-
-**Função:** Exibe detalhes completos de uma sessão de análise específica.
-
-**Sintaxe:**
-```
-*sessao <session-id>
-```
-
-**Parâmetros:**
-- `<session-id>` (obrigatório): ID da sessão (obtido via `*listar_analises`)
-
-**Exemplos:**
-```
-*sessao abc123def456
-*sessao 20251118_143022
-```
-
-**Saída:**
-- Detalhes da sessão
-- Estatísticas
-- Arquivos gerados
-- Log de execução
-
----
-
-### `*validar`
-
-**Função:** Valida PDF antes de processamento.
-
-**Sintaxe:**
-```
-*validar <caminho-do-pdf>
-```
-
-**Parâmetros:**
-- `<caminho-do-pdf>` (obrigatório): Caminho para arquivo PDF
-
-**Exemplos:**
-```
-*validar edital.pdf
-*validar data/uploads/edital_001.pdf
+/validate-pdf edital.pdf
+/validate-pdf data/uploads/edital_001.pdf
 ```
 
 **Saída:**
@@ -196,27 +115,27 @@ Comandos simples para ações pontuais. Use prefixo `*` seguido do comando.
 - Necessidade de OCR
 - Texto extraível
 
-**Tempo estimado:** Instantâneo (< 5 segundos)
+**Tempo estimado:** < 5 segundos
 
 ---
 
-### `*exportar-pdf`
+### `/export-pdf`
 
-**Função:** Gera relatório profissional em PDF a partir do CSV de análise.
+**Função:** Gera relatório profissional em PDF.
 
 **Sintaxe:**
 ```
-*exportar-pdf <caminho-do-csv> [caminho-saida]
+/export-pdf <csv> [output]
 ```
 
 **Parâmetros:**
-- `<caminho-do-csv>` (obrigatório): CSV de análise de conformidade
-- `[caminho-saida]` (opcional): Caminho para salvar PDF
+- `<csv>` (obrigatório): CSV de análise de conformidade
+- `[output]` (opcional): Caminho para salvar PDF
 
 **Exemplos:**
 ```
-*exportar-pdf analysis_conformidade.csv
-*exportar-pdf data/deliveries/.../analysis_conformidade.csv relatorio_edital_001.pdf
+/export-pdf analysis_conformidade.csv
+/export-pdf data/deliveries/.../analysis_conformidade.csv relatorio.pdf
 ```
 
 **Saída:**
@@ -230,30 +149,30 @@ Comandos simples para ações pontuais. Use prefixo `*` seguido do comando.
 
 ---
 
-### `*exportar-excel`
+### `/export-excel`
 
-**Função:** Gera planilha Excel com múltiplas abas a partir do CSV de análise.
+**Função:** Gera planilha Excel com múltiplas abas.
 
 **Sintaxe:**
 ```
-*exportar-excel <caminho-do-csv> [caminho-saida]
+/export-excel <csv> [output]
 ```
 
 **Parâmetros:**
-- `<caminho-do-csv>` (obrigatório): CSV de análise de conformidade
-- `[caminho-saida]` (opcional): Caminho para salvar Excel
+- `<csv>` (obrigatório): CSV de análise de conformidade
+- `[output]` (opcional): Caminho para salvar Excel
 
 **Exemplos:**
 ```
-*exportar-excel analysis_conformidade.csv
-*exportar-excel data/deliveries/.../analysis_conformidade.csv relatorio_edital_001.xlsx
+/export-excel analysis_conformidade.csv
+/export-excel data/deliveries/.../analysis_conformidade.csv relatorio.xlsx
 ```
 
 **Saída:**
 - Arquivo Excel (.xlsx) com:
   - Aba "Resumo" com estatísticas
   - Aba "Detalhes" com análise completa
-  - Abas por veredicto (Conforme, Não Conforme, etc.)
+  - Abas por veredicto (Conforme, Não Conforme, Revisão)
   - Formatação condicional
   - Gráficos automáticos
 
@@ -261,9 +180,123 @@ Comandos simples para ações pontuais. Use prefixo `*` seguido do comando.
 
 ---
 
-## 📚 Sintaxe e Exemplos
+### `/search`
 
-### Convenções
+**Função:** Busca rápida na base de conhecimento (RAG).
+
+**Sintaxe:**
+```
+/search "<query>"
+```
+
+**Parâmetros:**
+- `<query>` (obrigatório): Texto da busca (entre aspas se contiver espaços)
+
+**Exemplos:**
+```
+/search "prazo validade proposta Lei 8666"
+/search "requisitos câmera IP 4MP"
+/search "certificação INMETRO"
+```
+
+**Saída:**
+- Top 5 resultados com score de similaridade
+- Citação de fonte (documento:linha)
+- Destaque de alta confiança (≥0.85)
+
+**Tempo estimado:** Instantâneo
+
+---
+
+## 📊 Navegação e Histórico
+
+Comandos para gerenciar e revisar análises anteriores.
+
+### `/list-analyses`
+
+**Função:** Lista histórico de análises realizadas.
+
+**Sintaxe:**
+```
+/list-analyses [n]
+```
+
+**Parâmetros:**
+- `[n]` (opcional): Número de análises a listar (padrão: 10, máx: 50)
+
+**Exemplos:**
+```
+/list-analyses
+/list-analyses 20
+```
+
+**Saída:**
+- Lista em ordem cronológica reversa (mais recentes primeiro)
+- ID, data, edital, status
+- Resumo estatístico de cada análise
+
+**Tempo estimado:** Instantâneo
+
+---
+
+### `/session`
+
+**Função:** Exibe detalhes completos de uma sessão específica.
+
+**Sintaxe:**
+```
+/session <id>
+```
+
+**Parâmetros:**
+- `<id>` (obrigatório): Session ID (obtido via `/list-analyses`)
+
+**Exemplos:**
+```
+/session 20251118_143022
+/session 20251114_103501_edital_obras_publicas
+```
+
+**Saída:**
+- Metadados da sessão (ID, data, duração)
+- Informações do edital (nome, tamanho, páginas)
+- Estatísticas de extração
+- Estatísticas de análise
+- Arquivos gerados
+- Timeline de execução
+- Itens críticos flagados
+
+**Tempo estimado:** Instantâneo
+
+---
+
+### `/help`
+
+**Função:** Mostra lista de comandos disponíveis.
+
+**Sintaxe:**
+```
+/help
+```
+
+**Exemplos:**
+```
+/help
+```
+
+**Saída:**
+- Lista de todos os comandos organizados por categoria
+- Exemplos de uso
+- Workflow típico completo
+- Links para documentação
+
+**Tempo estimado:** Instantâneo
+
+---
+
+## 📚 Sintaxe e Convenções
+
+### Notação de Parâmetros
 
 - **`<parametro>`** = Obrigatório
 - **`[parametro]`** = Opcional
@@ -281,99 +314,114 @@ Comandos simples para ações pontuais. Use prefixo `*` seguido do comando.
 /structure-edital data/uploads/edital_001.pdf
 ```
 
-**Nome do arquivo (se estiver na raiz):**
+**Nome do arquivo (se estiver na pasta atual):**
 ```
 /structure-edital edital.pdf
 ```
+
+### Autocompletar
+
+Use **TAB** para autocompletar caminhos de arquivo ao digitar comandos.
 
 ---
 
 ## 🔄 Fluxos de Trabalho
 
-### Fluxo Completo (Análise de Edital)
+### Workflow Completo (Análise de Edital)
 
-**Passo 1:** Validar PDF
+**Passo 1: Validar PDF**
 ```
-*validar edital_001.pdf
+/validate-pdf edital_001.pdf
 ```
+⏱️ < 5 segundos
 
-**Passo 2:** Extrair requisitos
+**Passo 2: Extrair requisitos**
 ```
 /structure-edital edital_001.pdf
 ```
 ⏳ Aguardar conclusão (~10-30 min)
 
-**Passo 3:** Analisar conformidade
+**Passo 3: Analisar conformidade**
 ```
 /analyze-edital data/deliveries/20251118_143022_edital_001/outputs/requirements_structured.csv
 ```
 ⏳ Aguardar conclusão (~15-45 min)
 
-**Passo 4:** Gerar relatórios
+**Passo 4: Gerar relatórios**
 ```
-*exportar-pdf data/deliveries/20251118_143022_edital_001/outputs/analysis_conformidade.csv
-*exportar-excel data/deliveries/20251118_143022_edital_001/outputs/analysis_conformidade.csv
+/export-pdf data/deliveries/20251118_143022_edital_001/outputs/analysis_conformidade.csv
+/export-excel data/deliveries/20251118_143022_edital_001/outputs/analysis_conformidade.csv
 ```
+⏱️ < 1 minuto cada
 
-**Total:** ~30-80 minutos
+**Tempo total:** 30-80 minutos
 
 ---
 
-### Fluxo de Consulta Rápida
+### Workflow de Consulta Rápida
 
 **Buscar informação específica na base:**
 ```
-*buscar "prazo de validade de propostas Lei 8666"
+/search "prazo de validade de propostas Lei 8666"
 ```
+⏱️ Instantâneo
 
-**Resultado:** Instantâneo (< 5 segundos)
+**Caso de uso:**
+- Verificar requisitos legais
+- Consultar especificações técnicas
+- Validar interpretações
 
 ---
 
-### Fluxo de Revisão de Análise Anterior
+### Workflow de Revisão de Análise Anterior
 
-**Passo 1:** Listar análises
+**Passo 1: Listar análises**
 ```
-*listar_analises 10
-```
-
-**Passo 2:** Ver detalhes de uma
-```
-*sessao 20251118_143022
+/list-analyses 10
 ```
 
-**Passo 3:** Exportar novamente (se necessário)
+**Passo 2: Ver detalhes de uma**
 ```
-*exportar-pdf data/deliveries/20251118_143022_edital_001/outputs/analysis_conformidade.csv
+/session 20251118_143022
+```
+
+**Passo 3: Exportar novamente (se necessário)**
+```
+/export-pdf data/deliveries/20251118_143022_edital_001/outputs/analysis_conformidade.csv
 ```
 
 ---
 
-## 📊 Comparação: Slash vs Asterisco
+## 🆘 Suporte
 
-| Aspecto | Slash Commands | Comandos Asterisco |
-|---------|----------------|-------------------|
-| **Uso** | Workflows complexos | Ações pontuais |
-| **Duração** | Minutos a horas | Segundos a minutos |
-| **Governança** | Framework SHIELD completo | Execução direta |
-| **Interação** | Checkpoints de aprovação | Automático |
-| **Exemplos** | `/structure-edital`, `/analyze-edital` | `*buscar`, `*validar`, `*exportar-pdf` |
-
----
-
-## 🆘 Precisa de Ajuda?
-
-**Lista de comandos:**
+**Ver todos os comandos:**
 ```
-*ajuda
+/help
 ```
 
-**Documentação completa:**
-- [USER_GUIDE.md](USER_GUIDE.md) - Guia do usuário
+**Documentação adicional:**
+- [USER_GUIDE.md](USER_GUIDE.md) - Guia do usuário completo
 - [FAQ.md](FAQ.md) - Perguntas frequentes
 - [TUTORIAL.md](TUTORIAL.md) - Tutorial passo a passo
 
 ---
 
-**Versão:** 1.0
+## 📌 Resumo Rápido
+
+| Comando | Função | Tempo |
+|---------|--------|-------|
+| `/validate-pdf <pdf>` | Valida PDF | < 5s |
+| `/structure-edital <pdf>` | Extrai requisitos | 10-30 min |
+| `/analyze-edital <csv>` | Analisa conformidade | 15-45 min |
+| `/export-pdf <csv>` | Gera relatório PDF | < 1 min |
+| `/export-excel <csv>` | Gera planilha Excel | < 1 min |
+| `/search "<query>"` | Busca RAG | Instantâneo |
+| `/list-analyses [n]` | Lista histórico | Instantâneo |
+| `/session <id>` | Detalhes da sessão | Instantâneo |
+| `/help` | Lista comandos | Instantâneo |
+
+---
+
+**Versão:** 2.0
 **Compatível com:** BidAnalyzee Sprint 10+
+**Interface:** Claude Code (slash commands)
