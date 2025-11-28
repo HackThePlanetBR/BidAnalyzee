@@ -101,7 +101,7 @@ class IngestionPipeline:
         if not directory.exists():
             raise ValueError(f"Directory does not exist: {directory_path}")
 
-        markdown_files = list(directory.glob("*.md"))
+        markdown_files = list(directory.glob("**/*.md"))
 
         if not markdown_files:
             print(f"WARNING: No markdown files found in {directory_path}")

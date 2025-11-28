@@ -76,8 +76,8 @@ def main():
             print(f"💡 Hint: Create {kb_path} and add documents (.md, .txt files)")
             return 1
 
-        # Count documents
-        doc_files = list(kb_dir.glob("*.md")) + list(kb_dir.glob("*.txt"))
+        # Count documents (recursive search)
+        doc_files = list(kb_dir.glob("**/*.md")) + list(kb_dir.glob("**/*.txt"))
         print(f"📁 Knowledge Base: {kb_path}")
         print(f"📄 Documents found: {len(doc_files)}")
 
@@ -128,9 +128,12 @@ def main():
             print()
 
             test_queries = [
-                "requisitos técnicos",
-                "prazo de entrega",
-                "documentação necessária"
+                "Security Center system requirements",           # TechDocs/SCSaaS
+                "ISO 27001 certification compliance",            # Compliance
+                "video surveillance hardware specifications",    # TechDocs
+                "cloud services managed deployment",             # SCSaaS
+                "SOC 2 Type 2 audit report",                    # Compliance
+                "access control integration protocols"          # TechDocs
             ]
 
             for query in test_queries:
