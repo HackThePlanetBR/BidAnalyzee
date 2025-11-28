@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 import re
+import time
 
 from .base_scraper import BaseScraper
 from .config import ScrapersConfig
@@ -95,98 +96,74 @@ class TechDocsScraper(BaseScraper):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
 
-        # Setup Selenium if requested (for content extraction)
+        # Setup browser automation if requested (for content extraction)
+        self.browser = None
+        self.playwright = None
         if self.use_selenium:
-            self._setup_selenium()
+            self._setup_playwright()
 
         # Track discovered products
         self.discovered_products: Dict[str, str] = {}
 
-    def _setup_selenium(self):
-        """Setup Selenium with ChromeDriver for JavaScript rendering."""
+    def _setup_playwright(self):
+        """Setup Playwright for JavaScript rendering with anti-bot detection bypass."""
         try:
-            # Try undetected-chromedriver first (better for bot detection)
-            try:
-                import undetected_chromedriver as uc
-                self.logger.info("Setting up Selenium with undetected ChromeDriver...")
+            from playwright.sync_api import sync_playwright
 
-                options = uc.ChromeOptions()
-                options.add_argument('--no-sandbox')
-                options.add_argument('--disable-dev-shm-usage')
+            self.logger.info("Setting up Playwright browser...")
 
-                # Headless mode from config
-                if self.config.headless:
-                    options.add_argument('--headless=new')
+            # Start Playwright
+            self.playwright = sync_playwright().start()
 
-                options.add_argument('--window-size=1920,1080')
-
-                # Chrome binary path from config
-                if self.config.chrome_binary_path:
-                    options.binary_location = self.config.chrome_binary_path
-
-                # Proxy from config
-                proxy_url = self.config.get_proxy_config()
-                if proxy_url:
-                    options.add_argument(f'--proxy-server={proxy_url}')
-                    self.logger.info(f"Using proxy: {proxy_url[:50]}...")
-
-                # ChromeDriver path from config
-                driver_kwargs = {'options': options}
-                if self.config.chromedriver_path:
-                    driver_kwargs['driver_executable_path'] = self.config.chromedriver_path
-
-                self.driver = uc.Chrome(**driver_kwargs)
-                self.driver.set_page_load_timeout(30)
-
-                self.logger.info("Selenium ready (undetected-chromedriver)")
-                return
-
-            except ImportError:
-                self.logger.warning("undetected-chromedriver not available, using regular Selenium")
-
-            # Fallback to regular Selenium
-            from selenium import webdriver
-            from selenium.webdriver.chrome.options import Options
-            from selenium.webdriver.chrome.service import Service
-
-            self.logger.info("Setting up regular Selenium ChromeDriver...")
-
-            options = Options()
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-
-            # Headless mode from config
-            if self.config.headless:
-                options.add_argument('--headless=new')
-
-            options.add_argument('--window-size=1920,1080')
-            options.add_argument('--disable-blink-features=AutomationControlled')
-            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+            # Launch browser with anti-detection configurations
+            # Use chromium as it has best anti-bot bypass capabilities
+            launch_kwargs = {
+                'headless': self.config.headless,
+                'args': [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-blink-features=AutomationControlled',
+                ]
+            }
 
             # Chrome binary path from config
             if self.config.chrome_binary_path:
-                options.binary_location = self.config.chrome_binary_path
+                launch_kwargs['executable_path'] = self.config.chrome_binary_path
 
             # Proxy from config
             proxy_url = self.config.get_proxy_config()
             if proxy_url:
-                options.add_argument(f'--proxy-server={proxy_url}')
+                # Parse proxy URL for Playwright format
+                from urllib.parse import urlparse
+                parsed_proxy = urlparse(proxy_url)
+                launch_kwargs['proxy'] = {
+                    'server': f'{parsed_proxy.scheme}://{parsed_proxy.hostname}:{parsed_proxy.port}'
+                }
+                if parsed_proxy.username:
+                    launch_kwargs['proxy']['username'] = parsed_proxy.username
+                if parsed_proxy.password:
+                    launch_kwargs['proxy']['password'] = parsed_proxy.password
                 self.logger.info(f"Using proxy: {proxy_url[:50]}...")
 
-            # ChromeDriver service
-            service_kwargs = {}
-            if self.config.chromedriver_path:
-                service_kwargs['executable_path'] = self.config.chromedriver_path
+            self.browser = self.playwright.chromium.launch(**launch_kwargs)
 
-            service = Service(**service_kwargs) if service_kwargs else None
+            # Create a new context with realistic viewport and user agent
+            self.context = self.browser.new_context(
+                viewport={'width': 1920, 'height': 1080},
+                user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            )
 
-            self.driver = webdriver.Chrome(service=service, options=options)
-            self.driver.set_page_load_timeout(30)
+            # Create a new page
+            self.page = self.context.new_page()
 
-            self.logger.info("Selenium ready (regular ChromeDriver)")
+            self.logger.info("Playwright ready (Chromium with anti-bot bypass)")
 
+        except ImportError as e:
+            self.logger.error("Playwright not installed. Install with: pip install playwright && playwright install chromium")
+            raise
         except Exception as e:
-            self.logger.error(f"Failed to setup Selenium: {e}")
+            self.logger.error(f"Failed to setup Playwright: {e}")
             raise
 
     def discover_urls(self) -> List[str]:
@@ -268,12 +245,106 @@ class TechDocsScraper(BaseScraper):
         # Remove duplicates and sort
         all_urls = sorted(list(set(all_urls)))
 
+        # Filter to keep only latest versions
+        all_urls = self._filter_latest_versions(all_urls)
+
+        # Store base URLs for TOC expansion later (when Playwright is ready)
+        self.base_urls = all_urls.copy()
+
         # Log stats
         self._analyze_discovered_products(all_urls)
-        self.stats['urls_discovered'] = len(all_urls)
-        self.logger.info(f"Discovered {len(all_urls)} total URLs from sitemap index")
+        self.logger.info(f"Discovered {len(all_urls)} base guide URLs (latest versions only)")
 
-        return all_urls
+        # If Selenium is enabled, automatically expand to include all sub-pages
+        if self.use_selenium and hasattr(self, 'page'):
+            self.logger.info("\nAutomatically expanding base guides to include all sub-pages...")
+            expanded_urls = self.expand_to_subpages(all_urls)
+            self.stats['urls_discovered'] = len(expanded_urls)
+            return expanded_urls
+        else:
+            self.stats['urls_discovered'] = len(all_urls)
+            self.logger.info("Note: Selenium not enabled - returning base URLs only (without sub-pages)")
+            return all_urls
+
+    def expand_to_subpages(self, base_urls: List[str] = None, limit: int = None) -> List[str]:
+        """
+        Expand base guide URLs to include all sub-pages from Table of Contents.
+
+        This should be called AFTER Playwright is ready (after _setup_playwright).
+
+        Args:
+            base_urls: List of base URLs to expand (defaults to self.base_urls)
+            limit: Optional limit on number of guides to expand
+
+        Returns:
+            Expanded list of ALL URLs (base + all sub-pages)
+        """
+        if base_urls is None:
+            base_urls = getattr(self, 'base_urls', [])
+
+        if not base_urls:
+            self.logger.warning("No base URLs to expand")
+            return []
+
+        if not self.use_selenium or not hasattr(self, 'page'):
+            self.logger.error("Playwright not initialized - cannot expand TOC links")
+            return base_urls
+
+        if limit:
+            base_urls = base_urls[:limit]
+
+        self.logger.info(f"\n{'='*70}")
+        self.logger.info(f"EXPANDING {len(base_urls)} BASE GUIDES TO SUBPAGES")
+        self.logger.info(f"{'='*70}\n")
+
+        all_expanded_urls = []
+        total_subpages = 0
+
+        for i, base_url in enumerate(base_urls, 1):
+            try:
+                self.logger.info(f"[{i}/{len(base_urls)}] Expanding: {base_url}")
+
+                # Navigate to base URL
+                self.page.goto(base_url, wait_until='domcontentloaded', timeout=60000)
+
+                # Handle cookie consent on EVERY page (modal appears on all pages, not just first)
+                import time
+                time.sleep(2)
+                try:
+                    button = self.page.wait_for_selector("button:has-text('Accept all')", timeout=3000, state='visible')
+                    if button:
+                        button.click()
+                        self.logger.info("Clicked cookie consent")
+                        time.sleep(2)
+                except:
+                    pass  # Cookie modal not present or already accepted
+
+                # Extract TOC links
+                toc_links = self._extract_toc_links(base_url)
+
+                # Add all links (base + subpages)
+                all_expanded_urls.extend(toc_links)
+                total_subpages += len(toc_links)
+
+                self.logger.info(f"  → Added {len(toc_links)} URLs")
+
+            except Exception as e:
+                self.logger.error(f"Failed to expand {base_url}: {e}")
+                # Add base URL anyway
+                all_expanded_urls.append(base_url)
+
+        # Remove duplicates
+        all_expanded_urls = sorted(list(set(all_expanded_urls)))
+
+        self.logger.info(f"\n{'='*70}")
+        self.logger.info(f"EXPANSION COMPLETE")
+        self.logger.info(f"{'='*70}")
+        self.logger.info(f"Base guides: {len(base_urls)}")
+        self.logger.info(f"Total URLs (after expansion): {len(all_expanded_urls)}")
+        self.logger.info(f"Average subpages per guide: {total_subpages / len(base_urls):.1f}")
+        self.logger.info(f"{'='*70}\n")
+
+        return all_expanded_urls
 
     def _extract_urls_from_sitemap(self, root: ET.Element, namespace: dict) -> List[str]:
         """
@@ -326,6 +397,89 @@ class TechDocsScraper(BaseScraper):
 
         return True
 
+    def _filter_latest_versions(self, urls: List[str]) -> List[str]:
+        """
+        Filter URLs to keep only the latest version of each product/guide.
+
+        Example:
+            AMAG-Symmetry-Plugin-Guide-3.1 → Skip (older)
+            AMAG-Symmetry-Plugin-Guide-3.3.0 → Keep (newer)
+
+        Args:
+            urls: List of all discovered URLs
+
+        Returns:
+            Filtered list with only latest versions
+        """
+        from packaging import version
+
+        # Group URLs by product base (without version)
+        product_groups: Dict[str, List[tuple]] = {}
+
+        for url in urls:
+            product, ver = self._extract_product_and_version(url)
+
+            if not product:
+                # No version found, keep URL as-is
+                if None not in product_groups:
+                    product_groups[None] = []
+                product_groups[None].append((url, None))
+                continue
+
+            # Store URL with parsed version for comparison
+            if product not in product_groups:
+                product_groups[product] = []
+
+            product_groups[product].append((url, ver))
+
+        # Keep only latest version from each group
+        filtered_urls = []
+        skipped_count = 0
+
+        for product, url_list in product_groups.items():
+            if product is None:
+                # URLs without versions - keep all
+                filtered_urls.extend([url for url, _ in url_list])
+                continue
+
+            if len(url_list) == 1:
+                # Only one version - keep it
+                filtered_urls.append(url_list[0][0])
+                continue
+
+            # Multiple versions - find the latest
+            latest_url = None
+            latest_version = None
+
+            for url, ver in url_list:
+                if ver is None:
+                    # No version string, keep URL
+                    filtered_urls.append(url)
+                    continue
+
+                try:
+                    parsed_ver = version.parse(ver)
+
+                    if latest_version is None or parsed_ver > latest_version:
+                        if latest_url:
+                            skipped_count += 1
+                        latest_version = parsed_ver
+                        latest_url = url
+                    else:
+                        skipped_count += 1
+
+                except Exception as e:
+                    # Can't parse version - keep URL to be safe
+                    self.logger.debug(f"Can't parse version '{ver}' for {url}: {e}")
+                    filtered_urls.append(url)
+
+            if latest_url:
+                filtered_urls.append(latest_url)
+
+        self.logger.info(f"Version filtering: {len(urls)} URLs → {len(filtered_urls)} URLs (skipped {skipped_count} older versions)")
+
+        return sorted(filtered_urls)
+
     def _analyze_discovered_products(self, urls: List[str]):
         """
         Analyze URLs to discover products and their counts.
@@ -350,7 +504,7 @@ class TechDocsScraper(BaseScraper):
 
     def _fetch_page(self, url: str) -> Optional[str]:
         """
-        Fetch page HTML using requests or Selenium.
+        Fetch page HTML using requests or Playwright.
 
         Args:
             url: URL to fetch
@@ -359,28 +513,117 @@ class TechDocsScraper(BaseScraper):
             HTML content or None
         """
         try:
-            if self.use_selenium:
-                self.driver.get(url)
+            if self.use_selenium and self.page:
+                # Navigate to URL
+                self.page.goto(url, wait_until='domcontentloaded', timeout=60000)
 
-                # Wait for JavaScript to render content
-                # TechDocs is a SPA, so we need to wait for the main content to load
-                import time
-                from selenium.webdriver.common.by import By
-                from selenium.webdriver.support.ui import WebDriverWait
-                from selenium.webdriver.support import expected_conditions as EC
+                # Wait for initial page load
+                time.sleep(2)
 
+                # Handle cookie consent modal (if present)
                 try:
-                    # Wait up to 10 seconds for main content area to be present
-                    WebDriverWait(self.driver, 10).until(
-                        EC.presence_of_element_located((By.TAG_NAME, "article"))
-                    )
-                    # Additional wait for content to fully render
-                    time.sleep(2)
-                except:
-                    # If no article tag, just wait and hope for the best
-                    time.sleep(5)
+                    # Try multiple possible button selectors for "Accept All"
+                    accept_button_selectors = [
+                        "button:has-text('Accept all')",
+                        "button:has-text('Allow all')",
+                        "button:has-text('Accept')",
+                        "a:has-text('Accept all')",
+                        "#onetrust-accept-btn-handler",
+                        "button.accept-all",
+                        "button.accept",
+                    ]
 
-                return self.driver.page_source
+                    cookie_accepted = False
+                    for selector in accept_button_selectors:
+                        try:
+                            button = self.page.wait_for_selector(selector, timeout=3000, state='visible')
+                            if button:
+                                button.click()
+                                self.logger.info(f"Clicked cookie consent: {selector}")
+
+                                # Wait for cookie modal to disappear completely
+                                try:
+                                    # Wait for OneTrust banner to be hidden
+                                    self.page.wait_for_selector('#onetrust-banner-sdk', state='hidden', timeout=5000)
+                                    self.logger.info("Cookie modal disappeared")
+                                except:
+                                    # If banner selector doesn't exist, just wait
+                                    time.sleep(3)
+                                    self.logger.debug("Cookie modal wait timeout - proceeding")
+
+                                cookie_accepted = True
+                                break
+                        except:
+                            continue
+
+                    if not cookie_accepted:
+                        self.logger.debug("No cookie modal found (may have been accepted previously)")
+
+                except Exception as e:
+                    self.logger.debug(f"Cookie modal handling: {str(e)[:100]}")
+
+                # TechDocs is a SPA - content loads dynamically after initial page load
+                # Wait for network to be idle (content finished loading)
+                try:
+                    self.page.wait_for_load_state('networkidle', timeout=15000)
+                    self.logger.debug("Network idle - content loaded")
+                except:
+                    self.logger.debug("Network idle timeout - proceeding anyway")
+
+                # Additional wait for JavaScript to render
+                time.sleep(3)
+
+                # Scroll to trigger lazy-loaded content
+                try:
+                    self.page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
+                    time.sleep(1)
+                    self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    time.sleep(1)
+                    self.page.evaluate("window.scrollTo(0, 0)")
+                    time.sleep(1)
+                except:
+                    pass
+
+                # Wait for content indicators (multiple headings = document loaded)
+                try:
+                    self.page.wait_for_function(
+                        "document.querySelectorAll('h1, h2, h3').length > 1",
+                        timeout=10000
+                    )
+                    self.logger.debug("Dynamic content loaded (multiple headings found)")
+                except:
+                    self.logger.debug("Timeout waiting for headings - TechDocs may use shadow DOM")
+
+                # CRITICAL: TechDocs content is NOT in standard DOM, shadow DOM, or CDP HTML
+                # Content is only accessible via the Playwright Accessibility API
+                # Wait for page to fully render first
+                self.logger.info("Waiting 15 seconds for TechDocs SPA to fully render...")
+                time.sleep(15)
+
+                # TechDocs uses a special rendering mechanism where content is exposed via accessibility tree
+                # Extract content using Playwright's accessibility snapshot API
+                try:
+                    self.logger.info("Extracting content using Playwright Accessibility API...")
+
+                    # Get accessibility snapshot (contains all rendered text)
+                    snapshot = self.page.accessibility.snapshot()
+
+                    if snapshot:
+                        # Convert accessibility tree to HTML-like structure for compatibility
+                        html_content = self._accessibility_to_html(snapshot)
+
+                        # Always use accessibility content, even if small (some pages are legitimately short)
+                        if len(html_content) > 0:
+                            self.logger.info(f"Successfully extracted {len(html_content)} chars from accessibility tree")
+                            # Wrap in <div> (for proper text flow) and <main> tag (for _find_main_content())
+                            return f"<html><head><title>TechDocs</title></head><body><main><div>{html_content}</div></main></body></html>"
+                        else:
+                            self.logger.warning("Accessibility extraction returned empty content")
+                            return None
+
+                except Exception as e:
+                    self.logger.error(f"Accessibility extraction failed: {e}")
+                    return None
             else:
                 response = self.session.get(url, timeout=30)
                 response.raise_for_status()
@@ -389,6 +632,104 @@ class TechDocsScraper(BaseScraper):
         except Exception as e:
             self.logger.error(f"Failed to fetch {url}: {e}")
             return None
+
+    def _extract_toc_links(self, base_url: str) -> List[str]:
+        """
+        Extract all Table of Contents links from a guide page.
+
+        TechDocs guides have a sidebar with links to all sub-pages.
+        This extracts those links so we can scrape each page individually.
+
+        Args:
+            base_url: Guide base URL (e.g., /AMAG-Symmetry-Plugin-Guide-3.1)
+
+        Returns:
+            List of full URLs to sub-pages
+        """
+        if not self.use_selenium:
+            return []
+
+        try:
+            # Get accessibility snapshot
+            snapshot = self.page.accessibility.snapshot()
+            if not snapshot:
+                return []
+
+            # Find all links in the accessibility tree
+            links = []
+
+            def find_links(node):
+                if isinstance(node, dict):
+                    role = node.get('role', '')
+                    name = node.get('name', '')
+
+                    # Look for link nodes in TOC area
+                    if role == 'link' and name:
+                        # Skip navigation/footer links
+                        skip_patterns = [
+                            'Home', 'Search', 'Sign In', 'Downloads',
+                            'Privacy', 'Terms', 'Partners', 'About Us',
+                            'Contact', 'Facebook', 'Twitter', 'LinkedIn'
+                        ]
+
+                        if not any(pattern in name for pattern in skip_patterns):
+                            links.append(name)
+
+                    # Recurse into children
+                    for child in node.get('children', []):
+                        find_links(child)
+
+            find_links(snapshot)
+
+            # Convert link text to URLs (approximate based on URL patterns)
+            # TechDocs uses URL format: /r/en-US/Guide-Name/Topic-Name
+            # We need to find actual href values, not just text
+
+            # Better approach: extract from page HTML
+            all_links = self.page.query_selector_all('a[href*="/r/en-US/"]')
+            toc_urls = set()
+
+            for link in all_links:
+                try:
+                    href = link.get_attribute('href')
+                    if href and base_url.split('/')[-1] in href:
+                        # Link belongs to current guide
+                        full_url = urljoin(base_url, href)
+
+                        # Skip SSO/login URLs
+                        if '/authentication/' in full_url or '/sso/' in full_url:
+                            continue
+
+                        toc_urls.add(full_url)
+                except:
+                    continue
+
+            result = sorted(list(toc_urls))
+            self.logger.info(f"Found {len(result)} TOC links for {base_url}")
+            return result
+
+        except Exception as e:
+            self.logger.error(f"Failed to extract TOC links from {base_url}: {e}")
+            return []
+
+    def _should_expand_toc(self, url: str) -> bool:
+        """
+        Check if this URL is a base guide that should be expanded via TOC.
+
+        Args:
+            url: URL to check
+
+        Returns:
+            True if this is a base guide URL (not a sub-page)
+        """
+        # Base URLs don't have a topic path after the version
+        # Base: /r/en-US/Guide-Name-3.1
+        # Sub:  /r/en-US/Guide-Name-3.1/Topic-Name
+        parts = url.rstrip('/').split('/')
+
+        # If URL has more than 5 parts, it's likely a sub-page
+        # Format: https://techdocs.genetec.com/r/en-US/Guide-Name-3.1[/Topic]
+        return len(parts) == 5
 
     def extract_content(self, url: str) -> Optional[Dict[str, Any]]:
         """
@@ -435,6 +776,93 @@ class TechDocsScraper(BaseScraper):
         except Exception as e:
             self.logger.error(f"Error extracting {url}: {e}", exc_info=True)
             return None
+
+    def _accessibility_to_html(self, node: dict, depth: int = 0) -> str:
+        """
+        Convert Playwright accessibility tree to HTML-like format.
+
+        TechDocs documentation content is only accessible via accessibility API.
+        This method reconstructs HTML from the accessibility tree nodes.
+
+        Args:
+            node: Accessibility tree node
+            depth: Current depth (for filtering)
+
+        Returns:
+            HTML string reconstructed from accessibility tree
+        """
+        html_parts = []
+
+        role = node.get('role', '')
+        name = node.get('name', '')
+        children = node.get('children', [])
+
+        # Skip unwanted UI elements but still process their children
+        skip_roles = {
+            'button', 'searchbox', 'navigation', 'link', 'WebArea',
+            'banner', 'contentinfo', 'complementary', 'form'
+        }
+
+        # Skip UI text patterns (navigation, footers, UI elements)
+        skip_text_patterns = [
+            'Rate this content', 'Search in document', 'Copy link', 'Print this topic',
+            'Sign In', 'Downloads', 'Table of contents', 'Expand', 'Collapse',
+            'Language:', 'Home', 'Search site', 'Solutions', 'Resources',
+            'Was this topic helpful?', 'Not rated', 'Sign in to get the most out',
+            'Connect with us', '© 20', 'Genetec Inc.', 'All rights reserved',
+            'Privacy Policy', 'Terms of Use', 'Cookie', 'Partners', 'About Us'
+        ]
+
+        # Check if this node should be extracted
+        should_extract = False
+        if depth > 0:  # Skip root level
+            if role == 'heading':
+                should_extract = True
+            elif role == 'text' and name.strip():
+                # Extract text if it's not a UI label
+                if not any(pattern in name for pattern in skip_text_patterns):
+                    should_extract = True
+            elif role == 'paragraph' and name.strip():
+                should_extract = True
+            elif role == 'listitem' and name.strip():
+                should_extract = True
+
+        # Add this node's content if appropriate
+        if should_extract:
+            if role == 'heading':
+                level = node.get('level', 2)
+                html_parts.append(f"<h{level}>{name}</h{level}>")
+            elif role == 'text':
+                # Output text directly - it will be grouped into paragraphs naturally
+                if name.strip():
+                    html_parts.append(name + " ")
+            elif role == 'paragraph':
+                html_parts.append(f"<p>{name}</p>")
+            elif role == 'listitem':
+                html_parts.append(f"<li>{name}</li>")
+
+        # Recursively process children (ALWAYS, even if parent was skipped)
+        # This is crucial because documentation text nodes are often nested inside
+        # UI elements like 'link', 'button', 'WebArea' that we want to skip
+        for child in children:
+            child_html = self._accessibility_to_html(child, depth + 1)
+            if child_html:
+                html_parts.append(child_html)
+
+        result = ''.join(html_parts)
+
+        # Clean up at root level
+        if depth == 0 and result:
+            import re
+            # Remove excessive whitespace
+            result = re.sub(r'\n{3,}', '\n\n', result)
+            # Remove double spaces
+            result = re.sub(r' {2,}', ' ', result)
+            # Remove stray year at end (footer artifact)
+            result = re.sub(r'\s+20\d{2}\s*$', '', result)
+            result = result.strip()
+
+        return result
 
     def _extract_title(self, soup: BeautifulSoup, url: str) -> str:
         """
@@ -615,12 +1043,18 @@ class TechDocsScraper(BaseScraper):
         return product if product else "General"
 
     def __del__(self):
-        """Cleanup Selenium driver if used."""
-        if self.driver:
-            try:
-                self.driver.quit()
-            except:
-                pass
+        """Cleanup Playwright browser if used."""
+        try:
+            if hasattr(self, 'page') and self.page:
+                self.page.close()
+            if hasattr(self, 'context') and self.context:
+                self.context.close()
+            if hasattr(self, 'browser') and self.browser:
+                self.browser.close()
+            if hasattr(self, 'playwright') and self.playwright:
+                self.playwright.stop()
+        except:
+            pass
 
 
 def main():
@@ -684,25 +1118,33 @@ def main():
         use_selenium=args.selenium
     )
 
-    # Override discover_urls if filters specified
-    if args.limit or args.product:
-        original_discover = scraper.discover_urls
+    # Override discover_urls to include TOC expansion
+    original_discover = scraper.discover_urls
 
-        def filtered_discover():
-            urls = original_discover()
+    def discover_and_expand():
+        # Get base URLs (with version filtering already applied)
+        base_urls = original_discover()
 
-            # Filter by product
-            if args.product:
-                urls = [u for u in urls if f"/{args.product}/" in u.lower()]
-                print(f"Filtered to {len(urls)} URLs for product '{args.product}'")
+        # Filter by product if specified
+        if args.product:
+            base_urls = [u for u in base_urls if f"/{args.product}/" in u.lower()]
+            print(f"Filtered to {len(base_urls)} base guides for product '{args.product}'")
 
-            # Limit
-            if args.limit:
-                urls = urls[:args.limit]
+        # Limit base guides if specified
+        if args.limit:
+            base_urls = base_urls[:args.limit]
+            print(f"Limited to {args.limit} base guides")
 
-            return urls
+        # Expand to include all subpages
+        if args.selenium and scraper.use_selenium:
+            print("\nExpanding guides to include all sub-pages...")
+            expanded_urls = scraper.expand_to_subpages(base_urls)
+            return expanded_urls
+        else:
+            print("Warning: Selenium not enabled - cannot expand TOC links")
+            return base_urls
 
-        scraper.discover_urls = filtered_discover
+    scraper.discover_urls = discover_and_expand
 
     # Run scraper
     stats = scraper.run()

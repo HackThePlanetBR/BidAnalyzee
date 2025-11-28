@@ -194,7 +194,9 @@ class IngestionPipeline:
                 })
 
             # Move start position (with overlap)
-            start = end - self.chunk_overlap if end < len(text) else end
+            if end >= len(text):
+                break  # Exit loop when we've processed the entire text
+            start = max(end - self.chunk_overlap, start + 1)  # Ensure we always advance
 
         return chunks
 

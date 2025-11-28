@@ -7,6 +7,7 @@ Loads configuration from environment variables for web scrapers.
 import os
 from typing import Optional
 from pathlib import Path
+from dotenv import load_dotenv
 
 
 class ScrapersConfig:
@@ -14,6 +15,10 @@ class ScrapersConfig:
 
     def __init__(self):
         """Initialize configuration from environment variables."""
+        # Load .env file from project root
+        project_root = Path(__file__).parent.parent.parent
+        env_path = project_root / '.env'
+        load_dotenv(env_path)
 
         # Selenium Configuration
         self.use_selenium = self._get_bool('SCRAPERS_USE_SELENIUM', True)

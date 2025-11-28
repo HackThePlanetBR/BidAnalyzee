@@ -13,10 +13,13 @@ data/state/sessions/
 !data/state/.gitkeep
 
 # RAG specific
-data/vector_store/faiss/*.index
-data/vector_store/faiss/*.pkl
+data/knowledge_base/genetec/
+data/vector_store/
 *.index
 *.pkl
+
+# Temporary scraper files
+cdp_raw_html.html
 
 # Logs
 *.log
