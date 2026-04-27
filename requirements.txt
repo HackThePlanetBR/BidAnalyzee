@@ -12,7 +12,7 @@ python-dotenv>=1.0.0  # Environment variables management
 # Document Structurer Agent (Sprint 3-4)
 # ============================================
 # PDF processing
-PyPDF2>=3.0.0     # PDF text extraction
+PyPDF2>=3.0.1     # PDF text extraction
 
 # OCR Support (Sprint 4.5 - História 2.7)
 pytesseract>=0.3.10   # Tesseract OCR wrapper
