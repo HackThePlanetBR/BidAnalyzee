@@ -4,7 +4,7 @@
 # ============================================
 # Core Dependencies
 # ============================================
-pandas>=2.0.0       # CSV manipulation and data validation
+pandas>=3.0.2       # CSV manipulation and data validation
 pyyaml>=6.0        # YAML parsing (plans, checklists, results)
 python-dotenv>=1.0.0  # Environment variables management
 
