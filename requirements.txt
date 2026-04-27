@@ -27,7 +27,7 @@ Pillow>=10.0.0        # Image processing
 faiss-cpu>=1.7.4              # Local vector store (CPU-only)
 
 # Embeddings
-sentence-transformers>=2.2.2  # Local embeddings (free, multilingual)
+sentence-transformers>=5.4.1  # Local embeddings (free, multilingual)
 
 # OpenAI (Future - Cloud Migration)
 # openai>=1.10.0              # OpenAI API for embeddings (uncomment when migrating)
