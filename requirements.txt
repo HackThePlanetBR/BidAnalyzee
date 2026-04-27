@@ -54,7 +54,7 @@ openpyxl>=3.1.0   # Excel report generation with formatting
 # Testing
 # ============================================
 pytest>=7.0.0     # Test framework
-pytest-cov>=4.0.0 # Code coverage
+pytest-cov>=7.1.0 # Code coverage
 
 # ============================================
 # Code Quality (Optional)
